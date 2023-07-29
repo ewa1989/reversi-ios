@@ -337,6 +337,24 @@ extension ViewController {
             }
         }
     }
+
+    fileprivate func updateGame(_ game: ReversiGame) {
+        // turn
+        turn = game.turn
+
+        // players
+        for side in Disk.sides {
+            playerControls[side.index].selectedSegmentIndex = game.playerControls[side.index].rawValue
+        }
+
+        // board
+        for x in game.board.xRange {
+            for y in game.board.yRange {
+                boardView.setDisk(game.board.diskAt(x: x, y: y), atX: x, y: y, animated: false)
+            }
+        }
+    }
+
 }
 
 // MARK: Inputs
@@ -430,18 +448,37 @@ extension ViewController {
             throw FileIOError.read(path: path, cause: error)
         }
     }
-    
+
     /// ゲームの状態をファイルから読み込み、復元します。
     func loadGame() throws {
+        let game = try loadGameFromFile()
+
+        updateGame(game)
+        updateMessageViews()
+        updateCountLabels()
+    }
+    
+    enum FileIOError: Error {
+        case write(path: String, cause: Error?)
+        case read(path: String, cause: Error?)
+    }
+}
+
+protocol ReversiGameRepository {
+    func loadGameFromFile() throws -> ReversiGame
+}
+
+extension ViewController: ReversiGameRepository {
+    func loadGameFromFile() throws -> ReversiGame {
         let input = try String(contentsOfFile: path, encoding: .utf8)
         var game = ReversiGame()
 
         var lines: ArraySlice<Substring> = input.split(separator: "\n")[...]
-        
+
         guard var line = lines.popFirst() else {
             throw FileIOError.read(path: path, cause: nil)
         }
-        
+
         do { // turn
             guard
                 let diskSymbol = line.popFirst(),
@@ -468,7 +505,7 @@ extension ViewController {
             guard lines.count == game.board.height else {
                 throw FileIOError.read(path: path, cause: nil)
             }
-            
+
             var y = 0
             while let line = lines.popFirst() {
                 var x = 0
@@ -487,28 +524,7 @@ extension ViewController {
             }
         }
 
-        // turn
-        turn = game.turn
-
-        // players
-        for side in Disk.sides {
-            playerControls[side.index].selectedSegmentIndex = game.playerControls[side.index].rawValue
-        }
-
-        // board
-        for x in game.board.xRange {
-            for y in game.board.yRange {
-                boardView.setDisk(game.board.diskAt(x: x, y: y), atX: x, y: y, animated: false)
-            }
-        }
-
-        updateMessageViews()
-        updateCountLabels()
-    }
-    
-    enum FileIOError: Error {
-        case write(path: String, cause: Error?)
-        case read(path: String, cause: Error?)
+        return game
     }
 }
 
