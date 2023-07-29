@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct ReversiGame {
+struct ReversiGame: Hashable {
     /// どちらの色のプレイヤーのターンかを表します。ゲーム終了時は `nil` です。
     var turn: Disk?
 
@@ -20,9 +20,20 @@ struct ReversiGame {
         playerControls = Player.allCases.map { _ in .manual }
         board = Board()
     }
+
+    /// プレイヤーモードはどちらもManual、中央に白黒2つずつディスクが置かれ黒のから始まる新規ゲームを作成します。
+    static func newGame() -> ReversiGame {
+        var game = ReversiGame()
+        game.turn = .dark
+        game.board.setDisk(.light, atX: game.board.width / 2 - 1, y: game.board.height / 2 - 1)
+        game.board.setDisk(.dark, atX: game.board.width / 2, y: game.board.height / 2 - 1)
+        game.board.setDisk(.dark, atX: game.board.width / 2 - 1, y: game.board.height / 2)
+        game.board.setDisk(.light, atX: game.board.width / 2, y: game.board.height / 2)
+        return game
+    }
 }
 
-struct Board {
+struct Board: Hashable {
     /// 盤の幅（ `8` ）を表します。
     public let width: Int = 8
 
@@ -76,7 +87,7 @@ struct Board {
     }
 }
 
-struct Cell {
+struct Cell: Hashable {
     var disk: Disk?
 }
 
