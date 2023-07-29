@@ -434,6 +434,8 @@ extension ViewController {
     /// ゲームの状態をファイルから読み込み、復元します。
     func loadGame() throws {
         let input = try String(contentsOfFile: path, encoding: .utf8)
+        var game = ReversiGame()
+
         var lines: ArraySlice<Substring> = input.split(separator: "\n")[...]
         
         guard var line = lines.popFirst() else {
@@ -447,7 +449,8 @@ extension ViewController {
             else {
                 throw FileIOError.read(path: path, cause: nil)
             }
-            turn = disk
+            game.turn = disk
+            turn = game.turn
         }
 
         // players
@@ -459,11 +462,12 @@ extension ViewController {
             else {
                 throw FileIOError.read(path: path, cause: nil)
             }
-            playerControls[side.index].selectedSegmentIndex = player.rawValue
+            game.playerControls[side.index] = player
+            playerControls[side.index].selectedSegmentIndex = game.playerControls[side.index].rawValue
         }
 
         do { // board
-            guard lines.count == boardView.height else {
+            guard lines.count == game.board.height else {
                 throw FileIOError.read(path: path, cause: nil)
             }
             
@@ -472,15 +476,16 @@ extension ViewController {
                 var x = 0
                 for character in line {
                     let disk = Disk?(symbol: "\(character)").flatMap { $0 }
-                    boardView.setDisk(disk, atX: x, y: y, animated: false)
+                    game.board.setDisk(disk, atX: x, y: y)
+                    boardView.setDisk(game.board.diskAt(x: x, y: y), atX: x, y: y, animated: false)
                     x += 1
                 }
-                guard x == boardView.width else {
+                guard x == game.board.width else {
                     throw FileIOError.read(path: path, cause: nil)
                 }
                 y += 1
             }
-            guard y == boardView.height else {
+            guard y == game.board.height else {
                 throw FileIOError.read(path: path, cause: nil)
             }
         }
@@ -496,13 +501,6 @@ extension ViewController {
 }
 
 // MARK: Additional types
-
-extension ViewController {
-    enum Player: Int {
-        case manual = 0
-        case computer = 1
-    }
-}
 
 final class Canceller {
     private(set) var isCancelled: Bool = false
