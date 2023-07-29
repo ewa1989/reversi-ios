@@ -67,7 +67,13 @@ struct Board {
         guard xRange.contains(x) && yRange.contains(y) else { return nil }
         return cells[y * width + x]
     }
-    
+
+    /// `side` で指定された色のディスクが盤上に置かれている枚数を返します。
+    /// - Parameter side: 数えるディスクの色です。
+    /// - Returns: `side` で指定された色のディスクの、盤上の枚数です。
+    public func countDisks(of side: Disk) -> Int {
+        cells.filter { $0.disk == side }.count
+    }
 }
 
 struct Cell {

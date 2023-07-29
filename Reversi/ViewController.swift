@@ -447,7 +447,7 @@ extension ViewController {
 
     /// ゲームの状態をファイルから読み込み、復元します。
     func loadGame() throws {
-        let repository = ReversiGameRepositoryImpl()
+        let repository = ReversiGameRepositoryImpl(strategy: LocalFileSaveAndLoadStrategy())
         let game = try repository.loadGameFromFile()
 
         updateGame(game)
@@ -477,25 +477,4 @@ struct DiskPlacementError: Error {
     let disk: Disk
     let x: Int
     let y: Int
-}
-
-// MARK: File-private extensions
-
-extension Disk {
-    init(index: Int) {
-        for side in Disk.sides {
-            if index == side.index {
-                self = side
-                return
-            }
-        }
-        preconditionFailure("Illegal index: \(index)")
-    }
-    
-    var index: Int {
-        switch self {
-        case .dark: return 0
-        case .light: return 1
-        }
-    }
 }

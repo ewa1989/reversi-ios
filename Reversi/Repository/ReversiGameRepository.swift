@@ -21,10 +21,19 @@ var path: String {
     (NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true).first! as NSString).appendingPathComponent("Game")
 }
 
-struct ReversiGameRepositoryImpl: ReversiGameRepository {
+struct ReversiGameRepositoryImpl<Strategy: FileSaveAndLoadStrategy>: ReversiGameRepository {
+    private let strategy: Strategy
+
+    init(strategy: Strategy) {
+        self.strategy = strategy
+    }
+
     func loadGameFromFile() throws -> ReversiGame {
-        let strategy = self
         let input = try strategy.loadFile()
+        return try makeGameParsing(input)
+    }
+
+    private func makeGameParsing(_ input: String) throws -> ReversiGame {
         var game = ReversiGame()
 
         var lines: ArraySlice<Substring> = input.split(separator: "\n")[...]
@@ -86,7 +95,7 @@ protocol FileSaveAndLoadStrategy {
     func loadFile() throws -> String
 }
 
-extension ReversiGameRepositoryImpl: FileSaveAndLoadStrategy {
+struct LocalFileSaveAndLoadStrategy: FileSaveAndLoadStrategy {
     func loadFile() throws -> String {
         try String(contentsOfFile: path, encoding: .utf8)
     }
