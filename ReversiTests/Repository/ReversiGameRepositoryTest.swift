@@ -24,7 +24,7 @@ final class ReversiGameRepositoryTest: XCTestCase {
     func test_ゲームの初期状態_黒のターン_プレイヤーモードどちらもマニュアル_中央に白黒2つずつのゲームを復元できる() throws {
         fakeStrategy.fakeResult = "x00\n--------\n--------\n--------\n---ox---\n---xo---\n--------\n--------\n--------\n"
 
-        let game = try repository.loadGameFromFile()
+        let game = try repository.load()
 
         XCTAssertEqual(game.turn, .dark)
         XCTAssertEqual(game.playerControls, [.manual, .manual])
@@ -39,7 +39,7 @@ final class ReversiGameRepositoryTest: XCTestCase {
     func test_白のターンで始まるゲームを復元できる() throws {
         fakeStrategy.fakeResult = "o00\n--------\n--------\n--------\n---ox---\n---xo---\n--------\n--------\n--------\n"
 
-        let game = try repository.loadGameFromFile()
+        let game = try repository.load()
 
         XCTAssertEqual(game.turn, .light)
     }
@@ -47,7 +47,7 @@ final class ReversiGameRepositoryTest: XCTestCase {
     func test_引き分け_プレイヤーモードどちらもコンピューター_左半分が黒で右半分が白のゲームを復元できる() throws {
         fakeStrategy.fakeResult = "-11\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\n"
 
-        let game = try repository.loadGameFromFile()
+        let game = try repository.load()
 
         XCTAssertEqual(game.turn, nil)
         XCTAssertEqual(game.playerControls, [.computer, .computer])
@@ -67,7 +67,7 @@ final class ReversiGameRepositoryTest: XCTestCase {
 
 private class FakeFileSaveAndLoadStrategy: FileSaveAndLoadStrategy {
     var fakeResult: String = ""
-    func loadFile() throws -> String {
+    func load() throws -> String {
         fakeResult
     }
 }

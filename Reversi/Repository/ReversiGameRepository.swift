@@ -9,7 +9,7 @@
 import Foundation
 
 protocol ReversiGameRepository {
-    func loadGameFromFile() throws -> ReversiGame
+    func load() throws -> ReversiGame
 }
 
 enum FileIOError: Error {
@@ -28,8 +28,8 @@ struct ReversiGameRepositoryImpl<Strategy: FileSaveAndLoadStrategy>: ReversiGame
         self.strategy = strategy
     }
 
-    func loadGameFromFile() throws -> ReversiGame {
-        let input = try strategy.loadFile()
+    func load() throws -> ReversiGame {
+        let input = try strategy.load()
         return try makeGameParsing(input)
     }
 
@@ -92,11 +92,11 @@ struct ReversiGameRepositoryImpl<Strategy: FileSaveAndLoadStrategy>: ReversiGame
 }
 
 protocol FileSaveAndLoadStrategy {
-    func loadFile() throws -> String
+    func load() throws -> String
 }
 
 struct LocalFileSaveAndLoadStrategy: FileSaveAndLoadStrategy {
-    func loadFile() throws -> String {
+    func load() throws -> String {
         try String(contentsOfFile: path, encoding: .utf8)
     }
 }

@@ -448,7 +448,7 @@ extension ViewController {
     /// ゲームの状態をファイルから読み込み、復元します。
     func loadGame() throws {
         let repository = ReversiGameRepositoryImpl(strategy: LocalFileSaveAndLoadStrategy())
-        let game = try repository.loadGameFromFile()
+        let game = try repository.load()
 
         updateGame(game)
         updateMessageViews()
