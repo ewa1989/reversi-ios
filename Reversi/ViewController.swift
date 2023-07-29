@@ -450,7 +450,6 @@ extension ViewController {
                 throw FileIOError.read(path: path, cause: nil)
             }
             game.turn = disk
-            turn = game.turn
         }
 
         // players
@@ -463,7 +462,6 @@ extension ViewController {
                 throw FileIOError.read(path: path, cause: nil)
             }
             game.playerControls[side.index] = player
-            playerControls[side.index].selectedSegmentIndex = game.playerControls[side.index].rawValue
         }
 
         do { // board
@@ -477,7 +475,6 @@ extension ViewController {
                 for character in line {
                     let disk = Disk?(symbol: "\(character)").flatMap { $0 }
                     game.board.setDisk(disk, atX: x, y: y)
-                    boardView.setDisk(game.board.diskAt(x: x, y: y), atX: x, y: y, animated: false)
                     x += 1
                 }
                 guard x == game.board.width else {
@@ -487,6 +484,21 @@ extension ViewController {
             }
             guard y == game.board.height else {
                 throw FileIOError.read(path: path, cause: nil)
+            }
+        }
+
+        // turn
+        turn = game.turn
+
+        // players
+        for side in Disk.sides {
+            playerControls[side.index].selectedSegmentIndex = game.playerControls[side.index].rawValue
+        }
+
+        // board
+        for x in game.board.xRange {
+            for y in game.board.yRange {
+                boardView.setDisk(game.board.diskAt(x: x, y: y), atX: x, y: y, animated: false)
             }
         }
 
