@@ -23,7 +23,8 @@ var path: String {
 
 struct ReversiGameRepositoryImpl: ReversiGameRepository {
     func loadGameFromFile() throws -> ReversiGame {
-        let input = try String(contentsOfFile: path, encoding: .utf8)
+        let strategy = self
+        let input = try strategy.loadFile()
         var game = ReversiGame()
 
         var lines: ArraySlice<Substring> = input.split(separator: "\n")[...]
@@ -78,5 +79,15 @@ struct ReversiGameRepositoryImpl: ReversiGameRepository {
         }
 
         return game
+    }
+}
+
+protocol FileSaveAndLoadStrategy {
+    func loadFile() throws -> String
+}
+
+extension ReversiGameRepositoryImpl: FileSaveAndLoadStrategy {
+    func loadFile() throws -> String {
+        try String(contentsOfFile: path, encoding: .utf8)
     }
 }
