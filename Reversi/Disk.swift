@@ -24,3 +24,29 @@ extension Disk {
         self = flipped
     }
 }
+
+extension Optional where Wrapped == Disk {
+    init?<S: StringProtocol>(symbol: S) {
+        switch symbol {
+        case "x":
+            self = .some(.dark)
+        case "o":
+            self = .some(.light)
+        case "-":
+            self = .none
+        default:
+            return nil
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .some(.dark):
+            return "x"
+        case .some(.light):
+            return "o"
+        case .none:
+            return "-"
+        }
+    }
+}

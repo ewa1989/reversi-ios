@@ -422,10 +422,6 @@ extension ViewController: BoardViewDelegate {
 // MARK: Save and Load
 
 extension ViewController {
-    private var path: String {
-        (NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true).first! as NSString).appendingPathComponent("Game")
-    }
-    
     /// ゲームの状態をファイルに書き出し、保存します。
     func saveGame() throws {
         var output: String = ""
@@ -451,7 +447,8 @@ extension ViewController {
 
     /// ゲームの状態をファイルから読み込み、復元します。
     func loadGame() throws {
-        let game = try loadGameFromFile()
+        let repository = self
+        let game = try repository.loadGameFromFile()
 
         updateGame(game)
         updateMessageViews()
@@ -461,70 +458,6 @@ extension ViewController {
     enum FileIOError: Error {
         case write(path: String, cause: Error?)
         case read(path: String, cause: Error?)
-    }
-}
-
-protocol ReversiGameRepository {
-    func loadGameFromFile() throws -> ReversiGame
-}
-
-extension ViewController: ReversiGameRepository {
-    func loadGameFromFile() throws -> ReversiGame {
-        let input = try String(contentsOfFile: path, encoding: .utf8)
-        var game = ReversiGame()
-
-        var lines: ArraySlice<Substring> = input.split(separator: "\n")[...]
-
-        guard var line = lines.popFirst() else {
-            throw FileIOError.read(path: path, cause: nil)
-        }
-
-        do { // turn
-            guard
-                let diskSymbol = line.popFirst(),
-                let disk = Optional<Disk>(symbol: diskSymbol.description)
-            else {
-                throw FileIOError.read(path: path, cause: nil)
-            }
-            game.turn = disk
-        }
-
-        // players
-        for side in Disk.sides {
-            guard
-                let playerSymbol = line.popFirst(),
-                let playerNumber = Int(playerSymbol.description),
-                let player = Player(rawValue: playerNumber)
-            else {
-                throw FileIOError.read(path: path, cause: nil)
-            }
-            game.playerControls[side.index] = player
-        }
-
-        do { // board
-            guard lines.count == game.board.height else {
-                throw FileIOError.read(path: path, cause: nil)
-            }
-
-            var y = 0
-            while let line = lines.popFirst() {
-                var x = 0
-                for character in line {
-                    let disk = Disk?(symbol: "\(character)").flatMap { $0 }
-                    game.board.setDisk(disk, atX: x, y: y)
-                    x += 1
-                }
-                guard x == game.board.width else {
-                    throw FileIOError.read(path: path, cause: nil)
-                }
-                y += 1
-            }
-            guard y == game.board.height else {
-                throw FileIOError.read(path: path, cause: nil)
-            }
-        }
-
-        return game
     }
 }
 
@@ -568,32 +501,6 @@ extension Disk {
         switch self {
         case .dark: return 0
         case .light: return 1
-        }
-    }
-}
-
-extension Optional where Wrapped == Disk {
-    fileprivate init?<S: StringProtocol>(symbol: S) {
-        switch symbol {
-        case "x":
-            self = .some(.dark)
-        case "o":
-            self = .some(.light)
-        case "-":
-            self = .none
-        default:
-            return nil
-        }
-    }
-    
-    fileprivate var symbol: String {
-        switch self {
-        case .some(.dark):
-            return "x"
-        case .some(.light):
-            return "o"
-        case .none:
-            return "-"
         }
     }
 }
