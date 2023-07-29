@@ -447,17 +447,12 @@ extension ViewController {
 
     /// ゲームの状態をファイルから読み込み、復元します。
     func loadGame() throws {
-        let repository = self
+        let repository = ReversiGameRepositoryImpl()
         let game = try repository.loadGameFromFile()
 
         updateGame(game)
         updateMessageViews()
         updateCountLabels()
-    }
-    
-    enum FileIOError: Error {
-        case write(path: String, cause: Error?)
-        case read(path: String, cause: Error?)
     }
 }
 

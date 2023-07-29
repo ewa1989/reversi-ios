@@ -12,11 +12,16 @@ protocol ReversiGameRepository {
     func loadGameFromFile() throws -> ReversiGame
 }
 
+enum FileIOError: Error {
+    case write(path: String, cause: Error?)
+    case read(path: String, cause: Error?)
+}
+
 var path: String {
     (NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true).first! as NSString).appendingPathComponent("Game")
 }
 
-extension ViewController: ReversiGameRepository {
+struct ReversiGameRepositoryImpl: ReversiGameRepository {
     func loadGameFromFile() throws -> ReversiGame {
         let input = try String(contentsOfFile: path, encoding: .utf8)
         var game = ReversiGame()
