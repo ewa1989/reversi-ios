@@ -10,7 +10,7 @@ import Foundation
 
 protocol ReversiGameRepository {
     func load() throws -> ReversiGame
-    func saveGameToFile(_ game: ReversiGame) throws
+    func save(_ game: ReversiGame) throws
 }
 
 private enum FileIOError: Error {
@@ -91,7 +91,7 @@ struct ReversiGameRepositoryImpl<Strategy: FileSaveAndLoadStrategy>: ReversiGame
         return game
     }
 
-    func saveGameToFile(_ game: ReversiGame) throws {
+    func save(_ game: ReversiGame) throws {
         var output: String = ""
 
         output += game.turn.symbol
@@ -109,7 +109,7 @@ struct ReversiGameRepositoryImpl<Strategy: FileSaveAndLoadStrategy>: ReversiGame
         }
 
         do {
-            try output.write(toFile: path, atomically: true, encoding: .utf8)
+            try strategy.save(output)
         } catch let error {
             throw FileIOError.read(path: path, cause: error)
         }
@@ -118,10 +118,15 @@ struct ReversiGameRepositoryImpl<Strategy: FileSaveAndLoadStrategy>: ReversiGame
 
 protocol FileSaveAndLoadStrategy {
     func load() throws -> String
+    func save(_ output: String) throws
 }
 
 struct LocalFileSaveAndLoadStrategy: FileSaveAndLoadStrategy {
     func load() throws -> String {
         try String(contentsOfFile: path, encoding: .utf8)
+    }
+
+    func save(_ output: String) throws {
+        try output.write(toFile: path, atomically: true, encoding: .utf8)
     }
 }

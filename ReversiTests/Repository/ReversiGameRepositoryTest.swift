@@ -22,7 +22,7 @@ final class ReversiGameRepositoryTest: XCTestCase {
     }
 
     func test_ゲームの初期状態_黒のターン_プレイヤーモードどちらもマニュアル_中央に白黒2つずつのゲームを復元できる() throws {
-        fakeStrategy.fakeResult = "x00\n--------\n--------\n--------\n---ox---\n---xo---\n--------\n--------\n--------\n"
+        fakeStrategy.fakeInput = "x00\n--------\n--------\n--------\n---ox---\n---xo---\n--------\n--------\n--------\n"
 
         let actual = try repository.load()
 
@@ -30,7 +30,7 @@ final class ReversiGameRepositoryTest: XCTestCase {
     }
 
     func test_白のターンで始まるゲームを復元できる() throws {
-        fakeStrategy.fakeResult = "o00\n--------\n--------\n--------\n---ox---\n---xo---\n--------\n--------\n--------\n"
+        fakeStrategy.fakeInput = "o00\n--------\n--------\n--------\n---ox---\n---xo---\n--------\n--------\n--------\n"
 
         var expected = ReversiGame.newGame()
         expected.turn?.flip()
@@ -41,7 +41,7 @@ final class ReversiGameRepositoryTest: XCTestCase {
     }
 
     func test_引き分け_プレイヤーモードどちらもコンピューター_左半分が黒で右半分が白のゲームを復元できる() throws {
-        fakeStrategy.fakeResult = "-11\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\n"
+        fakeStrategy.fakeInput = "-11\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\n"
 
         var expected = ReversiGame.newGame()
         expected.turn = nil
@@ -62,8 +62,13 @@ final class ReversiGameRepositoryTest: XCTestCase {
 }
 
 private class FakeFileSaveAndLoadStrategy: FileSaveAndLoadStrategy {
-    var fakeResult: String = ""
+    var fakeInput: String = ""
     func load() throws -> String {
-        fakeResult
+        fakeInput
+    }
+
+    var fakeOutput: String?
+    func save(_ output: String) throws {
+        fakeOutput = output
     }
 }

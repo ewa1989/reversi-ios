@@ -445,7 +445,7 @@ extension ViewController {
     func saveGame() throws {
         let game = convertViewToGame()
 
-        try repository.saveGameToFile(game)
+        try repository.save(game)
     }
 
     /// ゲームの状態をファイルから読み込み、復元します。
