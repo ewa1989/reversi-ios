@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A3B35662A765BFB00527AB1 /* TestHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A3B35652A765BFB00527AB1 /* TestHelper.swift */; };
 		0A700AF92A756C4F00CC14B6 /* ReversiGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A700AF82A756C4F00CC14B6 /* ReversiGame.swift */; };
 		0A700AFA2A756C5200CC14B6 /* ReversiGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A700AF82A756C4F00CC14B6 /* ReversiGame.swift */; };
 		0A700AFF2A7576EA00CC14B6 /* ReversiGameTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A700AFE2A7576EA00CC14B6 /* ReversiGameTest.swift */; };
@@ -37,6 +38,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0A3B35652A765BFB00527AB1 /* TestHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHelper.swift; sourceTree = "<group>"; };
 		0A700AF82A756C4F00CC14B6 /* ReversiGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReversiGame.swift; sourceTree = "<group>"; };
 		0A700AFE2A7576EA00CC14B6 /* ReversiGameTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReversiGameTest.swift; sourceTree = "<group>"; };
 		0A700B022A757ADC00CC14B6 /* ReversiGameRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReversiGameRepository.swift; sourceTree = "<group>"; };
@@ -75,6 +77,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0A3B35642A765BEB00527AB1 /* TestHelper */ = {
+			isa = PBXGroup;
+			children = (
+				0A3B35652A765BFB00527AB1 /* TestHelper.swift */,
+			);
+			path = TestHelper;
+			sourceTree = "<group>";
+		};
 		0A700AF72A756C4400CC14B6 /* Model */ = {
 			isa = PBXGroup;
 			children = (
@@ -164,6 +174,7 @@
 		D642BDC923A9FE4700396732 /* ReversiTests */ = {
 			isa = PBXGroup;
 			children = (
+				0A3B35642A765BEB00527AB1 /* TestHelper */,
 				0A700B042A757ECD00CC14B6 /* Repository */,
 				0A700AFD2A7576DB00CC14B6 /* Model */,
 				D642BDCC23A9FE4700396732 /* Info.plist */,
@@ -291,6 +302,7 @@
 				0A700B072A757F7A00CC14B6 /* ReversiGameRepository.swift in Sources */,
 				0A700B062A757F7500CC14B6 /* ReversiGameRepositoryTest.swift in Sources */,
 				0A700B002A75771C00CC14B6 /* Disk.swift in Sources */,
+				0A3B35662A765BFB00527AB1 /* TestHelper.swift in Sources */,
 				0A700AFA2A756C5200CC14B6 /* ReversiGame.swift in Sources */,
 				0A700AFF2A7576EA00CC14B6 /* ReversiGameTest.swift in Sources */,
 			);

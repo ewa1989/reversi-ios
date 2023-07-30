@@ -85,6 +85,19 @@ struct Board: Hashable {
     public func countDisks(of side: Disk) -> Int {
         cells.filter { $0.disk == side }.count
     }
+
+    /// 盤上に置かれたディスクの枚数が多い方の色を返します。
+    /// 引き分けの場合は `nil` が返されます。
+    /// - Returns: 盤上に置かれたディスクの枚数が多い方の色です。引き分けの場合は `nil` を返します。
+    public func sideWithMoreDisks() -> Disk? {
+        let darkCount = countDisks(of: .dark)
+        let lightCount = countDisks(of: .light)
+        if darkCount == lightCount {
+            return nil
+        } else {
+            return darkCount > lightCount ? .dark : .light
+        }
+    }
 }
 
 struct Cell: Hashable {
