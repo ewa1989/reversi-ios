@@ -239,8 +239,8 @@ extension ViewController {
 
         boardView.reset()
 
-        for playerControl in playerControls {
-            playerControl.selectedSegmentIndex = Player.manual.rawValue
+        for side in Disk.sides {
+            playerControls[side.index].selectedSegmentIndex = game.playerControls[side.index].rawValue
         }
 
         updateMessageViews()
