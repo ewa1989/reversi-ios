@@ -142,4 +142,19 @@ final class ReversiGameTest: XCTestCase {
 
         XCTAssertEqual(actual, expected)
     }
+
+    // MARK: flippedDiskCoordinatesByPlacingDiskの返す順番
+
+    func test_一方向で複数枚裏返る場合に_置いたディスクに近いセルから順になったコレクションが返ってくる() throws {
+        let expected = [(2, 0), (1, 0)].toCoordinates()
+
+        var game = ReversiGame.newGame()
+        game.board.setDisk(.light, atX: 0, y: 0)
+        game.board.setDisk(.dark, atX: 1, y: 0)
+        game.board.setDisk(.dark, atX: 2, y: 0)
+
+        let actual = game.board.flippedDiskCoordinatesByPlacingDisk(.light, atX: 3, y: 0)
+
+        XCTAssertEqual(actual, expected)
+    }
 }
