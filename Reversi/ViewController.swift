@@ -422,8 +422,7 @@ extension ViewController: BoardViewDelegate {
 // MARK: Save and Load
 
 extension ViewController {
-    /// ゲームの状態をファイルに書き出し、保存します。
-    func saveGame() throws {
+    func convertViewToGame() -> ReversiGame {
         var game = ReversiGame()
 
         game.turn = turn
@@ -437,6 +436,33 @@ extension ViewController {
             }
         }
 
+        return game
+    }
+
+    /// ゲームの状態をファイルに書き出し、保存します。
+    func saveGame() throws {
+        let game = convertViewToGame()
+
+        try saveGameToFile(game)
+    }
+
+    /// ゲームの状態をファイルから読み込み、復元します。
+    func loadGame() throws {
+        let repository = ReversiGameRepositoryImpl(strategy: LocalFileSaveAndLoadStrategy())
+        let game = try repository.load()
+
+        updateGame(game)
+        updateMessageViews()
+        updateCountLabels()
+    }
+}
+
+protocol ReversiGameRepositoryTemp {
+    func saveGameToFile(_ game: ReversiGame) throws
+}
+
+extension ViewController: ReversiGameRepositoryTemp {
+    func saveGameToFile(_ game: ReversiGame) throws {
         var output: String = ""
 
         output += game.turn.symbol
@@ -458,16 +484,6 @@ extension ViewController {
         } catch let error {
             throw FileIOError.read(path: path, cause: error)
         }
-    }
-
-    /// ゲームの状態をファイルから読み込み、復元します。
-    func loadGame() throws {
-        let repository = ReversiGameRepositoryImpl(strategy: LocalFileSaveAndLoadStrategy())
-        let game = try repository.load()
-
-        updateGame(game)
-        updateMessageViews()
-        updateCountLabels()
     }
 }
 
