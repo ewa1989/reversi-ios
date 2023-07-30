@@ -21,6 +21,8 @@ final class ReversiGameRepositoryTest: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
+    // MARK: load
+
     func test_ゲームの初期状態_黒のターン_プレイヤーモードどちらもマニュアル_中央に白黒2つずつのゲームを復元できる() throws {
         fakeStrategy.fakeInput = "x00\n--------\n--------\n--------\n---ox---\n---xo---\n--------\n--------\n--------\n"
 
@@ -32,8 +34,7 @@ final class ReversiGameRepositoryTest: XCTestCase {
     func test_白のターンで始まるゲームを復元できる() throws {
         fakeStrategy.fakeInput = "o00\n--------\n--------\n--------\n---ox---\n---xo---\n--------\n--------\n--------\n"
 
-        var expected = ReversiGame.newGame()
-        expected.turn?.flip()
+        var expected = newGameStartFromLight()
 
         let actual = try repository.load()
 
@@ -43,21 +44,63 @@ final class ReversiGameRepositoryTest: XCTestCase {
     func test_引き分け_プレイヤーモードどちらもコンピューター_左半分が黒で右半分が白のゲームを復元できる() throws {
         fakeStrategy.fakeInput = "-11\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\n"
 
-        var expected = ReversiGame.newGame()
-        expected.turn = nil
-        expected.playerControls = [.computer, .computer]
-        for y in expected.board.yRange {
-            for x in 0..<expected.board.height / 2 {
-                expected.board.setDisk(.dark, atX: x, y: y)
-            }
-            for x in expected.board.height / 2..<expected.board.height {
-                expected.board.setDisk(.light, atX: x, y: y)
-            }
-        }
+        let expected = tiedComputerMatchWithLeftSideDarkAndRightSideLightBoard()
 
         let actual = try repository.load()
 
         XCTAssertEqual(actual, expected)
+    }
+
+    // MARK: save
+
+    func test_ゲームの初期状態_黒のターン_プレイヤーモードどちらもマニュアル_中央に白黒2つずつのゲームを保存できる() throws {
+        let expected = "x00\n--------\n--------\n--------\n---ox---\n---xo---\n--------\n--------\n--------\n"
+
+        try repository.save(ReversiGame.newGame())
+        let actual = fakeStrategy.fakeOutput
+
+        XCTAssertEqual(actual, expected)
+    }
+
+    func test_白のターンで始まるゲームを保存できる() throws {
+        let expected = "o00\n--------\n--------\n--------\n---ox---\n---xo---\n--------\n--------\n--------\n"
+
+        try repository.save(newGameStartFromLight())
+        let actual = fakeStrategy.fakeOutput
+
+        XCTAssertEqual(actual, expected)
+    }
+
+    func test_引き分け_プレイヤーモードどちらもコンピューター_左半分が黒で右半分が白のゲームを保存できる() throws {
+        let expected = "-11\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\n"
+
+        try repository.save(tiedComputerMatchWithLeftSideDarkAndRightSideLightBoard())
+        let actual = fakeStrategy.fakeOutput
+
+        XCTAssertEqual(actual, expected)
+    }
+
+    // MARK: Helper
+
+    private func newGameStartFromLight() -> ReversiGame {
+        var game = ReversiGame.newGame()
+        game.turn?.flip()
+        return game
+    }
+
+    private func tiedComputerMatchWithLeftSideDarkAndRightSideLightBoard() -> ReversiGame {
+        var game = ReversiGame.newGame()
+        game.turn = nil
+        game.playerControls = [.computer, .computer]
+        for y in game.board.yRange {
+            for x in 0..<game.board.height / 2 {
+                game.board.setDisk(.dark, atX: x, y: y)
+            }
+            for x in game.board.height / 2..<game.board.height {
+                game.board.setDisk(.light, atX: x, y: y)
+            }
+        }
+        return game
     }
 }
 
