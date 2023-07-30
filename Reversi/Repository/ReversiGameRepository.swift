@@ -10,6 +10,7 @@ import Foundation
 
 protocol ReversiGameRepository {
     func load() throws -> ReversiGame
+    func saveGameToFile(_ game: ReversiGame) throws
 }
 
 private enum FileIOError: Error {
@@ -89,13 +90,7 @@ struct ReversiGameRepositoryImpl<Strategy: FileSaveAndLoadStrategy>: ReversiGame
 
         return game
     }
-}
 
-protocol ReversiGameRepositoryTemp {
-    func saveGameToFile(_ game: ReversiGame) throws
-}
-
-extension ReversiGameRepositoryImpl: ReversiGameRepositoryTemp {
     func saveGameToFile(_ game: ReversiGame) throws {
         var output: String = ""
 

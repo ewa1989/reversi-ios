@@ -25,6 +25,8 @@ class ViewController: UIViewController {
     private var isAnimating: Bool { animationCanceller != nil }
     
     private var playerCancellers: [Disk: Canceller] = [:]
+
+    private let repository = ReversiGameRepositoryImpl(strategy: LocalFileSaveAndLoadStrategy())
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -443,13 +445,11 @@ extension ViewController {
     func saveGame() throws {
         let game = convertViewToGame()
 
-        let repository = ReversiGameRepositoryImpl(strategy: LocalFileSaveAndLoadStrategy())
         try repository.saveGameToFile(game)
     }
 
     /// ゲームの状態をファイルから読み込み、復元します。
     func loadGame() throws {
-        let repository = ReversiGameRepositoryImpl(strategy: LocalFileSaveAndLoadStrategy())
         let game = try repository.load()
 
         updateGame(game)
