@@ -439,28 +439,8 @@ extension ViewController: BoardViewDelegate {
 // MARK: Save and Load
 
 extension ViewController {
-    func convertViewToGame() -> ReversiGame {
-        var game = ReversiGame()
-
-        game.turn = self.game.turn
-        for side in Disk.sides {
-            game.playerControls[side.index] = Player(rawValue: playerControls[side.index].selectedSegmentIndex)!
-        }
-
-        for y in game.board.yRange {
-            for x in game.board.xRange {
-                game.board.setDisk(self.game.board.diskAt(x: x, y: y), atX: x, y: y)
-            }
-        }
-
-        return game
-    }
-
     /// ゲームの状態をファイルに書き出し、保存します。
     func saveGame() throws {
-        let game = convertViewToGame()
-        assert(game == self.game, "Viewの状態とプロパティgameの状態一致していない")
-
         try repository.save(game)
     }
 
