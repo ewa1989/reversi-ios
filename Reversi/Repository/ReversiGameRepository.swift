@@ -31,10 +31,36 @@ struct ReversiGameRepositoryImpl<Strategy: FileSaveAndLoadStrategy>: ReversiGame
 
     func load() throws -> ReversiGame {
         let input = try strategy.load()
-        return try makeGameParsing(input)
+        return try FileParser.makeGameParsing(input)
     }
 
-    private func makeGameParsing(_ input: String) throws -> ReversiGame {
+    func save(_ game: ReversiGame) throws {
+        var output: String = ""
+
+        output += game.turn.symbol
+
+        for side in Disk.sides {
+            output += game.playerControls[side.index].rawValue.description
+        }
+        output += "\n"
+
+        for y in game.board.yRange {
+            for x in game.board.xRange {
+                output += game.board.diskAt(x: x, y: y).symbol
+            }
+            output += "\n"
+        }
+
+        do {
+            try strategy.save(output)
+        } catch let error {
+            throw FileIOError.read(path: path, cause: error)
+        }
+    }
+}
+
+struct FileParser {
+    static func makeGameParsing(_ input: String) throws -> ReversiGame {
         var game = ReversiGame()
 
         var lines: ArraySlice<Substring> = input.split(separator: "\n")[...]
@@ -89,30 +115,6 @@ struct ReversiGameRepositoryImpl<Strategy: FileSaveAndLoadStrategy>: ReversiGame
         }
 
         return game
-    }
-
-    func save(_ game: ReversiGame) throws {
-        var output: String = ""
-
-        output += game.turn.symbol
-
-        for side in Disk.sides {
-            output += game.playerControls[side.index].rawValue.description
-        }
-        output += "\n"
-
-        for y in game.board.yRange {
-            for x in game.board.xRange {
-                output += game.board.diskAt(x: x, y: y).symbol
-            }
-            output += "\n"
-        }
-
-        do {
-            try strategy.save(output)
-        } catch let error {
-            throw FileIOError.read(path: path, cause: error)
-        }
     }
 }
 
