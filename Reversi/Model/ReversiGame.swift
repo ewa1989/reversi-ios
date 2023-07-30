@@ -98,6 +98,57 @@ struct Board: Hashable {
             return darkCount > lightCount ? .dark : .light
         }
     }
+
+    /// 指定された位置にディスクを置いた時に、裏返るディスクの位置のコレクションを返します。
+    /// コレクションの順番はディスクを裏返す処理を行う順番
+    /// 「左上、上、右上、右、右下、下、左下、左」
+    /// と一致しています。
+    /// - Parameters:
+    ///   - disk: 置くディスクの色です。
+    ///   - x: 置くセルの列です。
+    ///   - y: 置くセルの行です。
+    /// - Returns: 裏返るディスクの位置のコレクションです。置くディスクの位置は含みません。裏返るディスクがない場合は空のコレクションを返します。
+    public func flippedDiskCoordinatesByPlacingDisk(_ disk: Disk, atX x: Int, y: Int) -> [(Int, Int)] {
+        let directions = [
+            (x: -1, y: -1),
+            (x:  0, y: -1),
+            (x:  1, y: -1),
+            (x:  1, y:  0),
+            (x:  1, y:  1),
+            (x:  0, y:  1),
+            (x: -1, y:  0),
+            (x: -1, y:  1),
+        ]
+
+        guard diskAt(x: x, y: y) == nil else {
+            return []
+        }
+
+        var diskCoordinates: [(Int, Int)] = []
+
+        for direction in directions {
+            var x = x
+            var y = y
+
+            var diskCoordinatesInLine: [(Int, Int)] = []
+        flipping: while true {
+            x += direction.x
+            y += direction.y
+
+            switch (disk, diskAt(x: x, y: y)) { // Uses tuples to make patterns exhaustive
+            case (.dark, .some(.dark)), (.light, .some(.light)):
+                diskCoordinates.append(contentsOf: diskCoordinatesInLine)
+                break flipping
+            case (.dark, .some(.light)), (.light, .some(.dark)):
+                diskCoordinatesInLine.append((x, y))
+            case (_, .none):
+                break flipping
+            }
+        }
+        }
+
+        return diskCoordinates
+    }
 }
 
 struct Cell: Hashable {
