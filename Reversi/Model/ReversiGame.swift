@@ -107,7 +107,7 @@ struct Board: Hashable {
     ///   - disk: 置くディスクの色です。
     ///   - x: 置くセルの列です。
     ///   - y: 置くセルの行です。
-    /// - Returns: 裏返るディスクの位置のコレクションです。置くディスクの位置は含みません。裏返るディスクがない場合は空のコレクションを返します。
+    /// - Returns: 裏返るディスクの位置のコレクションです。置くディスクの位置は含みません。裏返るディスクがない場合は空のコレクションを返します。すでにディスクが存在するセルを指定した場合は空のコレクションを返します。
     public func flippedDiskCoordinatesByPlacingDisk(_ disk: Disk, atX x: Int, y: Int) -> [Coordinate] {
         let directions = [
             (x: -1, y: -1),
@@ -148,6 +148,15 @@ struct Board: Hashable {
         }
 
         return diskCoordinates.toCoordinates()
+    }
+
+    /// `x`, `y` で指定されたセルに、 `disk` が置けるかを調べます。
+    /// ディスクを置くためには、少なくとも 1 枚のディスクをひっくり返せる必要があります。
+    /// - Parameter x: セルの列です。
+    /// - Parameter y: セルの行です。
+    /// - Returns: 指定されたセルに `disk` を置ける場合は `true` を、置けない場合は `false` を返します。
+    func canPlaceDisk(_ disk: Disk, atX x: Int, y: Int) -> Bool {
+        !flippedDiskCoordinatesByPlacingDisk(disk, atX: x, y: y).toTuples().isEmpty
     }
 }
 
