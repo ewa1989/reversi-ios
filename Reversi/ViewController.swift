@@ -443,7 +443,8 @@ extension ViewController {
     func saveGame() throws {
         let game = convertViewToGame()
 
-        try saveGameToFile(game)
+        let repository = ReversiGameRepositoryImpl(strategy: LocalFileSaveAndLoadStrategy())
+        try repository.saveGameToFile(game)
     }
 
     /// ゲームの状態をファイルから読み込み、復元します。
@@ -454,36 +455,6 @@ extension ViewController {
         updateGame(game)
         updateMessageViews()
         updateCountLabels()
-    }
-}
-
-protocol ReversiGameRepositoryTemp {
-    func saveGameToFile(_ game: ReversiGame) throws
-}
-
-extension ViewController: ReversiGameRepositoryTemp {
-    func saveGameToFile(_ game: ReversiGame) throws {
-        var output: String = ""
-
-        output += game.turn.symbol
-
-        for side in Disk.sides {
-            output += game.playerControls[side.index].rawValue.description
-        }
-        output += "\n"
-
-        for y in game.board.yRange {
-            for x in game.board.xRange {
-                output += game.board.diskAt(x: x, y: y).symbol
-            }
-            output += "\n"
-        }
-
-        do {
-            try output.write(toFile: path, atomically: true, encoding: .utf8)
-        } catch let error {
-            throw FileIOError.read(path: path, cause: error)
-        }
     }
 }
 

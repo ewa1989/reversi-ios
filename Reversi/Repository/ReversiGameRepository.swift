@@ -12,12 +12,12 @@ protocol ReversiGameRepository {
     func load() throws -> ReversiGame
 }
 
-enum FileIOError: Error {
+private enum FileIOError: Error {
     case write(path: String, cause: Error?)
     case read(path: String, cause: Error?)
 }
 
-var path: String {
+private var path: String {
     (NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true).first! as NSString).appendingPathComponent("Game")
 }
 
@@ -88,6 +88,36 @@ struct ReversiGameRepositoryImpl<Strategy: FileSaveAndLoadStrategy>: ReversiGame
         }
 
         return game
+    }
+}
+
+protocol ReversiGameRepositoryTemp {
+    func saveGameToFile(_ game: ReversiGame) throws
+}
+
+extension ReversiGameRepositoryImpl: ReversiGameRepositoryTemp {
+    func saveGameToFile(_ game: ReversiGame) throws {
+        var output: String = ""
+
+        output += game.turn.symbol
+
+        for side in Disk.sides {
+            output += game.playerControls[side.index].rawValue.description
+        }
+        output += "\n"
+
+        for y in game.board.yRange {
+            for x in game.board.xRange {
+                output += game.board.diskAt(x: x, y: y).symbol
+            }
+            output += "\n"
+        }
+
+        do {
+            try output.write(toFile: path, atomically: true, encoding: .utf8)
+        } catch let error {
+            throw FileIOError.read(path: path, cause: error)
+        }
     }
 }
 
