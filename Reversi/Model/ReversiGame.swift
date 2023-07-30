@@ -158,6 +158,22 @@ struct Board: Hashable {
     func canPlaceDisk(_ disk: Disk, atX x: Int, y: Int) -> Bool {
         !flippedDiskCoordinatesByPlacingDisk(disk, atX: x, y: y).toTuples().isEmpty
     }
+
+    /// `side` で指定された色のディスクを置ける盤上のセルの座標をすべて返します。
+    /// - Returns: `side` で指定された色のディスクを置ける盤上のすべてのセルの座標の配列です。
+    public func validMoves(for side: Disk) -> [Coordinate] {
+        var coordinates: [(Int, Int)] = []
+
+        for y in yRange {
+            for x in xRange {
+                if canPlaceDisk(side, atX: x, y: y) {
+                    coordinates.append((x, y))
+                }
+            }
+        }
+
+        return coordinates.toCoordinates()
+    }
 }
 
 struct Cell: Hashable {

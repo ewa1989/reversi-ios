@@ -54,22 +54,6 @@ class ViewController: UIViewController {
 // MARK: Reversi logics
 
 extension ViewController {
-    /// `side` で指定された色のディスクを置ける盤上のセルの座標をすべて返します。
-    /// - Returns: `side` で指定された色のディスクを置ける盤上のすべてのセルの座標の配列です。
-    func validMoves(for side: Disk) -> [(x: Int, y: Int)] {
-        var coordinates: [(Int, Int)] = []
-        
-        for y in game.board.yRange {
-            for x in game.board.xRange {
-                if game.board.canPlaceDisk(side, atX: x, y: y) {
-                    coordinates.append((x, y))
-                }
-            }
-        }
-        
-        return coordinates
-    }
-
     /// `x`, `y` で指定されたセルに `disk` を置きます。
     /// - Parameter x: セルの列です。
     /// - Parameter y: セルの行です。
@@ -191,8 +175,8 @@ extension ViewController {
 
         turn.flip()
         
-        if validMoves(for: turn).isEmpty {
-            if validMoves(for: turn.flipped).isEmpty {
+        if game.board.validMoves(for: turn).toTuples().isEmpty {
+            if game.board.validMoves(for: turn.flipped).toTuples().isEmpty {
                 game.turn = nil
                 updateMessageViews()
             } else {
@@ -219,7 +203,7 @@ extension ViewController {
     /// "Computer" が選択されている場合のプレイヤーの行動を決定します。
     func playTurnOfComputer() {
         guard let turn = self.game.turn else { preconditionFailure() }
-        let (x, y) = validMoves(for: turn).randomElement()!
+        let (x, y) = game.board.validMoves(for: turn).toTuples().randomElement()!
 
         playerActivityIndicators[turn.index].startAnimating()
         

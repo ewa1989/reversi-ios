@@ -203,4 +203,32 @@ final class ReversiGameTest: XCTestCase {
 
         XCTAssertFalse(game.board.canPlaceDisk(.dark, atX: 3, y: 2))
     }
+
+    // MARK: validMoves
+
+    func test_初期盤面で黒は4箇所置くことができる() throws {
+        let expected = [
+            (3, 2),
+            (2, 3),
+            (5, 4),
+            (4, 5),
+        ].toCoordinates()
+
+        let newGame = ReversiGame.newGame()
+        let actual = newGame.board.validMoves(for: .dark)
+
+        XCTAssertEqual(actual, expected)
+    }
+
+    func test_1つもディスクがない盤面では黒も白もどこに置いても1つも裏返らないので置くことができない() throws {
+        let noDiskGame = ReversiGame()
+        XCTAssertTrue(noDiskGame.board.validMoves(for: .dark).isEmpty)
+        XCTAssertTrue(noDiskGame.board.validMoves(for: .light).isEmpty)
+    }
+
+    func test_全て埋まった盤面では黒も白もどこにも置くことができない() throws {
+        let allCellFilledGame = tiedComputerMatchWithLeftSideDarkAndRightSideLightBoard()
+        XCTAssertTrue(allCellFilledGame.board.validMoves(for: .dark).isEmpty)
+        XCTAssertTrue(allCellFilledGame.board.validMoves(for: .light).isEmpty)
+    }
 }
