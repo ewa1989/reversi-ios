@@ -18,9 +18,6 @@ class ViewController: UIViewController {
     @IBOutlet private var countLabels: [UILabel]!
     @IBOutlet private var playerActivityIndicators: [UIActivityIndicatorView]!
     
-    /// どちらの色のプレイヤーのターンかを表します。ゲーム終了時は `nil` です。
-    private var turn: Disk? = .dark
-    
     private var animationCanceller: Canceller?
     private var isAnimating: Bool { animationCanceller != nil }
     
@@ -241,8 +238,7 @@ extension ViewController {
         game = ReversiGame.newGame()
 
         boardView.reset()
-        turn = .dark
-        
+
         for playerControl in playerControls {
             playerControl.selectedSegmentIndex = Player.manual.rawValue
         }
@@ -255,7 +251,7 @@ extension ViewController {
     
     /// プレイヤーの行動を待ちます。
     func waitForPlayer() {
-        guard let turn = self.turn else { return }
+        guard let turn = self.game.turn else { return }
         switch Player(rawValue: playerControls[turn.index].selectedSegmentIndex)! {
         case .manual:
             break
@@ -268,20 +264,16 @@ extension ViewController {
     /// もし、次のプレイヤーに有効な手が存在しない場合、パスとなります。
     /// 両プレイヤーに有効な手がない場合、ゲームの勝敗を表示します。
     func nextTurn() {
-        guard var turn = self.turn else { return }
+        guard var turn = self.game.turn else { return }
 
         turn.flip()
         
         if validMoves(for: turn).isEmpty {
             if validMoves(for: turn.flipped).isEmpty {
                 game.turn = nil
-
-                self.turn = nil
                 updateMessageViews()
             } else {
                 game.turn = turn
-
-                self.turn = turn
                 updateMessageViews()
                 
                 let alertController = UIAlertController(
@@ -296,8 +288,6 @@ extension ViewController {
             }
         } else {
             game.turn = turn
-
-            self.turn = turn
             updateMessageViews()
             waitForPlayer()
         }
@@ -305,7 +295,7 @@ extension ViewController {
     
     /// "Computer" が選択されている場合のプレイヤーの行動を決定します。
     func playTurnOfComputer() {
-        guard let turn = self.turn else { preconditionFailure() }
+        guard let turn = self.game.turn else { preconditionFailure() }
         let (x, y) = validMoves(for: turn).randomElement()!
 
         playerActivityIndicators[turn.index].startAnimating()
@@ -342,7 +332,7 @@ extension ViewController {
     
     /// 現在の状況に応じてメッセージを表示します。
     func updateMessageViews() {
-        switch turn {
+        switch game.turn {
         case .some(let side):
             messageDiskSizeConstraint.constant = messageDiskSize
             messageDiskView.disk = side
@@ -361,9 +351,6 @@ extension ViewController {
 
     fileprivate func updateGame(_ game: ReversiGame) {
         self.game = game
-
-        // turn
-        turn = game.turn
 
         // players
         for side in Disk.sides {
@@ -423,7 +410,7 @@ extension ViewController {
             canceller.cancel()
         }
 
-        if !isAnimating, side == turn, case .computer = player {
+        if !isAnimating, side == game.turn, case .computer = player {
             playTurnOfComputer()
         }
     }
@@ -435,7 +422,7 @@ extension ViewController: BoardViewDelegate {
     /// - Parameter x: セルの列です。
     /// - Parameter y: セルの行です。
     func boardView(_ boardView: BoardView, didSelectCellAtX x: Int, y: Int) {
-        guard let turn = turn else { return }
+        guard let turn = game.turn else { return }
         if isAnimating { return }
         guard case .manual = Player(rawValue: playerControls[turn.index].selectedSegmentIndex)! else { return }
         // try? because doing nothing when an error occurs
@@ -451,7 +438,7 @@ extension ViewController {
     func convertViewToGame() -> ReversiGame {
         var game = ReversiGame()
 
-        game.turn = turn
+        game.turn = self.game.turn
         for side in Disk.sides {
             game.playerControls[side.index] = Player(rawValue: playerControls[side.index].selectedSegmentIndex)!
         }
