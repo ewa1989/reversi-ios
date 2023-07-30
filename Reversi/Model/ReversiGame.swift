@@ -108,7 +108,7 @@ struct Board: Hashable {
     ///   - x: 置くセルの列です。
     ///   - y: 置くセルの行です。
     /// - Returns: 裏返るディスクの位置のコレクションです。置くディスクの位置は含みません。裏返るディスクがない場合は空のコレクションを返します。
-    public func flippedDiskCoordinatesByPlacingDisk(_ disk: Disk, atX x: Int, y: Int) -> [(Int, Int)] {
+    public func flippedDiskCoordinatesByPlacingDisk(_ disk: Disk, atX x: Int, y: Int) -> [Coordinate] {
         let directions = [
             (x: -1, y: -1),
             (x:  0, y: -1),
@@ -147,7 +147,7 @@ struct Board: Hashable {
         }
         }
 
-        return diskCoordinates
+        return diskCoordinates.toCoordinates()
     }
 }
 
@@ -158,4 +158,20 @@ struct Cell: Hashable {
 enum Player: Int, CaseIterable {
     case manual = 0
     case computer = 1
+}
+
+struct Coordinate: Hashable {
+    let (x, y): (Int, Int)
+}
+
+extension Collection where Element == Coordinate {
+    func toTuples() -> [(Int, Int)] {
+        self.map { ($0.x, $0.y) }
+    }
+}
+
+extension Collection where Element == (Int, Int) {
+    func toCoordinates() -> [Coordinate] {
+        map { Coordinate(x: $0.0, y: $0.1) }
+    }
 }
