@@ -157,4 +157,31 @@ final class ReversiGameTest: XCTestCase {
 
         XCTAssertEqual(actual, expected)
     }
+
+    // 以下の盤面（1~8は白）で#に黒を置いた時に1~8の順になったコレクションが正しい
+    // xxxxx---
+    // x123x---
+    // x8#4x---
+    // x765x---
+    // xxxxx---
+    // --------
+    // --------
+    // --------
+    func test_複数枚裏返る場合に_左上から時計回り順になったコレクションが返ってくる() throws {
+        let expected = [
+            (1, 1),
+            (2, 1),
+            (3, 1),
+            (3, 2),
+            (3, 3),
+            (2, 3),
+            (1, 3),
+            (1, 2),
+        ].toCoordinates()
+
+        let game = blankSurroundedByLightSurroundingByDark()
+        let actual = game.board.flippedDiskCoordinatesByPlacingDisk(.dark, atX: 2, y: 2)
+
+        XCTAssertEqual(actual, expected)
+    }
 }

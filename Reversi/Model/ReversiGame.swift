@@ -116,8 +116,8 @@ struct Board: Hashable {
             (x:  1, y:  0),
             (x:  1, y:  1),
             (x:  0, y:  1),
-            (x: -1, y:  0),
             (x: -1, y:  1),
+            (x: -1, y:  0),
         ]
 
         guard diskAt(x: x, y: y) == nil else {

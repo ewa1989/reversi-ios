@@ -57,3 +57,18 @@ func tiedComputerMatchWithLeftSideDarkAndRightSideLightBoard() -> ReversiGame {
 func darkSurroundedByLightGame() -> ReversiGame {
     return try! FileParser.makeGameParsing("x00\n--------\n-ooo----\n-oxo----\n-ooo----\n--------\n--------\n--------\n--------\n")
 }
+
+/// 空白の周りを白、その周りを黒が囲んだゲームを作成します。
+/// ```
+/// xxxxx---
+/// xooox---
+/// xo-ox---
+/// xooox---
+/// xxxxx---
+/// --------
+/// --------
+/// --------
+/// ```
+func blankSurroundedByLightSurroundingByDark() -> ReversiGame {
+    return try! FileParser.makeGameParsing("x00\nxxxxx---\nxooox---\nxo#ox---\nxooox---\nxxxxx---\n--------\n--------\n--------\n")
+}
