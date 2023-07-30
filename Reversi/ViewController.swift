@@ -424,16 +424,21 @@ extension ViewController: BoardViewDelegate {
 extension ViewController {
     /// ゲームの状態をファイルに書き出し、保存します。
     func saveGame() throws {
+        var game = ReversiGame()
+
         var output: String = ""
-        output += turn.symbol
+        game.turn = turn
+        output += game.turn.symbol
         for side in Disk.sides {
-            output += playerControls[side.index].selectedSegmentIndex.description
+            game.playerControls[side.index] = Player(rawValue: playerControls[side.index].selectedSegmentIndex)!
+            output += game.playerControls[side.index].rawValue.description
         }
         output += "\n"
         
-        for y in boardView.yRange {
-            for x in boardView.xRange {
-                output += boardView.diskAt(x: x, y: y).symbol
+        for y in game.board.yRange {
+            for x in game.board.xRange {
+                game.board.setDisk(boardView.diskAt(x: x, y: y), atX: x, y: y)
+                output += game.board.diskAt(x: x, y: y).symbol
             }
             output += "\n"
         }
