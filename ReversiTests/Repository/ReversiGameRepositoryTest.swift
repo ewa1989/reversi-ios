@@ -34,7 +34,7 @@ final class ReversiGameRepositoryTest: XCTestCase {
     func test_白のターンで始まるゲームを復元できる() throws {
         fakeStrategy.fakeInput = "o00\n--------\n--------\n--------\n---ox---\n---xo---\n--------\n--------\n--------\n"
 
-        var expected = newGameStartFromLight()
+        let expected = newGameStartFromLight()
 
         let actual = try repository.load()
 
