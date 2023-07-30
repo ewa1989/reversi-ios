@@ -60,9 +60,9 @@ extension ViewController {
     func countDisks(of side: Disk) -> Int {
         var count = 0
         
-        for y in boardView.yRange {
-            for x in boardView.xRange {
-                if boardView.diskAt(x: x, y: y) == side {
+        for y in game.board.yRange {
+            for x in game.board.xRange {
+                if game.board.diskAt(x: x, y: y) == side {
                     count +=  1
                 }
             }
@@ -96,7 +96,7 @@ extension ViewController {
             (x: -1, y:  1),
         ]
         
-        guard boardView.diskAt(x: x, y: y) == nil else {
+        guard game.board.diskAt(x: x, y: y) == nil else {
             return []
         }
         
@@ -111,7 +111,7 @@ extension ViewController {
                 x += direction.x
                 y += direction.y
                 
-                switch (disk, boardView.diskAt(x: x, y: y)) { // Uses tuples to make patterns exhaustive
+                switch (disk, game.board.diskAt(x: x, y: y)) { // Uses tuples to make patterns exhaustive
                 case (.dark, .some(.dark)), (.light, .some(.light)):
                     diskCoordinates.append(contentsOf: diskCoordinatesInLine)
                     break flipping
@@ -140,8 +140,8 @@ extension ViewController {
     func validMoves(for side: Disk) -> [(x: Int, y: Int)] {
         var coordinates: [(Int, Int)] = []
         
-        for y in boardView.yRange {
-            for x in boardView.xRange {
+        for y in game.board.yRange {
+            for x in game.board.xRange {
                 if canPlaceDisk(side, atX: x, y: y) {
                     coordinates.append((x, y))
                 }
@@ -237,10 +237,14 @@ extension ViewController {
     func newGame() {
         game = ReversiGame.newGame()
 
-        boardView.reset()
-
         for side in Disk.sides {
             playerControls[side.index].selectedSegmentIndex = game.playerControls[side.index].rawValue
+        }
+
+        for y in game.board.yRange {
+            for x in game.board.xRange {
+                boardView.setDisk(game.board.diskAt(x: x, y: y), atX: x, y: y, animated: false)
+            }
         }
 
         updateMessageViews()
@@ -445,7 +449,7 @@ extension ViewController {
 
         for y in game.board.yRange {
             for x in game.board.xRange {
-                game.board.setDisk(boardView.diskAt(x: x, y: y), atX: x, y: y)
+                game.board.setDisk(self.game.board.diskAt(x: x, y: y), atX: x, y: y)
             }
         }
 
