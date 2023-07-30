@@ -426,23 +426,33 @@ extension ViewController {
     func saveGame() throws {
         var game = ReversiGame()
 
-        var output: String = ""
         game.turn = turn
-        output += game.turn.symbol
         for side in Disk.sides {
             game.playerControls[side.index] = Player(rawValue: playerControls[side.index].selectedSegmentIndex)!
-            output += game.playerControls[side.index].rawValue.description
         }
-        output += "\n"
-        
+
         for y in game.board.yRange {
             for x in game.board.xRange {
                 game.board.setDisk(boardView.diskAt(x: x, y: y), atX: x, y: y)
+            }
+        }
+
+        var output: String = ""
+
+        output += game.turn.symbol
+
+        for side in Disk.sides {
+            output += game.playerControls[side.index].rawValue.description
+        }
+        output += "\n"
+
+        for y in game.board.yRange {
+            for x in game.board.xRange {
                 output += game.board.diskAt(x: x, y: y).symbol
             }
             output += "\n"
         }
-        
+
         do {
             try output.write(toFile: path, atomically: true, encoding: .utf8)
         } catch let error {
