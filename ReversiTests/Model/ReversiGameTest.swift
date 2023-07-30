@@ -185,23 +185,18 @@ final class ReversiGameTest: XCTestCase {
         XCTAssertEqual(actual, expected)
     }
 
-    // MARK: canPlaceDisk
+    // MARK: flippedDiskCoordinatesByPlacingDiskの裏返らない場合
 
-    func test_初期盤面で黒はセルx3_y2に置ける() throws {
+    func test_初期盤面で黒をセルx4_y2に置いても1枚も裏返らない() throws {
         let game = ReversiGame.newGame()
-        XCTAssertTrue(game.board.canPlaceDisk(.dark, atX: 3, y: 2))
-    }
-
-    func test_初期盤面で黒はセルx4_y2に置けない() throws {
-        let game = ReversiGame.newGame()
-        XCTAssertFalse(game.board.canPlaceDisk(.dark, atX: 4, y: 2))
+        XCTAssertTrue(game.board.flippedDiskCoordinatesByPlacingDisk(.dark, atX: 4, y: 2).isEmpty)
     }
 
     func test_すでにディスクが存在するセルには置けない() throws {
         var game = ReversiGame.newGame()
         game.board.setDisk(.light, atX: 3, y: 2)
 
-        XCTAssertFalse(game.board.canPlaceDisk(.dark, atX: 3, y: 2))
+        XCTAssertTrue(game.board.flippedDiskCoordinatesByPlacingDisk(.dark, atX: 3, y: 2).isEmpty)
     }
 
     // MARK: validMoves
