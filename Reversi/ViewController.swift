@@ -27,6 +27,9 @@ class ViewController: UIViewController {
     private var playerCancellers: [Disk: Canceller] = [:]
 
     private let repository = ReversiGameRepositoryImpl(strategy: LocalFileSaveAndLoadStrategy())
+
+    /// ゲームの状態を管理します
+    private var game = ReversiGame()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -183,8 +186,12 @@ extension ViewController {
         } else {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
+                self.game.board.setDisk(disk, atX: x, y: y)
+
                 self.boardView.setDisk(disk, atX: x, y: y, animated: false)
                 for (x, y) in diskCoordinates {
+                    self.game.board.setDisk(disk, atX: x, y: y)
+
                     self.boardView.setDisk(disk, atX: x, y: y, animated: false)
                 }
                 completion?(true)
@@ -207,6 +214,8 @@ extension ViewController {
         }
         
         let animationCanceller = self.animationCanceller!
+        game.board.setDisk(disk, atX: x, y: y)
+
         boardView.setDisk(disk, atX: x, y: y, animated: true) { [weak self] isFinished in
             guard let self = self else { return }
             if animationCanceller.isCancelled { return }
@@ -214,6 +223,8 @@ extension ViewController {
                 self.animateSettingDisks(at: coordinates.dropFirst(), to: disk, completion: completion)
             } else {
                 for (x, y) in coordinates {
+                    self.game.board.setDisk(disk, atX: x, y: y)
+
                     self.boardView.setDisk(disk, atX: x, y: y, animated: false)
                 }
                 completion(false)
@@ -227,6 +238,8 @@ extension ViewController {
 extension ViewController {
     /// ゲームの状態を初期化し、新しいゲームを開始します。
     func newGame() {
+        game = ReversiGame.newGame()
+
         boardView.reset()
         turn = .dark
         
@@ -261,9 +274,13 @@ extension ViewController {
         
         if validMoves(for: turn).isEmpty {
             if validMoves(for: turn.flipped).isEmpty {
+                game.turn = nil
+
                 self.turn = nil
                 updateMessageViews()
             } else {
+                game.turn = turn
+
                 self.turn = turn
                 updateMessageViews()
                 
@@ -278,6 +295,8 @@ extension ViewController {
                 present(alertController, animated: true)
             }
         } else {
+            game.turn = turn
+
             self.turn = turn
             updateMessageViews()
             waitForPlayer()
@@ -341,6 +360,8 @@ extension ViewController {
     }
 
     fileprivate func updateGame(_ game: ReversiGame) {
+        self.game = game
+
         // turn
         turn = game.turn
 
@@ -392,14 +413,17 @@ extension ViewController {
     /// プレイヤーのモードが変更された場合に呼ばれるハンドラーです。
     @IBAction func changePlayerControlSegment(_ sender: UISegmentedControl) {
         let side: Disk = Disk(index: playerControls.firstIndex(of: sender)!)
+        let player: Player = Player(rawValue: sender.selectedSegmentIndex)!
+
+        game.playerControls[side.index] = player
         
         try? saveGame()
         
         if let canceller = playerCancellers[side] {
             canceller.cancel()
         }
-        
-        if !isAnimating, side == turn, case .computer = Player(rawValue: sender.selectedSegmentIndex)! {
+
+        if !isAnimating, side == turn, case .computer = player {
             playTurnOfComputer()
         }
     }
@@ -444,6 +468,7 @@ extension ViewController {
     /// ゲームの状態をファイルに書き出し、保存します。
     func saveGame() throws {
         let game = convertViewToGame()
+        assert(game == self.game, "Viewの状態とプロパティgameの状態一致していない")
 
         try repository.save(game)
     }
