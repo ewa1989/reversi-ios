@@ -21,7 +21,7 @@ struct ReversiGame: Hashable {
         board = Board()
     }
 
-    /// プレイヤーモードはどちらもManual、中央に白黒2つずつディスクが置かれ黒のから始まる新規ゲームを作成します。
+    /// プレイヤーモードはどちらもManual、中央に白黒2つずつディスクが置かれ黒から始まる新規ゲームを作成します。
     static func newGame() -> ReversiGame {
         var game = ReversiGame()
         game.turn = .dark
