@@ -256,7 +256,7 @@ extension ViewController {
     /// プレイヤーの行動を待ちます。
     func waitForPlayer() {
         guard let turn = self.game.turn else { return }
-        switch Player(rawValue: playerControls[turn.index].selectedSegmentIndex)! {
+        switch game.playerControls[turn.index] {
         case .manual:
             break
         case .computer:
@@ -428,7 +428,7 @@ extension ViewController: BoardViewDelegate {
     func boardView(_ boardView: BoardView, didSelectCellAtX x: Int, y: Int) {
         guard let turn = game.turn else { return }
         if isAnimating { return }
-        guard case .manual = Player(rawValue: playerControls[turn.index].selectedSegmentIndex)! else { return }
+        guard case .manual = game.playerControls[turn.index] else { return }
         // try? because doing nothing when an error occurs
         try? placeDisk(turn, atX: x, y: y, animated: true) { [weak self] _ in
             self?.nextTurn()
