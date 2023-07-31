@@ -35,27 +35,35 @@ struct ReversiGameRepositoryImpl<Strategy: FileSaveAndLoadStrategy>: ReversiGame
     }
 
     func save(_ game: ReversiGame) throws {
-        var output: String = ""
-
-        output += game.turn.symbol
-
-        for side in Disk.sides {
-            output += game.playerControls[side.index].rawValue.description
-        }
-        output += "\n"
-
-        for y in game.board.yRange {
-            for x in game.board.xRange {
-                output += game.board.diskAt(x: x, y: y).symbol
-            }
-            output += "\n"
-        }
+        let output = game.convertToSave()
 
         do {
             try strategy.save(output)
         } catch let error {
             throw FileIOError.read(path: path, cause: error)
         }
+    }
+}
+
+fileprivate extension ReversiGame {
+    func convertToSave() -> String {
+        var output: String = ""
+
+        output += turn.symbol
+
+        for side in Disk.sides {
+            output += playerControls[side.index].rawValue.description
+        }
+        output += "\n"
+
+        for y in board.yRange {
+            for x in board.xRange {
+                output += board.diskAt(x: x, y: y).symbol
+            }
+            output += "\n"
+        }
+
+        return output
     }
 }
 
