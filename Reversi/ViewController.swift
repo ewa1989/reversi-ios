@@ -174,9 +174,9 @@ extension ViewController {
         guard var turn = self.game.turn else { return }
 
         turn.flip()
-        
-        if game.board.validMoves(for: turn).toTuples().isEmpty {
-            if game.board.validMoves(for: turn.flipped).toTuples().isEmpty {
+
+        if !game.board.canPlaceAnyDisks(by: turn) {
+            if !game.board.canPlaceAnyDisks(by: turn.flipped) {
                 game.turn = nil
                 updateMessageViews()
             } else {

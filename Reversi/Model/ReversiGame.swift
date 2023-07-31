@@ -192,6 +192,13 @@ struct Board: Hashable {
 
         return coordinates.toCoordinates()
     }
+
+    /// 指定された色のディスクを置く位置が存在するかを調べます。
+    /// - Parameter side: 置く位置が存在するか調べるディスクの色です。
+    /// - Returns: ディスクを置く位置が存在する場合は`true`を、存在しない場合は`false`を返します。
+    public func canPlaceAnyDisks(by side: Disk) -> Bool {
+        !validMoves(for: side).toTuples().isEmpty
+    }
 }
 
 struct Cell: Hashable {

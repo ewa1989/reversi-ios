@@ -253,4 +253,20 @@ final class ReversiGameTest: XCTestCase {
         let winnerLightGame = allLightBoard()
         XCTAssertEqual(winnerLightGame.state, .win(winner: .light))
     }
+
+    // MARK: canPlaceAnyDisks
+
+    func test_ゲーム初期状態だと黒白どちらもディスクを置く位置がある() throws {
+        let newGame = ReversiGame.newGame()
+
+        XCTAssertTrue(newGame.board.canPlaceAnyDisks(by: .dark))
+        XCTAssertTrue(newGame.board.canPlaceAnyDisks(by: .light))
+    }
+
+    func test_黒が白に囲まれたゲームだと黒だけ置く位置がある() throws {
+        let game = darkSurroundedByLightGame()
+
+        XCTAssertTrue(game.board.canPlaceAnyDisks(by: .dark))
+        XCTAssertFalse(game.board.canPlaceAnyDisks(by: .light))
+    }
 }
