@@ -63,7 +63,7 @@ extension ViewController {
     ///     もし `animated` が `false` の場合、このクロージャは次の run loop サイクルの初めに実行されます。
     /// - Throws: もし `disk` を `x`, `y` で指定されるセルに置けない場合、 `DiskPlacementError` を `throw` します。
     func placeDisk(_ disk: Disk, atX x: Int, y: Int, animated isAnimated: Bool, completion: ((Bool) -> Void)? = nil) throws {
-        let diskCoordinates = game.board.flippedDiskCoordinatesByPlacingDisk(disk, atX: x, y: y).toTuples()
+        let diskCoordinates = game.board.flippedDiskCoordinatesByPlacingDisk(disk, atX: x, y: y)
         if diskCoordinates.isEmpty {
             throw DiskPlacementError(disk: disk, x: x, y: y)
         }
@@ -73,7 +73,7 @@ extension ViewController {
                 self?.animationCanceller = nil
             }
             animationCanceller = Canceller(cleanUp)
-            animateSettingDisks(at: [(x, y)] + diskCoordinates, to: disk) { [weak self] isFinished in
+            animateSettingDisks(at: [Coordinate(x: x, y: y)] + diskCoordinates, to: disk) { [weak self] isFinished in
                 guard let self = self else { return }
                 guard let canceller = self.animationCanceller else { return }
                 if canceller.isCancelled { return }
@@ -89,10 +89,10 @@ extension ViewController {
                 self.game.board.setDisk(disk, atX: x, y: y)
 
                 self.boardView.setDisk(disk, atX: x, y: y, animated: false)
-                for (x, y) in diskCoordinates {
-                    self.game.board.setDisk(disk, atX: x, y: y)
+                for diskCoordinate in diskCoordinates {
+                    self.game.board.setDisk(disk, atX: diskCoordinate.x, y: diskCoordinate.y)
 
-                    self.boardView.setDisk(disk, atX: x, y: y, animated: false)
+                    self.boardView.setDisk(disk, atX: diskCoordinate.x, y: diskCoordinate.y, animated: false)
                 }
                 completion?(true)
                 try? self.saveGame()
@@ -106,26 +106,26 @@ extension ViewController {
     /// 残りの座標についてこのメソッドを再帰呼び出しすることで処理が行われる。
     /// すべてのセルに `disk` が置けたら `completion` ハンドラーが呼び出される。
     private func animateSettingDisks<C: Collection>(at coordinates: C, to disk: Disk, completion: @escaping (Bool) -> Void)
-        where C.Element == (Int, Int)
+        where C.Element == Coordinate
     {
-        guard let (x, y) = coordinates.first else {
+        guard let coordinate = coordinates.first else {
             completion(true)
             return
         }
         
         let animationCanceller = self.animationCanceller!
-        game.board.setDisk(disk, atX: x, y: y)
+        game.board.setDisk(disk, atX: coordinate.x, y: coordinate.y)
 
-        boardView.setDisk(disk, atX: x, y: y, animated: true) { [weak self] isFinished in
+        boardView.setDisk(disk, atX: coordinate.x, y: coordinate.y, animated: true) { [weak self] isFinished in
             guard let self = self else { return }
             if animationCanceller.isCancelled { return }
             if isFinished {
                 self.animateSettingDisks(at: coordinates.dropFirst(), to: disk, completion: completion)
             } else {
-                for (x, y) in coordinates {
-                    self.game.board.setDisk(disk, atX: x, y: y)
+                for coordinate in coordinates {
+                    self.game.board.setDisk(disk, atX: coordinate.x, y: coordinate.y)
 
-                    self.boardView.setDisk(disk, atX: x, y: y, animated: false)
+                    self.boardView.setDisk(disk, atX: coordinate.x, y: coordinate.y, animated: false)
                 }
                 completion(false)
             }
@@ -203,7 +203,7 @@ extension ViewController {
     /// "Computer" が選択されている場合のプレイヤーの行動を決定します。
     func playTurnOfComputer() {
         guard let turn = self.game.turn else { preconditionFailure() }
-        let (x, y) = game.board.validMoves(for: turn).toTuples().randomElement()!
+        let coordinate = game.board.validMoves(for: turn).randomElement()!
 
         playerActivityIndicators[turn.index].startAnimating()
         
@@ -218,7 +218,7 @@ extension ViewController {
             if canceller.isCancelled { return }
             cleanUp()
             
-            try! self.placeDisk(turn, atX: x, y: y, animated: true) { [weak self] _ in
+            try! self.placeDisk(turn, atX: coordinate.x, y: coordinate.y, animated: true) { [weak self] _ in
                 self?.nextTurn()
             }
         }

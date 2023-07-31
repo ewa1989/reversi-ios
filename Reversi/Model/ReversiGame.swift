@@ -174,7 +174,7 @@ struct Board: Hashable {
     /// - Parameter y: セルの行です。
     /// - Returns: 指定されたセルに `disk` を置ける場合は `true` を、置けない場合は `false` を返します。
     private func canPlaceDisk(_ disk: Disk, atX x: Int, y: Int) -> Bool {
-        !flippedDiskCoordinatesByPlacingDisk(disk, atX: x, y: y).toTuples().isEmpty
+        !flippedDiskCoordinatesByPlacingDisk(disk, atX: x, y: y).isEmpty
     }
 
     /// `side` で指定された色のディスクを置ける盤上のセルの座標をすべて返します。
@@ -197,7 +197,7 @@ struct Board: Hashable {
     /// - Parameter side: 置く位置が存在するか調べるディスクの色です。
     /// - Returns: ディスクを置く位置が存在する場合は`true`を、存在しない場合は`false`を返します。
     public func canPlaceAnyDisks(by side: Disk) -> Bool {
-        !validMoves(for: side).toTuples().isEmpty
+        !validMoves(for: side).isEmpty
     }
 }
 
@@ -212,12 +212,6 @@ enum Player: Int, CaseIterable {
 
 struct Coordinate: Hashable {
     let (x, y): (Int, Int)
-}
-
-extension Collection where Element == Coordinate {
-    func toTuples() -> [(Int, Int)] {
-        self.map { ($0.x, $0.y) }
-    }
 }
 
 extension Collection where Element == (Int, Int) {
