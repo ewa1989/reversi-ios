@@ -72,3 +72,13 @@ func darkSurroundedByLightGame() -> ReversiGame {
 func blankSurroundedByLightSurroundingByDark() -> ReversiGame {
     return try! FileParser.makeGameParsing("x00\nxxxxx---\nxooox---\nxo#ox---\nxooox---\nxxxxx---\n--------\n--------\n--------\n")
 }
+
+/// 全マス黒で埋まったゲームを作成します。
+func allDarkBoard() -> ReversiGame {
+    return try! FileParser.makeGameParsing("-00\nxxxxxxxx\nxxxxxxxx\nxxxxxxxx\nxxxxxxxx\nxxxxxxxx\nxxxxxxxx\nxxxxxxxx\nxxxxxxxx\n")
+}
+
+/// 全マス白で埋まったゲームを作成します。
+func allLightBoard() -> ReversiGame {
+    return try! FileParser.makeGameParsing("-00\noooooooo\noooooooo\noooooooo\noooooooo\noooooooo\noooooooo\noooooooo\noooooooo\n")
+}

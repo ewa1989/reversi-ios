@@ -16,6 +16,18 @@ struct ReversiGame: Hashable {
     var playerControls: [Player]
     var board: Board
 
+    var state: ReversiGameState {
+        get {
+            guard let turn = turn else {
+                guard let winner = board.sideWithMoreDisks() else {
+                    return .draw
+                }
+                return .win(winner: winner)
+            }
+            return .move(side: turn)
+        }
+    }
+
     init() {
         playerControls = Player.allCases.map { _ in .manual }
         board = Board()
@@ -31,6 +43,12 @@ struct ReversiGame: Hashable {
         game.board.setDisk(.light, atX: game.board.width / 2, y: game.board.height / 2)
         return game
     }
+}
+
+enum ReversiGameState: Hashable {
+    case move(side: Disk)
+    case win(winner: Disk)
+    case draw
 }
 
 struct Board: Hashable {

@@ -226,4 +226,31 @@ final class ReversiGameTest: XCTestCase {
         XCTAssertTrue(allCellFilledGame.board.validMoves(for: .dark).isEmpty)
         XCTAssertTrue(allCellFilledGame.board.validMoves(for: .light).isEmpty)
     }
+
+    // MARK: state
+
+    func test_黒で始まる初期盤面は黒のターン() throws {
+        let newGame = ReversiGame.newGame()
+        XCTAssertEqual(newGame.state, .move(side: .dark))
+    }
+
+    func test_白で始まる初期盤面は白のターン() throws {
+        let newGameStartFromLight = newGameStartFromLight()
+        XCTAssertEqual(newGameStartFromLight.state, .move(side: .light))
+    }
+
+    func test_終了したゲームでディスク数が等しければ引き分け() throws {
+        let tiedGame = tiedComputerMatchWithLeftSideDarkAndRightSideLightBoard()
+        XCTAssertEqual(tiedGame.state, .draw)
+    }
+
+    func test_test_終了したゲームで黒のディスクが多ければ黒の勝利() throws {
+        let winnerDarkGame = allDarkBoard()
+        XCTAssertEqual(winnerDarkGame.state, .win(winner: .dark))
+    }
+
+    func test_test_終了したゲームで白のディスクが多ければ白の勝利() throws {
+        let winnerLightGame = allLightBoard()
+        XCTAssertEqual(winnerLightGame.state, .win(winner: .light))
+    }
 }

@@ -239,20 +239,18 @@ extension ViewController {
     
     /// 現在の状況に応じてメッセージを表示します。
     func updateMessageViews() {
-        switch game.turn {
-        case .some(let side):
+        switch game.state {
+        case .move(side: let side):
             messageDiskSizeConstraint.constant = messageDiskSize
             messageDiskView.disk = side
             messageLabel.text = "'s turn"
-        case .none:
-            if let winner = game.board.sideWithMoreDisks() {
-                messageDiskSizeConstraint.constant = messageDiskSize
-                messageDiskView.disk = winner
-                messageLabel.text = " won"
-            } else {
-                messageDiskSizeConstraint.constant = 0
-                messageLabel.text = "Tied"
-            }
+        case .win(winner: let winner):
+            messageDiskSizeConstraint.constant = messageDiskSize
+            messageDiskView.disk = winner
+            messageLabel.text = " won"
+        case .draw:
+            messageDiskSizeConstraint.constant = 0
+            messageLabel.text = "Tied"
         }
     }
 
