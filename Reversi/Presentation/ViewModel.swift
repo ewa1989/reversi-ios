@@ -17,4 +17,14 @@ class ViewModel<GameRepository: ReversiGameRepository> {
         self.viewController = viewController
         self.gameRepository = gameRepository
     }
+
+    func viewDidLoad() {
+        viewController.messageDiskSize = viewController.messageDiskSizeConstraint.constant
+
+        do {
+            try viewController.loadGame()
+        } catch _ {
+            viewController.newGame()
+        }
+    }
 }

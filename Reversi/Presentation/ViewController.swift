@@ -5,14 +5,14 @@ class ViewController: UIViewController {
     
     @IBOutlet private var messageDiskView: DiskView!
     @IBOutlet private var messageLabel: UILabel!
-    @IBOutlet private var messageDiskSizeConstraint: NSLayoutConstraint!
+    @IBOutlet var messageDiskSizeConstraint: NSLayoutConstraint!
     /// Storyboard 上で設定されたサイズを保管します。
     /// 引き分けの際は `messageDiskView` の表示が必要ないため、
     /// `messageDiskSizeConstraint.constant` を `0` に設定します。
     /// その後、新しいゲームが開始されたときに `messageDiskSize` を
     /// 元のサイズで表示する必要があり、
     /// その際に `messageDiskSize` に保管された値を使います。
-    private var messageDiskSize: CGFloat!
+    var messageDiskSize: CGFloat!
     
     @IBOutlet private var playerControls: [UISegmentedControl]!
     @IBOutlet private var countLabels: [UILabel]!
@@ -36,13 +36,8 @@ class ViewController: UIViewController {
         viewModel = ViewModel(viewController: self, gameRepository: repository)
 
         boardView.delegate = self
-        messageDiskSize = messageDiskSizeConstraint.constant
-        
-        do {
-            try loadGame()
-        } catch _ {
-            newGame()
-        }
+
+        viewModel.viewDidLoad()
     }
     
     private var viewHasAppeared: Bool = false
