@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A391B052A7954DC00CE4B13 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A391B042A7954DC00CE4B13 /* ViewModel.swift */; };
 		0A3B35662A765BFB00527AB1 /* TestHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A3B35652A765BFB00527AB1 /* TestHelper.swift */; };
 		0A700AF92A756C4F00CC14B6 /* ReversiGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A700AF82A756C4F00CC14B6 /* ReversiGame.swift */; };
 		0A700AFA2A756C5200CC14B6 /* ReversiGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A700AF82A756C4F00CC14B6 /* ReversiGame.swift */; };
@@ -38,6 +39,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0A391B042A7954DC00CE4B13 /* ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
 		0A3B35652A765BFB00527AB1 /* TestHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHelper.swift; sourceTree = "<group>"; };
 		0A700AF82A756C4F00CC14B6 /* ReversiGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReversiGame.swift; sourceTree = "<group>"; };
 		0A700AFE2A7576EA00CC14B6 /* ReversiGameTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReversiGameTest.swift; sourceTree = "<group>"; };
@@ -77,6 +79,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0A391B032A7954CE00CE4B13 /* Presentation */ = {
+			isa = PBXGroup;
+			children = (
+				D642BDB723A9FE4500396732 /* ViewController.swift */,
+				0A391B042A7954DC00CE4B13 /* ViewModel.swift */,
+			);
+			path = Presentation;
+			sourceTree = "<group>";
+		};
 		0A3B35642A765BEB00527AB1 /* TestHelper */ = {
 			isa = PBXGroup;
 			children = (
@@ -149,11 +160,11 @@
 		D642BDB223A9FE4500396732 /* Reversi */ = {
 			isa = PBXGroup;
 			children = (
+				0A391B032A7954CE00CE4B13 /* Presentation */,
 				0A700B012A757ACB00CC14B6 /* Repository */,
 				0A700AF72A756C4400CC14B6 /* Model */,
 				D642BDB323A9FE4500396732 /* AppDelegate.swift */,
 				D642BDB523A9FE4500396732 /* SceneDelegate.swift */,
-				D642BDB723A9FE4500396732 /* ViewController.swift */,
 				D642BDB923A9FE4500396732 /* Main.storyboard */,
 				D642BDBC23A9FE4700396732 /* Assets.xcassets */,
 				D642BDBE23A9FE4700396732 /* LaunchScreen.storyboard */,
@@ -275,6 +286,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A391B052A7954DC00CE4B13 /* ViewModel.swift in Sources */,
 				D636B39F23D35043007F370F /* DiskView.swift in Sources */,
 				D642BDD623AA0B3900396732 /* CellView.swift in Sources */,
 				D642BDD823AA0B5700396732 /* Disk.swift in Sources */,

@@ -27,10 +27,14 @@ class ViewController: UIViewController {
 
     /// ゲームの状態を管理します
     private var game = ReversiGame()
-    
+
+    private var viewModel: ViewModel<ReversiGameRepositoryImpl<LocalFileSaveAndLoadStrategy>>!
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
+        viewModel = ViewModel(viewController: self, gameRepository: repository)
+
         boardView.delegate = self
         messageDiskSize = messageDiskSizeConstraint.constant
         
