@@ -13,6 +13,8 @@ class ViewModel<GameRepository: ReversiGameRepository> {
     private weak var viewController: ViewController!
     private let gameRepository: GameRepository
 
+    var viewHasAppeared: Bool = false
+
     init(viewController: ViewController!, gameRepository: GameRepository) {
         self.viewController = viewController
         self.gameRepository = gameRepository
@@ -26,5 +28,11 @@ class ViewModel<GameRepository: ReversiGameRepository> {
         } catch _ {
             viewController.newGame()
         }
+    }
+
+    func viewDidAppear() {
+        if viewHasAppeared { return }
+        viewHasAppeared = true
+        viewController.waitForPlayer()
     }
 }
