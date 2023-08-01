@@ -18,13 +18,15 @@ class ViewController: UIViewController {
     @IBOutlet private var countLabels: [UILabel]!
     @IBOutlet private var playerActivityIndicators: [UIActivityIndicatorView]!
     
-    /// どちらの色のプレイヤーのターンかを表します。ゲーム終了時は `nil` です。
-    private var turn: Disk? = .dark
-    
     private var animationCanceller: Canceller?
     private var isAnimating: Bool { animationCanceller != nil }
     
     private var playerCancellers: [Disk: Canceller] = [:]
+
+    private let repository = ReversiGameRepositoryImpl(strategy: LocalFileSaveAndLoadStrategy())
+
+    /// ゲームの状態を管理します
+    private var game = ReversiGame()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,103 +54,6 @@ class ViewController: UIViewController {
 // MARK: Reversi logics
 
 extension ViewController {
-    /// `side` で指定された色のディスクが盤上に置かれている枚数を返します。
-    /// - Parameter side: 数えるディスクの色です。
-    /// - Returns: `side` で指定された色のディスクの、盤上の枚数です。
-    func countDisks(of side: Disk) -> Int {
-        var count = 0
-        
-        for y in boardView.yRange {
-            for x in boardView.xRange {
-                if boardView.diskAt(x: x, y: y) == side {
-                    count +=  1
-                }
-            }
-        }
-        
-        return count
-    }
-    
-    /// 盤上に置かれたディスクの枚数が多い方の色を返します。
-    /// 引き分けの場合は `nil` が返されます。
-    /// - Returns: 盤上に置かれたディスクの枚数が多い方の色です。引き分けの場合は `nil` を返します。
-    func sideWithMoreDisks() -> Disk? {
-        let darkCount = countDisks(of: .dark)
-        let lightCount = countDisks(of: .light)
-        if darkCount == lightCount {
-            return nil
-        } else {
-            return darkCount > lightCount ? .dark : .light
-        }
-    }
-    
-    private func flippedDiskCoordinatesByPlacingDisk(_ disk: Disk, atX x: Int, y: Int) -> [(Int, Int)] {
-        let directions = [
-            (x: -1, y: -1),
-            (x:  0, y: -1),
-            (x:  1, y: -1),
-            (x:  1, y:  0),
-            (x:  1, y:  1),
-            (x:  0, y:  1),
-            (x: -1, y:  0),
-            (x: -1, y:  1),
-        ]
-        
-        guard boardView.diskAt(x: x, y: y) == nil else {
-            return []
-        }
-        
-        var diskCoordinates: [(Int, Int)] = []
-        
-        for direction in directions {
-            var x = x
-            var y = y
-            
-            var diskCoordinatesInLine: [(Int, Int)] = []
-            flipping: while true {
-                x += direction.x
-                y += direction.y
-                
-                switch (disk, boardView.diskAt(x: x, y: y)) { // Uses tuples to make patterns exhaustive
-                case (.dark, .some(.dark)), (.light, .some(.light)):
-                    diskCoordinates.append(contentsOf: diskCoordinatesInLine)
-                    break flipping
-                case (.dark, .some(.light)), (.light, .some(.dark)):
-                    diskCoordinatesInLine.append((x, y))
-                case (_, .none):
-                    break flipping
-                }
-            }
-        }
-        
-        return diskCoordinates
-    }
-    
-    /// `x`, `y` で指定されたセルに、 `disk` が置けるかを調べます。
-    /// ディスクを置くためには、少なくとも 1 枚のディスクをひっくり返せる必要があります。
-    /// - Parameter x: セルの列です。
-    /// - Parameter y: セルの行です。
-    /// - Returns: 指定されたセルに `disk` を置ける場合は `true` を、置けない場合は `false` を返します。
-    func canPlaceDisk(_ disk: Disk, atX x: Int, y: Int) -> Bool {
-        !flippedDiskCoordinatesByPlacingDisk(disk, atX: x, y: y).isEmpty
-    }
-    
-    /// `side` で指定された色のディスクを置ける盤上のセルの座標をすべて返します。
-    /// - Returns: `side` で指定された色のディスクを置ける盤上のすべてのセルの座標の配列です。
-    func validMoves(for side: Disk) -> [(x: Int, y: Int)] {
-        var coordinates: [(Int, Int)] = []
-        
-        for y in boardView.yRange {
-            for x in boardView.xRange {
-                if canPlaceDisk(side, atX: x, y: y) {
-                    coordinates.append((x, y))
-                }
-            }
-        }
-        
-        return coordinates
-    }
-
     /// `x`, `y` で指定されたセルに `disk` を置きます。
     /// - Parameter x: セルの列です。
     /// - Parameter y: セルの行です。
@@ -158,7 +63,7 @@ extension ViewController {
     ///     もし `animated` が `false` の場合、このクロージャは次の run loop サイクルの初めに実行されます。
     /// - Throws: もし `disk` を `x`, `y` で指定されるセルに置けない場合、 `DiskPlacementError` を `throw` します。
     func placeDisk(_ disk: Disk, atX x: Int, y: Int, animated isAnimated: Bool, completion: ((Bool) -> Void)? = nil) throws {
-        let diskCoordinates = flippedDiskCoordinatesByPlacingDisk(disk, atX: x, y: y)
+        let diskCoordinates = game.board.flippedDiskCoordinatesByPlacingDisk(disk, atX: x, y: y)
         if diskCoordinates.isEmpty {
             throw DiskPlacementError(disk: disk, x: x, y: y)
         }
@@ -168,7 +73,7 @@ extension ViewController {
                 self?.animationCanceller = nil
             }
             animationCanceller = Canceller(cleanUp)
-            animateSettingDisks(at: [(x, y)] + diskCoordinates, to: disk) { [weak self] isFinished in
+            animateSettingDisks(at: [Coordinate(x: x, y: y)] + diskCoordinates, to: disk) { [weak self] isFinished in
                 guard let self = self else { return }
                 guard let canceller = self.animationCanceller else { return }
                 if canceller.isCancelled { return }
@@ -181,9 +86,13 @@ extension ViewController {
         } else {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
+                self.game.board.setDisk(disk, atX: x, y: y)
+
                 self.boardView.setDisk(disk, atX: x, y: y, animated: false)
-                for (x, y) in diskCoordinates {
-                    self.boardView.setDisk(disk, atX: x, y: y, animated: false)
+                for diskCoordinate in diskCoordinates {
+                    self.game.board.setDisk(disk, atX: diskCoordinate.x, y: diskCoordinate.y)
+
+                    self.boardView.setDisk(disk, atX: diskCoordinate.x, y: diskCoordinate.y, animated: false)
                 }
                 completion?(true)
                 try? self.saveGame()
@@ -197,22 +106,26 @@ extension ViewController {
     /// 残りの座標についてこのメソッドを再帰呼び出しすることで処理が行われる。
     /// すべてのセルに `disk` が置けたら `completion` ハンドラーが呼び出される。
     private func animateSettingDisks<C: Collection>(at coordinates: C, to disk: Disk, completion: @escaping (Bool) -> Void)
-        where C.Element == (Int, Int)
+        where C.Element == Coordinate
     {
-        guard let (x, y) = coordinates.first else {
+        guard let coordinate = coordinates.first else {
             completion(true)
             return
         }
         
         let animationCanceller = self.animationCanceller!
-        boardView.setDisk(disk, atX: x, y: y, animated: true) { [weak self] isFinished in
+        game.board.setDisk(disk, atX: coordinate.x, y: coordinate.y)
+
+        boardView.setDisk(disk, atX: coordinate.x, y: coordinate.y, animated: true) { [weak self] isFinished in
             guard let self = self else { return }
             if animationCanceller.isCancelled { return }
             if isFinished {
                 self.animateSettingDisks(at: coordinates.dropFirst(), to: disk, completion: completion)
             } else {
-                for (x, y) in coordinates {
-                    self.boardView.setDisk(disk, atX: x, y: y, animated: false)
+                for coordinate in coordinates {
+                    self.game.board.setDisk(disk, atX: coordinate.x, y: coordinate.y)
+
+                    self.boardView.setDisk(disk, atX: coordinate.x, y: coordinate.y, animated: false)
                 }
                 completion(false)
             }
@@ -225,11 +138,16 @@ extension ViewController {
 extension ViewController {
     /// ゲームの状態を初期化し、新しいゲームを開始します。
     func newGame() {
-        boardView.reset()
-        turn = .dark
-        
-        for playerControl in playerControls {
-            playerControl.selectedSegmentIndex = Player.manual.rawValue
+        game = ReversiGame.newGame()
+
+        for side in Disk.sides {
+            playerControls[side.index].selectedSegmentIndex = game.playerControls[side.index].rawValue
+        }
+
+        for y in game.board.yRange {
+            for x in game.board.xRange {
+                boardView.setDisk(game.board.diskAt(x: x, y: y), atX: x, y: y, animated: false)
+            }
         }
 
         updateMessageViews()
@@ -240,8 +158,8 @@ extension ViewController {
     
     /// プレイヤーの行動を待ちます。
     func waitForPlayer() {
-        guard let turn = self.turn else { return }
-        switch Player(rawValue: playerControls[turn.index].selectedSegmentIndex)! {
+        guard let turn = self.game.turn else { return }
+        switch game.playerControls[turn.index] {
         case .manual:
             break
         case .computer:
@@ -253,16 +171,16 @@ extension ViewController {
     /// もし、次のプレイヤーに有効な手が存在しない場合、パスとなります。
     /// 両プレイヤーに有効な手がない場合、ゲームの勝敗を表示します。
     func nextTurn() {
-        guard var turn = self.turn else { return }
+        guard var turn = self.game.turn else { return }
 
         turn.flip()
-        
-        if validMoves(for: turn).isEmpty {
-            if validMoves(for: turn.flipped).isEmpty {
-                self.turn = nil
+
+        if !game.board.canPlaceAnyDisks(by: turn) {
+            if !game.board.canPlaceAnyDisks(by: turn.flipped) {
+                game.turn = nil
                 updateMessageViews()
             } else {
-                self.turn = turn
+                game.turn = turn
                 updateMessageViews()
                 
                 let alertController = UIAlertController(
@@ -276,7 +194,7 @@ extension ViewController {
                 present(alertController, animated: true)
             }
         } else {
-            self.turn = turn
+            game.turn = turn
             updateMessageViews()
             waitForPlayer()
         }
@@ -284,8 +202,8 @@ extension ViewController {
     
     /// "Computer" が選択されている場合のプレイヤーの行動を決定します。
     func playTurnOfComputer() {
-        guard let turn = self.turn else { preconditionFailure() }
-        let (x, y) = validMoves(for: turn).randomElement()!
+        guard let turn = self.game.turn else { preconditionFailure() }
+        let coordinate = game.board.validMoves(for: turn).randomElement()!
 
         playerActivityIndicators[turn.index].startAnimating()
         
@@ -300,7 +218,7 @@ extension ViewController {
             if canceller.isCancelled { return }
             cleanUp()
             
-            try! self.placeDisk(turn, atX: x, y: y, animated: true) { [weak self] _ in
+            try! self.placeDisk(turn, atX: coordinate.x, y: coordinate.y, animated: true) { [weak self] _ in
                 self?.nextTurn()
             }
         }
@@ -315,28 +233,43 @@ extension ViewController {
     /// 各プレイヤーの獲得したディスクの枚数を表示します。
     func updateCountLabels() {
         for side in Disk.sides {
-            countLabels[side.index].text = "\(countDisks(of: side))"
+            countLabels[side.index].text = "\(game.board.countDisks(of: side))"
         }
     }
     
     /// 現在の状況に応じてメッセージを表示します。
     func updateMessageViews() {
-        switch turn {
-        case .some(let side):
+        switch game.state {
+        case .move(side: let side):
             messageDiskSizeConstraint.constant = messageDiskSize
             messageDiskView.disk = side
             messageLabel.text = "'s turn"
-        case .none:
-            if let winner = self.sideWithMoreDisks() {
-                messageDiskSizeConstraint.constant = messageDiskSize
-                messageDiskView.disk = winner
-                messageLabel.text = " won"
-            } else {
-                messageDiskSizeConstraint.constant = 0
-                messageLabel.text = "Tied"
+        case .win(winner: let winner):
+            messageDiskSizeConstraint.constant = messageDiskSize
+            messageDiskView.disk = winner
+            messageLabel.text = " won"
+        case .draw:
+            messageDiskSizeConstraint.constant = 0
+            messageLabel.text = "Tied"
+        }
+    }
+
+    fileprivate func updateGame(_ game: ReversiGame) {
+        self.game = game
+
+        // players
+        for side in Disk.sides {
+            playerControls[side.index].selectedSegmentIndex = game.playerControls[side.index].rawValue
+        }
+
+        // board
+        for x in game.board.xRange {
+            for y in game.board.yRange {
+                boardView.setDisk(game.board.diskAt(x: x, y: y), atX: x, y: y, animated: false)
             }
         }
     }
+
 }
 
 // MARK: Inputs
@@ -372,14 +305,17 @@ extension ViewController {
     /// プレイヤーのモードが変更された場合に呼ばれるハンドラーです。
     @IBAction func changePlayerControlSegment(_ sender: UISegmentedControl) {
         let side: Disk = Disk(index: playerControls.firstIndex(of: sender)!)
+        let player: Player = Player(rawValue: sender.selectedSegmentIndex)!
+
+        game.playerControls[side.index] = player
         
         try? saveGame()
         
         if let canceller = playerCancellers[side] {
             canceller.cancel()
         }
-        
-        if !isAnimating, side == turn, case .computer = Player(rawValue: sender.selectedSegmentIndex)! {
+
+        if !isAnimating, side == game.turn, case .computer = player {
             playTurnOfComputer()
         }
     }
@@ -391,9 +327,9 @@ extension ViewController: BoardViewDelegate {
     /// - Parameter x: セルの列です。
     /// - Parameter y: セルの行です。
     func boardView(_ boardView: BoardView, didSelectCellAtX x: Int, y: Int) {
-        guard let turn = turn else { return }
+        guard let turn = game.turn else { return }
         if isAnimating { return }
-        guard case .manual = Player(rawValue: playerControls[turn.index].selectedSegmentIndex)! else { return }
+        guard case .manual = game.playerControls[turn.index] else { return }
         // try? because doing nothing when an error occurs
         try? placeDisk(turn, atX: x, y: y, animated: true) { [weak self] _ in
             self?.nextTurn()
@@ -404,105 +340,22 @@ extension ViewController: BoardViewDelegate {
 // MARK: Save and Load
 
 extension ViewController {
-    private var path: String {
-        (NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true).first! as NSString).appendingPathComponent("Game")
-    }
-    
     /// ゲームの状態をファイルに書き出し、保存します。
     func saveGame() throws {
-        var output: String = ""
-        output += turn.symbol
-        for side in Disk.sides {
-            output += playerControls[side.index].selectedSegmentIndex.description
-        }
-        output += "\n"
-        
-        for y in boardView.yRange {
-            for x in boardView.xRange {
-                output += boardView.diskAt(x: x, y: y).symbol
-            }
-            output += "\n"
-        }
-        
-        do {
-            try output.write(toFile: path, atomically: true, encoding: .utf8)
-        } catch let error {
-            throw FileIOError.read(path: path, cause: error)
-        }
+        try repository.save(game)
     }
-    
+
     /// ゲームの状態をファイルから読み込み、復元します。
     func loadGame() throws {
-        let input = try String(contentsOfFile: path, encoding: .utf8)
-        var lines: ArraySlice<Substring> = input.split(separator: "\n")[...]
-        
-        guard var line = lines.popFirst() else {
-            throw FileIOError.read(path: path, cause: nil)
-        }
-        
-        do { // turn
-            guard
-                let diskSymbol = line.popFirst(),
-                let disk = Optional<Disk>(symbol: diskSymbol.description)
-            else {
-                throw FileIOError.read(path: path, cause: nil)
-            }
-            turn = disk
-        }
+        let game = try repository.load()
 
-        // players
-        for side in Disk.sides {
-            guard
-                let playerSymbol = line.popFirst(),
-                let playerNumber = Int(playerSymbol.description),
-                let player = Player(rawValue: playerNumber)
-            else {
-                throw FileIOError.read(path: path, cause: nil)
-            }
-            playerControls[side.index].selectedSegmentIndex = player.rawValue
-        }
-
-        do { // board
-            guard lines.count == boardView.height else {
-                throw FileIOError.read(path: path, cause: nil)
-            }
-            
-            var y = 0
-            while let line = lines.popFirst() {
-                var x = 0
-                for character in line {
-                    let disk = Disk?(symbol: "\(character)").flatMap { $0 }
-                    boardView.setDisk(disk, atX: x, y: y, animated: false)
-                    x += 1
-                }
-                guard x == boardView.width else {
-                    throw FileIOError.read(path: path, cause: nil)
-                }
-                y += 1
-            }
-            guard y == boardView.height else {
-                throw FileIOError.read(path: path, cause: nil)
-            }
-        }
-
+        updateGame(game)
         updateMessageViews()
         updateCountLabels()
-    }
-    
-    enum FileIOError: Error {
-        case write(path: String, cause: Error?)
-        case read(path: String, cause: Error?)
     }
 }
 
 // MARK: Additional types
-
-extension ViewController {
-    enum Player: Int {
-        case manual = 0
-        case computer = 1
-    }
-}
 
 final class Canceller {
     private(set) var isCancelled: Bool = false
@@ -523,51 +376,4 @@ struct DiskPlacementError: Error {
     let disk: Disk
     let x: Int
     let y: Int
-}
-
-// MARK: File-private extensions
-
-extension Disk {
-    init(index: Int) {
-        for side in Disk.sides {
-            if index == side.index {
-                self = side
-                return
-            }
-        }
-        preconditionFailure("Illegal index: \(index)")
-    }
-    
-    var index: Int {
-        switch self {
-        case .dark: return 0
-        case .light: return 1
-        }
-    }
-}
-
-extension Optional where Wrapped == Disk {
-    fileprivate init?<S: StringProtocol>(symbol: S) {
-        switch symbol {
-        case "x":
-            self = .some(.dark)
-        case "o":
-            self = .some(.light)
-        case "-":
-            self = .none
-        default:
-            return nil
-        }
-    }
-    
-    fileprivate var symbol: String {
-        switch self {
-        case .some(.dark):
-            return "x"
-        case .some(.light):
-            return "o"
-        case .none:
-            return "-"
-        }
-    }
 }

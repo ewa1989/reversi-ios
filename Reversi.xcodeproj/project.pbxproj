@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A3B35662A765BFB00527AB1 /* TestHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A3B35652A765BFB00527AB1 /* TestHelper.swift */; };
+		0A700AF92A756C4F00CC14B6 /* ReversiGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A700AF82A756C4F00CC14B6 /* ReversiGame.swift */; };
+		0A700AFA2A756C5200CC14B6 /* ReversiGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A700AF82A756C4F00CC14B6 /* ReversiGame.swift */; };
+		0A700AFF2A7576EA00CC14B6 /* ReversiGameTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A700AFE2A7576EA00CC14B6 /* ReversiGameTest.swift */; };
+		0A700B002A75771C00CC14B6 /* Disk.swift in Sources */ = {isa = PBXBuildFile; fileRef = D642BDD723AA0B5700396732 /* Disk.swift */; };
+		0A700B032A757ADC00CC14B6 /* ReversiGameRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A700B022A757ADC00CC14B6 /* ReversiGameRepository.swift */; };
+		0A700B062A757F7500CC14B6 /* ReversiGameRepositoryTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A700B052A757F7500CC14B6 /* ReversiGameRepositoryTest.swift */; };
+		0A700B072A757F7A00CC14B6 /* ReversiGameRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A700B022A757ADC00CC14B6 /* ReversiGameRepository.swift */; };
 		D636B39F23D35043007F370F /* DiskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D636B39E23D35043007F370F /* DiskView.swift */; };
 		D642BDB423A9FE4500396732 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D642BDB323A9FE4500396732 /* AppDelegate.swift */; };
 		D642BDB623A9FE4500396732 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D642BDB523A9FE4500396732 /* SceneDelegate.swift */; };
@@ -14,7 +22,6 @@
 		D642BDBB23A9FE4500396732 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D642BDB923A9FE4500396732 /* Main.storyboard */; };
 		D642BDBD23A9FE4700396732 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D642BDBC23A9FE4700396732 /* Assets.xcassets */; };
 		D642BDC023A9FE4700396732 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D642BDBE23A9FE4700396732 /* LaunchScreen.storyboard */; };
-		D642BDCB23A9FE4700396732 /* ReversiTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D642BDCA23A9FE4700396732 /* ReversiTests.swift */; };
 		D642BDD623AA0B3900396732 /* CellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D642BDD523AA0B3900396732 /* CellView.swift */; };
 		D642BDD823AA0B5700396732 /* Disk.swift in Sources */ = {isa = PBXBuildFile; fileRef = D642BDD723AA0B5700396732 /* Disk.swift */; };
 		D642BDDC23AA137C00396732 /* BoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D642BDDB23AA137C00396732 /* BoardView.swift */; };
@@ -31,6 +38,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0A3B35652A765BFB00527AB1 /* TestHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHelper.swift; sourceTree = "<group>"; };
+		0A700AF82A756C4F00CC14B6 /* ReversiGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReversiGame.swift; sourceTree = "<group>"; };
+		0A700AFE2A7576EA00CC14B6 /* ReversiGameTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReversiGameTest.swift; sourceTree = "<group>"; };
+		0A700B022A757ADC00CC14B6 /* ReversiGameRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReversiGameRepository.swift; sourceTree = "<group>"; };
+		0A700B052A757F7500CC14B6 /* ReversiGameRepositoryTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReversiGameRepositoryTest.swift; sourceTree = "<group>"; };
 		D636B39E23D35043007F370F /* DiskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskView.swift; sourceTree = "<group>"; };
 		D642BDB023A9FE4500396732 /* Reversi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Reversi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D642BDB323A9FE4500396732 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -41,7 +53,6 @@
 		D642BDBF23A9FE4700396732 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		D642BDC123A9FE4700396732 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D642BDC623A9FE4700396732 /* ReversiTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ReversiTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		D642BDCA23A9FE4700396732 /* ReversiTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReversiTests.swift; sourceTree = "<group>"; };
 		D642BDCC23A9FE4700396732 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D642BDD523AA0B3900396732 /* CellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellView.swift; sourceTree = "<group>"; };
 		D642BDD723AA0B5700396732 /* Disk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Disk.swift; sourceTree = "<group>"; };
@@ -66,6 +77,47 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0A3B35642A765BEB00527AB1 /* TestHelper */ = {
+			isa = PBXGroup;
+			children = (
+				0A3B35652A765BFB00527AB1 /* TestHelper.swift */,
+			);
+			path = TestHelper;
+			sourceTree = "<group>";
+		};
+		0A700AF72A756C4400CC14B6 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				D642BDD723AA0B5700396732 /* Disk.swift */,
+				0A700AF82A756C4F00CC14B6 /* ReversiGame.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		0A700AFD2A7576DB00CC14B6 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				0A700AFE2A7576EA00CC14B6 /* ReversiGameTest.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		0A700B012A757ACB00CC14B6 /* Repository */ = {
+			isa = PBXGroup;
+			children = (
+				0A700B022A757ADC00CC14B6 /* ReversiGameRepository.swift */,
+			);
+			path = Repository;
+			sourceTree = "<group>";
+		};
+		0A700B042A757ECD00CC14B6 /* Repository */ = {
+			isa = PBXGroup;
+			children = (
+				0A700B052A757F7500CC14B6 /* ReversiGameRepositoryTest.swift */,
+			);
+			path = Repository;
+			sourceTree = "<group>";
+		};
 		D636B3A123D43203007F370F /* Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -74,14 +126,6 @@
 				D636B39E23D35043007F370F /* DiskView.swift */,
 			);
 			name = Views;
-			sourceTree = "<group>";
-		};
-		D636B3A423D432D3007F370F /* DataTypes */ = {
-			isa = PBXGroup;
-			children = (
-				D642BDD723AA0B5700396732 /* Disk.swift */,
-			);
-			name = DataTypes;
 			sourceTree = "<group>";
 		};
 		D642BDA723A9FE4500396732 = {
@@ -105,6 +149,8 @@
 		D642BDB223A9FE4500396732 /* Reversi */ = {
 			isa = PBXGroup;
 			children = (
+				0A700B012A757ACB00CC14B6 /* Repository */,
+				0A700AF72A756C4400CC14B6 /* Model */,
 				D642BDB323A9FE4500396732 /* AppDelegate.swift */,
 				D642BDB523A9FE4500396732 /* SceneDelegate.swift */,
 				D642BDB723A9FE4500396732 /* ViewController.swift */,
@@ -113,7 +159,6 @@
 				D642BDBE23A9FE4700396732 /* LaunchScreen.storyboard */,
 				D642BDC123A9FE4700396732 /* Info.plist */,
 				D636B3A123D43203007F370F /* Views */,
-				D636B3A423D432D3007F370F /* DataTypes */,
 			);
 			path = Reversi;
 			sourceTree = "<group>";
@@ -121,7 +166,9 @@
 		D642BDC923A9FE4700396732 /* ReversiTests */ = {
 			isa = PBXGroup;
 			children = (
-				D642BDCA23A9FE4700396732 /* ReversiTests.swift */,
+				0A3B35642A765BEB00527AB1 /* TestHelper */,
+				0A700B042A757ECD00CC14B6 /* Repository */,
+				0A700AFD2A7576DB00CC14B6 /* Model */,
 				D642BDCC23A9FE4700396732 /* Info.plist */,
 			);
 			path = ReversiTests;
@@ -234,6 +281,8 @@
 				D642BDB823A9FE4500396732 /* ViewController.swift in Sources */,
 				D642BDDC23AA137C00396732 /* BoardView.swift in Sources */,
 				D642BDB423A9FE4500396732 /* AppDelegate.swift in Sources */,
+				0A700AF92A756C4F00CC14B6 /* ReversiGame.swift in Sources */,
+				0A700B032A757ADC00CC14B6 /* ReversiGameRepository.swift in Sources */,
 				D642BDB623A9FE4500396732 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -242,7 +291,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D642BDCB23A9FE4700396732 /* ReversiTests.swift in Sources */,
+				0A700B072A757F7A00CC14B6 /* ReversiGameRepository.swift in Sources */,
+				0A700B062A757F7500CC14B6 /* ReversiGameRepositoryTest.swift in Sources */,
+				0A700B002A75771C00CC14B6 /* Disk.swift in Sources */,
+				0A3B35662A765BFB00527AB1 /* TestHelper.swift in Sources */,
+				0A700AFA2A756C5200CC14B6 /* ReversiGame.swift in Sources */,
+				0A700AFF2A7576EA00CC14B6 /* ReversiGameTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
