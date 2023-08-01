@@ -62,4 +62,14 @@ class ViewModel<GameRepository: ReversiGameRepository> {
             viewController.playTurnOfComputer()
         }
     }
+
+    func didSelectCellAt(x: Int, y: Int) {
+        guard let turn = viewController.game.turn else { return }
+        if viewController.isAnimating { return }
+        guard case .manual = viewController.game.playerControls[turn.index] else { return }
+        // try? because doing nothing when an error occurs
+        try? viewController.placeDisk(turn, atX: x, y: y, animated: true) { [weak self] _ in
+            self?.viewController.nextTurn()
+        }
+    }
 }
