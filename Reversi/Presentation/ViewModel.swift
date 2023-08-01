@@ -48,4 +48,18 @@ class ViewModel<GameRepository: ReversiGameRepository> {
         viewController.newGame()
         viewController.waitForPlayer()
     }
+
+    func changePlayerControl(of side: Disk, to player: Player) {
+        viewController.game.playerControls[side.index] = player
+
+        try? viewController.saveGame()
+
+        if let canceller = viewController.playerCancellers[side] {
+            canceller.cancel()
+        }
+
+        if !viewController.isAnimating, side == viewController.game.turn, case .computer = player {
+            viewController.playTurnOfComputer()
+        }
+    }
 }

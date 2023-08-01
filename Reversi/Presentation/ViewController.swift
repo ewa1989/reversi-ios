@@ -19,14 +19,14 @@ class ViewController: UIViewController {
     @IBOutlet private var playerActivityIndicators: [UIActivityIndicatorView]!
     
     var animationCanceller: Canceller?
-    private var isAnimating: Bool { animationCanceller != nil }
+    var isAnimating: Bool { animationCanceller != nil }
     
     var playerCancellers: [Disk: Canceller] = [:]
 
     private let repository = ReversiGameRepositoryImpl(strategy: LocalFileSaveAndLoadStrategy())
 
     /// ゲームの状態を管理します
-    private var game = ReversiGame()
+    var game = ReversiGame()
 
     private var viewModel: ViewModel<ReversiGameRepositoryImpl<LocalFileSaveAndLoadStrategy>>!
 
@@ -294,17 +294,7 @@ extension ViewController {
         let side: Disk = Disk(index: playerControls.firstIndex(of: sender)!)
         let player: Player = Player(rawValue: sender.selectedSegmentIndex)!
 
-        game.playerControls[side.index] = player
-        
-        try? saveGame()
-        
-        if let canceller = playerCancellers[side] {
-            canceller.cancel()
-        }
-
-        if !isAnimating, side == game.turn, case .computer = player {
-            playTurnOfComputer()
-        }
+        viewModel.changePlayerControl(of: side, to: player)
     }
 }
 
