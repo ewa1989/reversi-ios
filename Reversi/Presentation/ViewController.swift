@@ -18,10 +18,10 @@ class ViewController: UIViewController {
     @IBOutlet private var countLabels: [UILabel]!
     @IBOutlet private var playerActivityIndicators: [UIActivityIndicatorView]!
     
-    private var animationCanceller: Canceller?
+    var animationCanceller: Canceller?
     private var isAnimating: Bool { animationCanceller != nil }
     
-    private var playerCancellers: [Disk: Canceller] = [:]
+    var playerCancellers: [Disk: Canceller] = [:]
 
     private let repository = ReversiGameRepositoryImpl(strategy: LocalFileSaveAndLoadStrategy())
 
@@ -42,7 +42,7 @@ class ViewController: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
+
         viewModel.viewDidAppear()
     }
 }
@@ -284,16 +284,7 @@ extension ViewController {
         alertController.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] _ in
             guard let self = self else { return }
             
-            self.animationCanceller?.cancel()
-            self.animationCanceller = nil
-            
-            for side in Disk.sides {
-                self.playerCancellers[side]?.cancel()
-                self.playerCancellers.removeValue(forKey: side)
-            }
-            
-            self.newGame()
-            self.waitForPlayer()
+            self.viewModel.reset()
         })
         present(alertController, animated: true)
     }

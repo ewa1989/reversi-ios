@@ -35,4 +35,17 @@ class ViewModel<GameRepository: ReversiGameRepository> {
         viewHasAppeared = true
         viewController.waitForPlayer()
     }
+
+    func reset() {
+        viewController.animationCanceller?.cancel()
+        viewController.animationCanceller = nil
+
+        for side in Disk.sides {
+            viewController.playerCancellers[side]?.cancel()
+            viewController.playerCancellers.removeValue(forKey: side)
+        }
+
+        viewController.newGame()
+        viewController.waitForPlayer()
+    }
 }
