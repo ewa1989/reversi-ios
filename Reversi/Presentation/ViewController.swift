@@ -149,17 +149,6 @@ extension ViewController {
         
         try? saveGame()
     }
-    
-    /// プレイヤーの行動を待ちます。
-    func waitForPlayer() {
-        guard let turn = self.viewModel.game.turn else { return }
-        switch viewModel.game.playerControls[turn.index] {
-        case .manual:
-            break
-        case .computer:
-            playTurnOfComputer()
-        }
-    }
 
     /// プレイヤーの行動後、そのプレイヤーのターンを終了して次のターンを開始します。
     /// もし、次のプレイヤーに有効な手が存在しない場合、パスとなります。
@@ -184,7 +173,7 @@ extension ViewController {
         } else {
             viewModel.game.turn = turn
             updateMessageViews()
-            waitForPlayer()
+            viewModel.waitForPlayer()
         }
     }
     

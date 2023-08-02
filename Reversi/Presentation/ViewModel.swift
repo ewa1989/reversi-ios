@@ -36,7 +36,7 @@ class ViewModel<GameRepository: ReversiGameRepository> {
     func viewDidAppear() {
         if viewHasAppeared { return }
         viewHasAppeared = true
-        viewController.waitForPlayer()
+        waitForPlayer()
     }
 
     func reset() {
@@ -49,7 +49,7 @@ class ViewModel<GameRepository: ReversiGameRepository> {
         }
 
         viewController.newGame()
-        viewController.waitForPlayer()
+        waitForPlayer()
     }
 
     func changePlayerControl(of side: Disk, to player: Player) {
@@ -83,5 +83,16 @@ class ViewModel<GameRepository: ReversiGameRepository> {
         viewController.updateGame(game)
         viewController.updateMessageViews()
         viewController.updateCountLabels()
+    }
+
+    /// プレイヤーの行動を待ちます。
+    func waitForPlayer() {
+        guard let turn = self.game.turn else { return }
+        switch game.playerControls[turn.index] {
+        case .manual:
+            break
+        case .computer:
+            viewController.playTurnOfComputer()
+        }
     }
 }
