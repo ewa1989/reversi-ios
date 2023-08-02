@@ -77,7 +77,7 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
         if viewController.isAnimating { return }
         guard case .manual = game.playerControls[turn.index] else { return }
         // try? because doing nothing when an error occurs
-        try? viewController.placeDisk(turn, atX: x, y: y, animated: true) { [weak self] _ in
+        try? placeDisk(turn, atX: x, y: y, animated: true) { [weak self] _ in
             self?.nextTurn()
         }
     }
@@ -120,7 +120,7 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
             if canceller.isCancelled { return }
             cleanUp()
 
-            try! self.viewController.placeDisk(turn, atX: coordinate.x, y: coordinate.y, animated: true) { [weak self] _ in
+            try! self.placeDisk(turn, atX: coordinate.x, y: coordinate.y, animated: true) { [weak self] _ in
                 self?.nextTurn()
             }
         }
@@ -174,4 +174,52 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
 
         try? gameRepository.save(game)
     }
+
+    /// `x`, `y` で指定されたセルに `disk` を置きます。
+    /// - Parameter x: セルの列です。
+    /// - Parameter y: セルの行です。
+    /// - Parameter isAnimated: ディスクを置いたりひっくり返したりするアニメーションを表示するかどうかを指定します。
+    /// - Parameter completion: アニメーション完了時に実行されるクロージャです。
+    ///     このクロージャは値を返さず、アニメーションが完了したかを示す真偽値を受け取ります。
+    ///     もし `animated` が `false` の場合、このクロージャは次の run loop サイクルの初めに実行されます。
+    /// - Throws: もし `disk` を `x`, `y` で指定されるセルに置けない場合、 `DiskPlacementError` を `throw` します。
+    private func placeDisk(_ disk: Disk, atX x: Int, y: Int, animated isAnimated: Bool, completion: ((Bool) -> Void)? = nil) throws {
+        let diskCoordinates = game.board.flippedDiskCoordinatesByPlacingDisk(disk, atX: x, y: y)
+        if diskCoordinates.isEmpty {
+            throw DiskPlacementError(disk: disk, x: x, y: y)
+        }
+
+        if isAnimated {
+            let cleanUp: () -> Void = { [weak self] in
+                self?.viewController.animationCanceller = nil
+            }
+            viewController.animationCanceller = Canceller(cleanUp)
+            viewController.animateSettingDisks(at: [Coordinate(x: x, y: y)] + diskCoordinates, to: disk) { [weak self] isFinished in
+                guard let self = self else { return }
+                guard let canceller = self.viewController.animationCanceller else { return }
+                if canceller.isCancelled { return }
+                cleanUp()
+
+                completion?(isFinished)
+                try? gameRepository.save(game)
+                self.viewController.updateCountLabels()
+            }
+        } else {
+            dispatcher.async { [weak self] in
+                guard let self = self else { return }
+                self.game.board.setDisk(disk, atX: x, y: y)
+
+                self.viewController.boardView.setDisk(disk, atX: x, y: y, animated: false)
+                for diskCoordinate in diskCoordinates {
+                    self.game.board.setDisk(disk, atX: diskCoordinate.x, y: diskCoordinate.y)
+
+                    self.viewController.boardView.setDisk(disk, atX: diskCoordinate.x, y: diskCoordinate.y, animated: false)
+                }
+                completion?(true)
+                try? gameRepository.save(game)
+                self.viewController.updateCountLabels()
+            }
+        }
+    }
+
 }
