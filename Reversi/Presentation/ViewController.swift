@@ -5,7 +5,7 @@ class ViewController: UIViewController {
     
     @IBOutlet private var messageDiskView: DiskView!
     @IBOutlet private var messageLabel: UILabel!
-    @IBOutlet var messageDiskSizeConstraint: NSLayoutConstraint!
+    @IBOutlet private var messageDiskSizeConstraint: NSLayoutConstraint!
     
     @IBOutlet var playerControls: [UISegmentedControl]!
     @IBOutlet private var countLabels: [UILabel]!
@@ -24,7 +24,7 @@ class ViewController: UIViewController {
 
         boardView.delegate = self
 
-        viewModel.viewDidLoad()
+        viewModel.viewDidLoad(initialDiskSize: messageDiskSizeConstraint.constant)
     }
 
     override func viewDidAppear(_ animated: Bool) {

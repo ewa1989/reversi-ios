@@ -42,8 +42,8 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
         self.dispatcher = dispatcher
     }
 
-    func viewDidLoad() {
-        messageDiskSize = viewController.messageDiskSizeConstraint.constant
+    func viewDidLoad(initialDiskSize: CGFloat) {
+        messageDiskSize = initialDiskSize
 
         do {
             try loadGame()
