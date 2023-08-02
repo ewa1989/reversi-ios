@@ -80,7 +80,8 @@ extension ViewController {
                 self.updateCountLabels()
             }
         } else {
-            DispatchQueue.main.async { [weak self] in
+            let dispatcher = self
+            dispatcher.async { [weak self] in
                 guard let self = self else { return }
                 self.game.board.setDisk(disk, atX: x, y: y)
 
@@ -203,7 +204,8 @@ extension ViewController {
             self.playerCancellers[turn] = nil
         }
         let canceller = Canceller(cleanUp)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+        let dispatcher = self
+        dispatcher.asyncAfter(seconds: 2.0) { [weak self] in
             guard let self = self else { return }
             if canceller.isCancelled { return }
             cleanUp()
@@ -279,6 +281,21 @@ extension ViewController {
         alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: cancelHandler))
         alertController.addAction(UIAlertAction(title: "OK", style: .default, handler: defaultHandler))
         present(alertController, animated: true)
+    }
+}
+
+protocol Dispatchable {
+    func async(execute work: @escaping () -> Void)
+    func asyncAfter(seconds: Double, execute work: @escaping () -> Void)
+}
+
+extension ViewController: Dispatchable {
+    func async(execute work: @escaping () -> Void) {
+        DispatchQueue.main.async(execute: work)
+    }
+
+    func asyncAfter(seconds: Double, execute work: @escaping () -> Void) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + seconds, execute: work)
     }
 }
 
