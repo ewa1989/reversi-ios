@@ -23,9 +23,6 @@ class ViewController: UIViewController {
     
     var playerCancellers: [Disk: Canceller] = [:]
 
-    private let repository = ReversiGameRepositoryImpl(strategy: LocalFileSaveAndLoadStrategy())
-    private let dispatcher = MainQueueDispatcher()
-
     private var viewModel: ViewModel<ReversiGameRepositoryImpl<LocalFileSaveAndLoadStrategy>, MainQueueDispatcher>!
 
     override func viewDidLoad() {
@@ -33,8 +30,8 @@ class ViewController: UIViewController {
 
         viewModel = ViewModel(
             viewController: self,
-            gameRepository: repository,
-            dispatcher: dispatcher
+            gameRepository: ReversiGameRepositoryImpl(strategy: LocalFileSaveAndLoadStrategy()),
+            dispatcher: MainQueueDispatcher()
         )
 
         boardView.delegate = self
