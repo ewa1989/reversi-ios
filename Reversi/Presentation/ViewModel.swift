@@ -78,7 +78,7 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
         guard case .manual = game.playerControls[turn.index] else { return }
         // try? because doing nothing when an error occurs
         try? viewController.placeDisk(turn, atX: x, y: y, animated: true) { [weak self] _ in
-            self?.viewController.nextTurn()
+            self?.nextTurn()
         }
     }
 
@@ -121,10 +121,37 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
             cleanUp()
 
             try! self.viewController.placeDisk(turn, atX: coordinate.x, y: coordinate.y, animated: true) { [weak self] _ in
-                self?.viewController.nextTurn()
+                self?.nextTurn()
             }
         }
 
         viewController.playerCancellers[turn] = canceller
+    }
+
+    /// プレイヤーの行動後、そのプレイヤーのターンを終了して次のターンを開始します。
+    /// もし、次のプレイヤーに有効な手が存在しない場合、パスとなります。
+    /// 両プレイヤーに有効な手がない場合、ゲームの勝敗を表示します。
+    private func nextTurn() {
+        guard var turn = self.game.turn else { return }
+
+        turn.flip()
+
+        if !game.board.canPlaceAnyDisks(by: turn) {
+            if !game.board.canPlaceAnyDisks(by: turn.flipped) {
+                game.turn = nil
+                viewController.updateMessageViews()
+            } else {
+                game.turn = turn
+                viewController.updateMessageViews()
+
+                viewController.showPassAlert() { [weak self] _ in
+                    self?.nextTurn()
+                }
+            }
+        } else {
+            game.turn = turn
+            viewController.updateMessageViews()
+            waitForPlayer()
+        }
     }
 }

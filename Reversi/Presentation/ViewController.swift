@@ -153,33 +153,6 @@ extension ViewController {
         
         try? saveGame()
     }
-
-    /// プレイヤーの行動後、そのプレイヤーのターンを終了して次のターンを開始します。
-    /// もし、次のプレイヤーに有効な手が存在しない場合、パスとなります。
-    /// 両プレイヤーに有効な手がない場合、ゲームの勝敗を表示します。
-    func nextTurn() {
-        guard var turn = self.viewModel.game.turn else { return }
-
-        turn.flip()
-
-        if !viewModel.game.board.canPlaceAnyDisks(by: turn) {
-            if !viewModel.game.board.canPlaceAnyDisks(by: turn.flipped) {
-                viewModel.game.turn = nil
-                updateMessageViews()
-            } else {
-                viewModel.game.turn = turn
-                updateMessageViews()
-
-                showPassAlert() { [weak self] _ in
-                    self?.nextTurn()
-                }
-            }
-        } else {
-            viewModel.game.turn = turn
-            updateMessageViews()
-            viewModel.waitForPlayer()
-        }
-    }
 }
 
 // MARK: Views
@@ -225,7 +198,7 @@ extension ViewController {
         }
     }
 
-    fileprivate func showPassAlert(_ handler: ((UIAlertAction) -> Void)?) {
+    func showPassAlert(_ handler: ((UIAlertAction) -> Void)?) {
         let alertController = UIAlertController(
             title: "Pass",
             message: "Cannot place a disk.",
