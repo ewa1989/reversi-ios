@@ -194,7 +194,7 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
                 self?.viewController.animationCanceller = nil
             }
             viewController.animationCanceller = Canceller(cleanUp)
-            viewController.animateSettingDisks(at: [Coordinate(x: x, y: y)] + diskCoordinates, to: disk) { [weak self] isFinished in
+            animateSettingDisks(at: [Coordinate(x: x, y: y)] + diskCoordinates, to: disk) { [weak self] isFinished in
                 guard let self = self else { return }
                 guard let canceller = self.viewController.animationCanceller else { return }
                 if canceller.isCancelled { return }
@@ -222,4 +222,34 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
         }
     }
 
+    /// `coordinates` で指定されたセルに、アニメーションしながら順番に `disk` を置く。
+    /// `coordinates` から先頭の座標を取得してそのセルに `disk` を置き、
+    /// 残りの座標についてこのメソッドを再帰呼び出しすることで処理が行われる。
+    /// すべてのセルに `disk` が置けたら `completion` ハンドラーが呼び出される。
+    private func animateSettingDisks<C: Collection>(at coordinates: C, to disk: Disk, completion: @escaping (Bool) -> Void)
+    where C.Element == Coordinate
+    {
+        guard let coordinate = coordinates.first else {
+            completion(true)
+            return
+        }
+
+        let animationCanceller = self.viewController.animationCanceller!
+        game.board.setDisk(disk, atX: coordinate.x, y: coordinate.y)
+
+        viewController.boardView.setDisk(disk, atX: coordinate.x, y: coordinate.y, animated: true) { [weak self] isFinished in
+            guard let self = self else { return }
+            if animationCanceller.isCancelled { return }
+            if isFinished {
+                self.animateSettingDisks(at: coordinates.dropFirst(), to: disk, completion: completion)
+            } else {
+                for coordinate in coordinates {
+                    self.game.board.setDisk(disk, atX: coordinate.x, y: coordinate.y)
+
+                    self.viewController.boardView.setDisk(disk, atX: coordinate.x, y: coordinate.y, animated: false)
+                }
+                completion(false)
+            }
+        }
+    }
 }
