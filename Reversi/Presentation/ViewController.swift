@@ -10,10 +10,7 @@ class ViewController: UIViewController {
     @IBOutlet var playerControls: [UISegmentedControl]!
     @IBOutlet private var countLabels: [UILabel]!
     @IBOutlet var playerActivityIndicators: [UIActivityIndicatorView]!
-    
-    var animationCanceller: Canceller?
-    var isAnimating: Bool { animationCanceller != nil }
-    
+
     var playerCancellers: [Disk: Canceller] = [:]
 
     private var viewModel: ViewModel<ReversiGameRepositoryImpl<LocalFileSaveAndLoadStrategy>, MainQueueDispatcher>!

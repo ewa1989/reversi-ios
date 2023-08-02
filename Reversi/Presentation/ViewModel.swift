@@ -27,6 +27,9 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
     /// その際に `messageDiskSize` に保管された値を使います。
     var messageDiskSize: CGFloat!
 
+    private var animationCanceller: Canceller?
+    private var isAnimating: Bool { animationCanceller != nil }
+
     init(
         viewController: ViewController!,
         gameRepository: GameRepository,
@@ -54,8 +57,8 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
     }
 
     func reset() {
-        viewController.animationCanceller?.cancel()
-        viewController.animationCanceller = nil
+        animationCanceller?.cancel()
+        animationCanceller = nil
 
         for side in Disk.sides {
             viewController.playerCancellers[side]?.cancel()
@@ -75,14 +78,14 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
             canceller.cancel()
         }
 
-        if !viewController.isAnimating, side == game.turn, case .computer = player {
+        if !isAnimating, side == game.turn, case .computer = player {
             playTurnOfComputer()
         }
     }
 
     func didSelectCellAt(x: Int, y: Int) {
         guard let turn = game.turn else { return }
-        if viewController.isAnimating { return }
+        if isAnimating { return }
         guard case .manual = game.playerControls[turn.index] else { return }
         // try? because doing nothing when an error occurs
         try? placeDisk(turn, atX: x, y: y, animated: true) { [weak self] _ in
@@ -199,12 +202,12 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
 
         if isAnimated {
             let cleanUp: () -> Void = { [weak self] in
-                self?.viewController.animationCanceller = nil
+                self?.animationCanceller = nil
             }
-            viewController.animationCanceller = Canceller(cleanUp)
+            animationCanceller = Canceller(cleanUp)
             animateSettingDisks(at: [Coordinate(x: x, y: y)] + diskCoordinates, to: disk) { [weak self] isFinished in
                 guard let self = self else { return }
-                guard let canceller = self.viewController.animationCanceller else { return }
+                guard let canceller = self.animationCanceller else { return }
                 if canceller.isCancelled { return }
                 cleanUp()
 
@@ -242,7 +245,7 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
             return
         }
 
-        let animationCanceller = self.viewController.animationCanceller!
+        let animationCanceller = self.animationCanceller!
         game.board.setDisk(disk, atX: coordinate.x, y: coordinate.y)
 
         viewController.boardView.setDisk(disk, atX: coordinate.x, y: coordinate.y, animated: true) { [weak self] isFinished in
