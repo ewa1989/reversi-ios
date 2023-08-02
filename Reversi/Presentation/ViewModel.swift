@@ -35,7 +35,7 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
         do {
             try loadGame()
         } catch _ {
-            viewController.newGame()
+            newGame()
         }
     }
 
@@ -54,7 +54,7 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
             viewController.playerCancellers.removeValue(forKey: side)
         }
 
-        viewController.newGame()
+        newGame()
         waitForPlayer()
     }
 
@@ -153,5 +153,25 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
             viewController.updateMessageViews()
             waitForPlayer()
         }
+    }
+
+    /// ゲームの状態を初期化し、新しいゲームを開始します。
+    private func newGame() {
+        game = ReversiGame.newGame()
+
+        for side in Disk.sides {
+            viewController.playerControls[side.index].selectedSegmentIndex = game.playerControls[side.index].rawValue
+        }
+
+        for y in game.board.yRange {
+            for x in game.board.xRange {
+                viewController.boardView.setDisk(game.board.diskAt(x: x, y: y), atX: x, y: y, animated: false)
+            }
+        }
+
+        viewController.updateMessageViews()
+        viewController.updateCountLabels()
+
+        try? viewController.saveGame()
     }
 }

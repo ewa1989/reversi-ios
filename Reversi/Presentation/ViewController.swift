@@ -1,7 +1,7 @@
 import UIKit
 
 class ViewController: UIViewController {
-    @IBOutlet private var boardView: BoardView!
+    @IBOutlet var boardView: BoardView!
     
     @IBOutlet private var messageDiskView: DiskView!
     @IBOutlet private var messageLabel: UILabel!
@@ -14,7 +14,7 @@ class ViewController: UIViewController {
     /// その際に `messageDiskSize` に保管された値を使います。
     var messageDiskSize: CGFloat!
     
-    @IBOutlet private var playerControls: [UISegmentedControl]!
+    @IBOutlet var playerControls: [UISegmentedControl]!
     @IBOutlet private var countLabels: [UILabel]!
     @IBOutlet var playerActivityIndicators: [UIActivityIndicatorView]!
     
@@ -128,30 +128,6 @@ extension ViewController {
                 completion(false)
             }
         }
-    }
-}
-
-// MARK: Game management
-
-extension ViewController {
-    /// ゲームの状態を初期化し、新しいゲームを開始します。
-    func newGame() {
-        viewModel.game = ReversiGame.newGame()
-
-        for side in Disk.sides {
-            playerControls[side.index].selectedSegmentIndex = viewModel.game.playerControls[side.index].rawValue
-        }
-
-        for y in viewModel.game.board.yRange {
-            for x in viewModel.game.board.xRange {
-                boardView.setDisk(viewModel.game.board.diskAt(x: x, y: y), atX: x, y: y, animated: false)
-            }
-        }
-
-        updateMessageViews()
-        updateCountLabels()
-        
-        try? saveGame()
     }
 }
 
