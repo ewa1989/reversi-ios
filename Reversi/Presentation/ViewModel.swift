@@ -92,7 +92,7 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
     }
 
     /// プレイヤーの行動を待ちます。
-    func waitForPlayer() {
+    private func waitForPlayer() {
         guard let turn = self.game.turn else { return }
         switch game.playerControls[turn.index] {
         case .manual:
