@@ -96,7 +96,7 @@ extension ViewController {
             }
         }
     }
-    
+
     /// `coordinates` で指定されたセルに、アニメーションしながら順番に `disk` を置く。
     /// `coordinates` から先頭の座標を取得してそのセルに `disk` を置き、
     /// 残りの座標についてこのメソッドを再帰呼び出しすることで処理が行われる。
@@ -162,7 +162,7 @@ extension ViewController {
             playTurnOfComputer()
         }
     }
-    
+
     /// プレイヤーの行動後、そのプレイヤーのターンを終了して次のターンを開始します。
     /// もし、次のプレイヤーに有効な手が存在しない場合、パスとなります。
     /// 両プレイヤーに有効な手がない場合、ゲームの勝敗を表示します。
@@ -178,16 +178,10 @@ extension ViewController {
             } else {
                 game.turn = turn
                 updateMessageViews()
-                
-                let alertController = UIAlertController(
-                    title: "Pass",
-                    message: "Cannot place a disk.",
-                    preferredStyle: .alert
-                )
-                alertController.addAction(UIAlertAction(title: "Dismiss", style: .default) { [weak self] _ in
+
+                showPassAlert() { [weak self] _ in
                     self?.nextTurn()
-                })
-                present(alertController, animated: true)
+                }
             }
         } else {
             game.turn = turn
@@ -266,6 +260,26 @@ extension ViewController {
         }
     }
 
+    fileprivate func showPassAlert(_ handler: ((UIAlertAction) -> Void)?) {
+        let alertController = UIAlertController(
+            title: "Pass",
+            message: "Cannot place a disk.",
+            preferredStyle: .alert
+        )
+        alertController.addAction(UIAlertAction(title: "Dismiss", style: .default, handler: handler))
+        present(alertController, animated: true)
+    }
+
+    fileprivate func showResetAlert(didOKSelect defaultHandler: ((UIAlertAction) -> Void)?, didCancelSelect cancelHandler: ((UIAlertAction) -> Void)?) {
+        let alertController = UIAlertController(
+            title: "Confirmation",
+            message: "Do you really want to reset the game?",
+            preferredStyle: .alert
+        )
+        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: cancelHandler))
+        alertController.addAction(UIAlertAction(title: "OK", style: .default, handler: defaultHandler))
+        present(alertController, animated: true)
+    }
 }
 
 // MARK: Inputs
@@ -275,18 +289,14 @@ extension ViewController {
     /// アラートを表示して、ゲームを初期化して良いか確認し、
     /// "OK" が選択された場合ゲームを初期化します。
     @IBAction func pressResetButton(_ sender: UIButton) {
-        let alertController = UIAlertController(
-            title: "Confirmation",
-            message: "Do you really want to reset the game?",
-            preferredStyle: .alert
+        showResetAlert(
+            didOKSelect: { [weak self] _ in
+                guard let self = self else { return }
+
+                self.viewModel.reset()
+            },
+            didCancelSelect: { _ in }
         )
-        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel) { _ in })
-        alertController.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] _ in
-            guard let self = self else { return }
-            
-            self.viewModel.reset()
-        })
-        present(alertController, animated: true)
     }
     
     /// プレイヤーのモードが変更された場合に呼ばれるハンドラーです。
