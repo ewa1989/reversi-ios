@@ -13,6 +13,9 @@ class ViewModel<GameRepository: ReversiGameRepository> {
     private weak var viewController: ViewController!
     private let gameRepository: GameRepository
 
+    /// ゲームの状態を管理します
+    var game = ReversiGame()
+
     var viewHasAppeared: Bool = false
 
     init(viewController: ViewController!, gameRepository: GameRepository) {
@@ -50,7 +53,7 @@ class ViewModel<GameRepository: ReversiGameRepository> {
     }
 
     func changePlayerControl(of side: Disk, to player: Player) {
-        viewController.game.playerControls[side.index] = player
+        game.playerControls[side.index] = player
 
         try? viewController.saveGame()
 
@@ -58,15 +61,15 @@ class ViewModel<GameRepository: ReversiGameRepository> {
             canceller.cancel()
         }
 
-        if !viewController.isAnimating, side == viewController.game.turn, case .computer = player {
+        if !viewController.isAnimating, side == game.turn, case .computer = player {
             viewController.playTurnOfComputer()
         }
     }
 
     func didSelectCellAt(x: Int, y: Int) {
-        guard let turn = viewController.game.turn else { return }
+        guard let turn = game.turn else { return }
         if viewController.isAnimating { return }
-        guard case .manual = viewController.game.playerControls[turn.index] else { return }
+        guard case .manual = game.playerControls[turn.index] else { return }
         // try? because doing nothing when an error occurs
         try? viewController.placeDisk(turn, atX: x, y: y, animated: true) { [weak self] _ in
             self?.viewController.nextTurn()

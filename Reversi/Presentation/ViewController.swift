@@ -25,9 +25,6 @@ class ViewController: UIViewController {
 
     private let repository = ReversiGameRepositoryImpl(strategy: LocalFileSaveAndLoadStrategy())
 
-    /// ゲームの状態を管理します
-    var game = ReversiGame()
-
     private var viewModel: ViewModel<ReversiGameRepositoryImpl<LocalFileSaveAndLoadStrategy>>!
 
     override func viewDidLoad() {
@@ -59,7 +56,7 @@ extension ViewController {
     ///     もし `animated` が `false` の場合、このクロージャは次の run loop サイクルの初めに実行されます。
     /// - Throws: もし `disk` を `x`, `y` で指定されるセルに置けない場合、 `DiskPlacementError` を `throw` します。
     func placeDisk(_ disk: Disk, atX x: Int, y: Int, animated isAnimated: Bool, completion: ((Bool) -> Void)? = nil) throws {
-        let diskCoordinates = game.board.flippedDiskCoordinatesByPlacingDisk(disk, atX: x, y: y)
+        let diskCoordinates = viewModel.game.board.flippedDiskCoordinatesByPlacingDisk(disk, atX: x, y: y)
         if diskCoordinates.isEmpty {
             throw DiskPlacementError(disk: disk, x: x, y: y)
         }
@@ -83,11 +80,11 @@ extension ViewController {
             let dispatcher = self
             dispatcher.async { [weak self] in
                 guard let self = self else { return }
-                self.game.board.setDisk(disk, atX: x, y: y)
+                self.viewModel.game.board.setDisk(disk, atX: x, y: y)
 
                 self.boardView.setDisk(disk, atX: x, y: y, animated: false)
                 for diskCoordinate in diskCoordinates {
-                    self.game.board.setDisk(disk, atX: diskCoordinate.x, y: diskCoordinate.y)
+                    self.viewModel.game.board.setDisk(disk, atX: diskCoordinate.x, y: diskCoordinate.y)
 
                     self.boardView.setDisk(disk, atX: diskCoordinate.x, y: diskCoordinate.y, animated: false)
                 }
@@ -111,7 +108,7 @@ extension ViewController {
         }
         
         let animationCanceller = self.animationCanceller!
-        game.board.setDisk(disk, atX: coordinate.x, y: coordinate.y)
+        viewModel.game.board.setDisk(disk, atX: coordinate.x, y: coordinate.y)
 
         boardView.setDisk(disk, atX: coordinate.x, y: coordinate.y, animated: true) { [weak self] isFinished in
             guard let self = self else { return }
@@ -120,7 +117,7 @@ extension ViewController {
                 self.animateSettingDisks(at: coordinates.dropFirst(), to: disk, completion: completion)
             } else {
                 for coordinate in coordinates {
-                    self.game.board.setDisk(disk, atX: coordinate.x, y: coordinate.y)
+                    self.viewModel.game.board.setDisk(disk, atX: coordinate.x, y: coordinate.y)
 
                     self.boardView.setDisk(disk, atX: coordinate.x, y: coordinate.y, animated: false)
                 }
@@ -135,15 +132,15 @@ extension ViewController {
 extension ViewController {
     /// ゲームの状態を初期化し、新しいゲームを開始します。
     func newGame() {
-        game = ReversiGame.newGame()
+        viewModel.game = ReversiGame.newGame()
 
         for side in Disk.sides {
-            playerControls[side.index].selectedSegmentIndex = game.playerControls[side.index].rawValue
+            playerControls[side.index].selectedSegmentIndex = viewModel.game.playerControls[side.index].rawValue
         }
 
-        for y in game.board.yRange {
-            for x in game.board.xRange {
-                boardView.setDisk(game.board.diskAt(x: x, y: y), atX: x, y: y, animated: false)
+        for y in viewModel.game.board.yRange {
+            for x in viewModel.game.board.xRange {
+                boardView.setDisk(viewModel.game.board.diskAt(x: x, y: y), atX: x, y: y, animated: false)
             }
         }
 
@@ -155,8 +152,8 @@ extension ViewController {
     
     /// プレイヤーの行動を待ちます。
     func waitForPlayer() {
-        guard let turn = self.game.turn else { return }
-        switch game.playerControls[turn.index] {
+        guard let turn = self.viewModel.game.turn else { return }
+        switch viewModel.game.playerControls[turn.index] {
         case .manual:
             break
         case .computer:
@@ -168,16 +165,16 @@ extension ViewController {
     /// もし、次のプレイヤーに有効な手が存在しない場合、パスとなります。
     /// 両プレイヤーに有効な手がない場合、ゲームの勝敗を表示します。
     func nextTurn() {
-        guard var turn = self.game.turn else { return }
+        guard var turn = self.viewModel.game.turn else { return }
 
         turn.flip()
 
-        if !game.board.canPlaceAnyDisks(by: turn) {
-            if !game.board.canPlaceAnyDisks(by: turn.flipped) {
-                game.turn = nil
+        if !viewModel.game.board.canPlaceAnyDisks(by: turn) {
+            if !viewModel.game.board.canPlaceAnyDisks(by: turn.flipped) {
+                viewModel.game.turn = nil
                 updateMessageViews()
             } else {
-                game.turn = turn
+                viewModel.game.turn = turn
                 updateMessageViews()
 
                 showPassAlert() { [weak self] _ in
@@ -185,7 +182,7 @@ extension ViewController {
                 }
             }
         } else {
-            game.turn = turn
+            viewModel.game.turn = turn
             updateMessageViews()
             waitForPlayer()
         }
@@ -193,8 +190,8 @@ extension ViewController {
     
     /// "Computer" が選択されている場合のプレイヤーの行動を決定します。
     func playTurnOfComputer() {
-        guard let turn = self.game.turn else { preconditionFailure() }
-        let coordinate = game.board.validMoves(for: turn).randomElement()!
+        guard let turn = self.viewModel.game.turn else { preconditionFailure() }
+        let coordinate = viewModel.game.board.validMoves(for: turn).randomElement()!
 
         playerActivityIndicators[turn.index].startAnimating()
         
@@ -225,13 +222,13 @@ extension ViewController {
     /// 各プレイヤーの獲得したディスクの枚数を表示します。
     func updateCountLabels() {
         for side in Disk.sides {
-            countLabels[side.index].text = "\(game.board.countDisks(of: side))"
+            countLabels[side.index].text = "\(viewModel.game.board.countDisks(of: side))"
         }
     }
     
     /// 現在の状況に応じてメッセージを表示します。
     func updateMessageViews() {
-        switch game.state {
+        switch viewModel.game.state {
         case .move(side: let side):
             messageDiskSizeConstraint.constant = messageDiskSize
             messageDiskView.disk = side
@@ -247,7 +244,7 @@ extension ViewController {
     }
 
     fileprivate func updateGame(_ game: ReversiGame) {
-        self.game = game
+        self.viewModel.game = game
 
         // players
         for side in Disk.sides {
@@ -255,9 +252,9 @@ extension ViewController {
         }
 
         // board
-        for x in game.board.xRange {
-            for y in game.board.yRange {
-                boardView.setDisk(game.board.diskAt(x: x, y: y), atX: x, y: y, animated: false)
+        for x in viewModel.game.board.xRange {
+            for y in viewModel.game.board.yRange {
+                boardView.setDisk(viewModel.game.board.diskAt(x: x, y: y), atX: x, y: y, animated: false)
             }
         }
     }
@@ -340,7 +337,7 @@ extension ViewController: BoardViewDelegate {
 extension ViewController {
     /// ゲームの状態をファイルに書き出し、保存します。
     func saveGame() throws {
-        try repository.save(game)
+        try repository.save(viewModel.game)
     }
 
     /// ゲームの状態をファイルから読み込み、復元します。
