@@ -78,7 +78,7 @@ extension ViewController {
                 cleanUp()
 
                 completion?(isFinished)
-                try? self.saveGame()
+                try? repository.save(viewModel.game)
                 self.updateCountLabels()
             }
         } else {
@@ -93,7 +93,7 @@ extension ViewController {
                     self.boardView.setDisk(disk, atX: diskCoordinate.x, y: diskCoordinate.y, animated: false)
                 }
                 completion?(true)
-                try? self.saveGame()
+                try? repository.save(viewModel.game)
                 self.updateCountLabels()
             }
         }
@@ -229,15 +229,6 @@ extension ViewController: BoardViewDelegate {
     /// - Parameter y: セルの行です。
     func boardView(_ boardView: BoardView, didSelectCellAtX x: Int, y: Int) {
         viewModel.didSelectCellAt(x: x, y: y)
-    }
-}
-
-// MARK: Save and Load
-
-extension ViewController {
-    /// ゲームの状態をファイルに書き出し、保存します。
-    func saveGame() throws {
-        try repository.save(viewModel.game)
     }
 }
 

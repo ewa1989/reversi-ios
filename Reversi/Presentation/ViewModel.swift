@@ -61,7 +61,7 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
     func changePlayerControl(of side: Disk, to player: Player) {
         game.playerControls[side.index] = player
 
-        try? viewController.saveGame()
+        try? gameRepository.save(game)
 
         if let canceller = viewController.playerCancellers[side] {
             canceller.cancel()
@@ -172,6 +172,6 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
         viewController.updateMessageViews()
         viewController.updateCountLabels()
 
-        try? viewController.saveGame()
+        try? gameRepository.save(game)
     }
 }
