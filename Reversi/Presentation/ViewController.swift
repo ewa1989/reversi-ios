@@ -16,7 +16,7 @@ class ViewController: UIViewController {
     
     @IBOutlet private var playerControls: [UISegmentedControl]!
     @IBOutlet private var countLabels: [UILabel]!
-    @IBOutlet private var playerActivityIndicators: [UIActivityIndicatorView]!
+    @IBOutlet var playerActivityIndicators: [UIActivityIndicatorView]!
     
     var animationCanceller: Canceller?
     var isAnimating: Bool { animationCanceller != nil }
@@ -179,32 +179,6 @@ extension ViewController {
             updateMessageViews()
             viewModel.waitForPlayer()
         }
-    }
-    
-    /// "Computer" が選択されている場合のプレイヤーの行動を決定します。
-    func playTurnOfComputer() {
-        guard let turn = self.viewModel.game.turn else { preconditionFailure() }
-        let coordinate = viewModel.game.board.validMoves(for: turn).randomElement()!
-
-        playerActivityIndicators[turn.index].startAnimating()
-        
-        let cleanUp: () -> Void = { [weak self] in
-            guard let self = self else { return }
-            self.playerActivityIndicators[turn.index].stopAnimating()
-            self.playerCancellers[turn] = nil
-        }
-        let canceller = Canceller(cleanUp)
-        dispatcher.asyncAfter(seconds: 2.0) { [weak self] in
-            guard let self = self else { return }
-            if canceller.isCancelled { return }
-            cleanUp()
-            
-            try! self.placeDisk(turn, atX: coordinate.x, y: coordinate.y, animated: true) { [weak self] _ in
-                self?.nextTurn()
-            }
-        }
-        
-        playerCancellers[turn] = canceller
     }
 }
 

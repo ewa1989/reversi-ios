@@ -68,7 +68,7 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
         }
 
         if !viewController.isAnimating, side == game.turn, case .computer = player {
-            viewController.playTurnOfComputer()
+            playTurnOfComputer()
         }
     }
 
@@ -98,7 +98,33 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
         case .manual:
             break
         case .computer:
-            viewController.playTurnOfComputer()
+            playTurnOfComputer()
         }
+    }
+
+    /// "Computer" が選択されている場合のプレイヤーの行動を決定します。
+    private func playTurnOfComputer() {
+        guard let turn = self.game.turn else { preconditionFailure() }
+        let coordinate = game.board.validMoves(for: turn).randomElement()!
+
+        viewController.playerActivityIndicators[turn.index].startAnimating()
+
+        let cleanUp: () -> Void = { [weak self] in
+            guard let self = self else { return }
+            self.viewController.playerActivityIndicators[turn.index].stopAnimating()
+            self.viewController.playerCancellers[turn] = nil
+        }
+        let canceller = Canceller(cleanUp)
+        dispatcher.asyncAfter(seconds: 2.0) { [weak self] in
+            guard let self = self else { return }
+            if canceller.isCancelled { return }
+            cleanUp()
+
+            try! self.viewController.placeDisk(turn, atX: coordinate.x, y: coordinate.y, animated: true) { [weak self] _ in
+                self?.viewController.nextTurn()
+            }
+        }
+
+        viewController.playerCancellers[turn] = canceller
     }
 }
