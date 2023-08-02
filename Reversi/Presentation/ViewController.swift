@@ -243,7 +243,7 @@ extension ViewController {
         }
     }
 
-    fileprivate func updateGame(_ game: ReversiGame) {
+    func updateGame(_ game: ReversiGame) {
         self.viewModel.game = game
 
         // players
@@ -338,15 +338,6 @@ extension ViewController {
     /// ゲームの状態をファイルに書き出し、保存します。
     func saveGame() throws {
         try repository.save(viewModel.game)
-    }
-
-    /// ゲームの状態をファイルから読み込み、復元します。
-    func loadGame() throws {
-        let game = try repository.load()
-
-        updateGame(game)
-        updateMessageViews()
-        updateCountLabels()
     }
 }
 

@@ -27,7 +27,7 @@ class ViewModel<GameRepository: ReversiGameRepository> {
         viewController.messageDiskSize = viewController.messageDiskSizeConstraint.constant
 
         do {
-            try viewController.loadGame()
+            try loadGame()
         } catch _ {
             viewController.newGame()
         }
@@ -74,5 +74,14 @@ class ViewModel<GameRepository: ReversiGameRepository> {
         try? viewController.placeDisk(turn, atX: x, y: y, animated: true) { [weak self] _ in
             self?.viewController.nextTurn()
         }
+    }
+
+    /// ゲームの状態をファイルから読み込み、復元します。
+    private func loadGame() throws {
+        let game = try gameRepository.load()
+
+        viewController.updateGame(game)
+        viewController.updateMessageViews()
+        viewController.updateCountLabels()
     }
 }
