@@ -30,6 +30,8 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
     private var animationCanceller: Canceller?
     private var isAnimating: Bool { animationCanceller != nil }
 
+    private var playerCancellers: [Disk: Canceller] = [:]
+
     init(
         viewController: ViewController!,
         gameRepository: GameRepository,
@@ -61,8 +63,8 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
         animationCanceller = nil
 
         for side in Disk.sides {
-            viewController.playerCancellers[side]?.cancel()
-            viewController.playerCancellers.removeValue(forKey: side)
+            playerCancellers[side]?.cancel()
+            playerCancellers.removeValue(forKey: side)
         }
 
         newGame()
@@ -74,7 +76,7 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
 
         try? gameRepository.save(game)
 
-        if let canceller = viewController.playerCancellers[side] {
+        if let canceller = playerCancellers[side] {
             canceller.cancel()
         }
 
@@ -123,7 +125,7 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
         let cleanUp: () -> Void = { [weak self] in
             guard let self = self else { return }
             self.viewController.playerActivityIndicators[turn.index].stopAnimating()
-            self.viewController.playerCancellers[turn] = nil
+            self.playerCancellers[turn] = nil
         }
         let canceller = Canceller(cleanUp)
         dispatcher.asyncAfter(seconds: 2.0) { [weak self] in
@@ -136,7 +138,7 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
             }
         }
 
-        viewController.playerCancellers[turn] = canceller
+        playerCancellers[turn] = canceller
     }
 
     /// プレイヤーの行動後、そのプレイヤーのターンを終了して次のターンを開始します。

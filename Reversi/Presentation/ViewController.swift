@@ -11,8 +11,6 @@ class ViewController: UIViewController {
     @IBOutlet private var countLabels: [UILabel]!
     @IBOutlet var playerActivityIndicators: [UIActivityIndicatorView]!
 
-    var playerCancellers: [Disk: Canceller] = [:]
-
     private var viewModel: ViewModel<ReversiGameRepositoryImpl<LocalFileSaveAndLoadStrategy>, MainQueueDispatcher>!
 
     override func viewDidLoad() {
