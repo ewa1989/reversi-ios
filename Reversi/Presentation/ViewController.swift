@@ -6,13 +6,6 @@ class ViewController: UIViewController {
     @IBOutlet private var messageDiskView: DiskView!
     @IBOutlet private var messageLabel: UILabel!
     @IBOutlet var messageDiskSizeConstraint: NSLayoutConstraint!
-    /// Storyboard 上で設定されたサイズを保管します。
-    /// 引き分けの際は `messageDiskView` の表示が必要ないため、
-    /// `messageDiskSizeConstraint.constant` を `0` に設定します。
-    /// その後、新しいゲームが開始されたときに `messageDiskSize` を
-    /// 元のサイズで表示する必要があり、
-    /// その際に `messageDiskSize` に保管された値を使います。
-    var messageDiskSize: CGFloat!
     
     @IBOutlet var playerControls: [UISegmentedControl]!
     @IBOutlet private var countLabels: [UILabel]!
@@ -60,11 +53,11 @@ extension ViewController {
     func updateMessageViews() {
         switch viewModel.game.state {
         case .move(side: let side):
-            messageDiskSizeConstraint.constant = messageDiskSize
+            messageDiskSizeConstraint.constant = viewModel.messageDiskSize
             messageDiskView.disk = side
             messageLabel.text = "'s turn"
         case .win(winner: let winner):
-            messageDiskSizeConstraint.constant = messageDiskSize
+            messageDiskSizeConstraint.constant = viewModel.messageDiskSize
             messageDiskView.disk = winner
             messageLabel.text = " won"
         case .draw:

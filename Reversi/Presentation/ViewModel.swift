@@ -19,6 +19,14 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
 
     var viewHasAppeared: Bool = false
 
+    /// Storyboard 上で設定されたサイズを保管します。
+    /// 引き分けの際は `messageDiskView` の表示が必要ないため、
+    /// `messageDiskSizeConstraint.constant` を `0` に設定します。
+    /// その後、新しいゲームが開始されたときに `messageDiskSize` を
+    /// 元のサイズで表示する必要があり、
+    /// その際に `messageDiskSize` に保管された値を使います。
+    var messageDiskSize: CGFloat!
+
     init(
         viewController: ViewController!,
         gameRepository: GameRepository,
@@ -30,7 +38,7 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
     }
 
     func viewDidLoad() {
-        viewController.messageDiskSize = viewController.messageDiskSizeConstraint.constant
+        messageDiskSize = viewController.messageDiskSizeConstraint.constant
 
         do {
             try loadGame()
