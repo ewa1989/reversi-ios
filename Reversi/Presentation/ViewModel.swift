@@ -8,19 +8,25 @@
 
 import Foundation
 
-class ViewModel<GameRepository: ReversiGameRepository> {
+class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable> {
     /// リファクタリング最中の暫定措置として参照を持っているだけなので後で消す予定
     private weak var viewController: ViewController!
     private let gameRepository: GameRepository
+    private let dispatcher: Dispatcher
 
     /// ゲームの状態を管理します
     var game = ReversiGame()
 
     var viewHasAppeared: Bool = false
 
-    init(viewController: ViewController!, gameRepository: GameRepository) {
+    init(
+        viewController: ViewController!,
+        gameRepository: GameRepository,
+        dispatcher: Dispatcher
+    ) {
         self.viewController = viewController
         self.gameRepository = gameRepository
+        self.dispatcher = dispatcher
     }
 
     func viewDidLoad() {

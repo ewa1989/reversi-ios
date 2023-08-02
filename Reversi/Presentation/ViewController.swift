@@ -24,13 +24,18 @@ class ViewController: UIViewController {
     var playerCancellers: [Disk: Canceller] = [:]
 
     private let repository = ReversiGameRepositoryImpl(strategy: LocalFileSaveAndLoadStrategy())
+    private let dispatcher = MainQueueDispatcher()
 
-    private var viewModel: ViewModel<ReversiGameRepositoryImpl<LocalFileSaveAndLoadStrategy>>!
+    private var viewModel: ViewModel<ReversiGameRepositoryImpl<LocalFileSaveAndLoadStrategy>, MainQueueDispatcher>!
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        viewModel = ViewModel(viewController: self, gameRepository: repository)
+        viewModel = ViewModel(
+            viewController: self,
+            gameRepository: repository,
+            dispatcher: dispatcher
+        )
 
         boardView.delegate = self
 
@@ -77,7 +82,6 @@ extension ViewController {
                 self.updateCountLabels()
             }
         } else {
-            let dispatcher = self
             dispatcher.async { [weak self] in
                 guard let self = self else { return }
                 self.viewModel.game.board.setDisk(disk, atX: x, y: y)
@@ -190,7 +194,6 @@ extension ViewController {
             self.playerCancellers[turn] = nil
         }
         let canceller = Canceller(cleanUp)
-        let dispatcher = self
         dispatcher.asyncAfter(seconds: 2.0) { [weak self] in
             guard let self = self else { return }
             if canceller.isCancelled { return }
@@ -267,21 +270,6 @@ extension ViewController {
         alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: cancelHandler))
         alertController.addAction(UIAlertAction(title: "OK", style: .default, handler: defaultHandler))
         present(alertController, animated: true)
-    }
-}
-
-protocol Dispatchable {
-    func async(execute work: @escaping () -> Void)
-    func asyncAfter(seconds: Double, execute work: @escaping () -> Void)
-}
-
-extension ViewController: Dispatchable {
-    func async(execute work: @escaping () -> Void) {
-        DispatchQueue.main.async(execute: work)
-    }
-
-    func asyncAfter(seconds: Double, execute work: @escaping () -> Void) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + seconds, execute: work)
     }
 }
 
