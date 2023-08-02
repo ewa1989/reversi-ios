@@ -17,7 +17,7 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
     /// ゲームの状態を管理します
     var game = ReversiGame()
 
-    var viewHasAppeared: Bool = false
+    private var viewHasAppeared: Bool = false
 
     /// Storyboard 上で設定されたサイズを保管します。
     /// 引き分けの際は `messageDiskView` の表示が必要ないため、
