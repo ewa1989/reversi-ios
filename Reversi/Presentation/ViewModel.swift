@@ -19,6 +19,8 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
     /// ゲームの状態を管理します
     let game = BehaviorRelay(value: ReversiGame())
 
+    public let diskCount: Observable<[Int]>
+
     private var viewHasAppeared: Bool = false
 
     /// Storyboard 上で設定されたサイズを保管します。
@@ -57,6 +59,7 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
         messageDiskSize = game.map { $0.state }.map { state in
             state == .draw ? 0 : initialDiskSize
         }
+        diskCount = game.map { $0.board.diskCounts }
     }
 
     func viewDidLoad() {
@@ -119,7 +122,6 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
 
         viewController.updateGame()
         viewController.updateMessageViews()
-        viewController.updateCountLabels()
     }
 
     /// プレイヤーの行動を待ちます。
@@ -209,7 +211,6 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
         }
 
         viewController.updateMessageViews()
-        viewController.updateCountLabels()
 
         try? repository.save(game.value)
     }
@@ -241,7 +242,6 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
 
                 completion?(isFinished)
                 try? repository.save(game.value)
-                self.viewController.updateCountLabels()
             }
         } else {
             dispatcher.async { [weak self] in
@@ -259,7 +259,6 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
                 }
                 completion?(true)
                 try? repository.save(game.value)
-                self.viewController.updateCountLabels()
             }
         }
     }

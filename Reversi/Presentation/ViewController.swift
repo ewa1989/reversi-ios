@@ -54,19 +54,22 @@ extension ViewController {
         viewModel.messageDiskSize.subscribe { [weak self] size in
             self?.messageDiskSizeConstraint.constant = size
         }.disposed(by: disposeBag)
+
+        viewModel.diskCount.subscribe { [weak self] count in
+            // FIXME: ViewModel#diskCountの要素数がビルド時に確定しないから（？）かsubscribeしたときに[Int]ではなくEvent<[Int]>になるので、暫定対応としてguard letを入れている。入れずに済むように修正したい。
+            guard let element = count.element, element.count == Disk.sides.count else {
+                return
+            }
+            for side in Disk.sides {
+                self?.countLabels[side.index].text = "\(element[side.index])"
+            }
+        }.disposed(by: disposeBag)
     }
 }
 
 // MARK: Views
 
 extension ViewController {
-    /// 各プレイヤーの獲得したディスクの枚数を表示します。
-    func updateCountLabels() {
-        for side in Disk.sides {
-            countLabels[side.index].text = "\(viewModel.game.value.board.countDisks(of: side))"
-        }
-    }
-    
     /// 現在の状況に応じてメッセージを表示します。
     func updateMessageViews() {
         switch viewModel.game.value.state {
