@@ -22,8 +22,7 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
     public let diskCount: Observable<[Int]>
     public let message: Observable<(Disk?, String)>
     public let playerControls: Observable<[Player]>
-
-    private var viewHasAppeared: Bool = false
+    public let messageDiskSize: Observable<CGFloat>
 
     /// Storyboard 上で設定されたサイズを保管します。
     /// 引き分けの際は `messageDiskView` の表示が必要ないため、
@@ -32,12 +31,6 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
     /// 元のサイズで表示する必要があり、
     /// その際に `initialDiskSize` に保管された値を使います。
     private let initialDiskSize: CGFloat
-    public let messageDiskSize: Observable<CGFloat>
-
-    private var animationCanceller: Canceller?
-    private var isAnimating: Bool { animationCanceller != nil }
-
-    private var playerCancellers: [Disk: Canceller] = [:]
 
     private let _computerProcessing = BehaviorRelay(value: [false, false])
     /// コンピューターの思考状態を表します。
@@ -52,6 +45,13 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
     public var passAlert: Observable<Void> {
         _passAlert.asObservable()
     }
+
+    private var viewHasAppeared: Bool = false
+
+    private var animationCanceller: Canceller?
+    private var isAnimating: Bool { animationCanceller != nil }
+
+    private var playerCancellers: [Disk: Canceller] = [:]
 
     init(
         viewController: ViewController!,
@@ -80,7 +80,11 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
         }
         playerControls = game.map { $0.playerControls }
     }
+}
 
+// MARK: Event from View
+
+extension ViewModel {
     func viewDidLoad() {
         do {
             try loadGame()
@@ -134,16 +138,20 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
         }
     }
 
+    func pass() {
+        nextTurn()
+    }
+}
+
+// MARK: Game Management
+
+extension ViewModel {
     /// ゲームの状態をファイルから読み込み、復元します。
     private func loadGame() throws {
         let value = try repository.load()
         game.accept(value)
 
         viewController.updateGame()
-    }
-
-    func pass() {
-        nextTurn()
     }
 
     /// プレイヤーの行動を待ちます。
