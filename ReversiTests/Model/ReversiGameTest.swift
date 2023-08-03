@@ -19,7 +19,7 @@ final class ReversiGameTest: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    // MARK: setDisk, diskAt, countDisks
+    // MARK: setDisk, diskAt, countDisks, diskCounts
 
     func test_白のディスクをボードの一番先頭に置ける() throws {
         XCTAssertEqual(game.board.countDisks(of: .light), 0)
@@ -28,15 +28,17 @@ final class ReversiGameTest: XCTestCase {
 
         XCTAssertEqual(game.board.countDisks(of: .light), 1)
         XCTAssertEqual(game.board.diskAt(x: 0, y: 0), .light)
+        XCTAssertEqual(game.board.diskCounts, [0, 1])
     }
 
     func test_黒のディスクをボードの一番末尾に置ける() throws {
-        XCTAssertEqual(game.board.countDisks(of: .light), 0)
+        XCTAssertEqual(game.board.countDisks(of: .dark), 0)
 
         game.board.setDisk(.dark, atX: 7, y: 7)
 
         XCTAssertEqual(game.board.countDisks(of: .dark), 1)
         XCTAssertEqual(game.board.diskAt(x: 7, y: 7), .dark)
+        XCTAssertEqual(game.board.diskCounts, [1, 0])
     }
 
     // MARK: sideWithMoreDisks
