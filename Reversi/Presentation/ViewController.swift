@@ -59,13 +59,13 @@ extension ViewController {
     /// 各プレイヤーの獲得したディスクの枚数を表示します。
     func updateCountLabels() {
         for side in Disk.sides {
-            countLabels[side.index].text = "\(viewModel.game.board.countDisks(of: side))"
+            countLabels[side.index].text = "\(viewModel.game.value.board.countDisks(of: side))"
         }
     }
     
     /// 現在の状況に応じてメッセージを表示します。
     func updateMessageViews() {
-        switch viewModel.game.state {
+        switch viewModel.game.value.state {
         case .move(side: let side):
             messageDiskSizeConstraint.constant = viewModel.initialDiskSize
             messageDiskView.disk = side
@@ -83,13 +83,13 @@ extension ViewController {
     func updateGame() {
         // players
         for side in Disk.sides {
-            playerControls[side.index].selectedSegmentIndex = viewModel.game.playerControls[side.index].rawValue
+            playerControls[side.index].selectedSegmentIndex = viewModel.game.value.playerControls[side.index].rawValue
         }
 
         // board
-        for x in viewModel.game.board.xRange {
-            for y in viewModel.game.board.yRange {
-                boardView.setDisk(viewModel.game.board.diskAt(x: x, y: y), atX: x, y: y, animated: false)
+        for x in viewModel.game.value.board.xRange {
+            for y in viewModel.game.value.board.yRange {
+                boardView.setDisk(viewModel.game.value.board.diskAt(x: x, y: y), atX: x, y: y, animated: false)
             }
         }
     }

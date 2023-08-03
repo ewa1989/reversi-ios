@@ -17,7 +17,7 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
     private let dispatcher: Dispatcher
 
     /// ゲームの状態を管理します
-    var game = ReversiGame()
+    let game = BehaviorRelay(value: ReversiGame())
 
     private var viewHasAppeared: Bool = false
 
@@ -82,23 +82,25 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
     }
 
     func changePlayerControl(of side: Disk, to player: Player) {
-        game.playerControls[side.index] = player
+        var value = game.value
+        value.playerControls[side.index] = player
+        game.accept(value)
 
-        try? repository.save(game)
+        try? repository.save(game.value)
 
         if let canceller = playerCancellers[side] {
             canceller.cancel()
         }
 
-        if !isAnimating, side == game.turn, case .computer = player {
+        if !isAnimating, side == game.value.turn, case .computer = player {
             playTurnOfComputer()
         }
     }
 
     func didSelectCellAt(x: Int, y: Int) {
-        guard let turn = game.turn else { return }
+        guard let turn = game.value.turn else { return }
         if isAnimating { return }
-        guard case .manual = game.playerControls[turn.index] else { return }
+        guard case .manual = game.value.playerControls[turn.index] else { return }
         // try? because doing nothing when an error occurs
         try? placeDisk(turn, atX: x, y: y, animated: true) { [weak self] _ in
             self?.nextTurn()
@@ -107,7 +109,8 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
 
     /// ゲームの状態をファイルから読み込み、復元します。
     private func loadGame() throws {
-        game = try repository.load()
+        let value = try repository.load()
+        game.accept(value)
 
         viewController.updateGame()
         viewController.updateMessageViews()
@@ -116,8 +119,8 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
 
     /// プレイヤーの行動を待ちます。
     private func waitForPlayer() {
-        guard let turn = self.game.turn else { return }
-        switch game.playerControls[turn.index] {
+        guard let turn = self.game.value.turn else { return }
+        switch game.value.playerControls[turn.index] {
         case .manual:
             break
         case .computer:
@@ -127,8 +130,8 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
 
     /// "Computer" が選択されている場合のプレイヤーの行動を決定します。
     private func playTurnOfComputer() {
-        guard let turn = self.game.turn else { preconditionFailure() }
-        let coordinate = game.board.validMoves(for: turn).randomElement()!
+        guard let turn = self.game.value.turn else { preconditionFailure() }
+        let coordinate = game.value.board.validMoves(for: turn).randomElement()!
 
         _computerProcessing.start(side: turn)
 
@@ -155,16 +158,21 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
     /// もし、次のプレイヤーに有効な手が存在しない場合、パスとなります。
     /// 両プレイヤーに有効な手がない場合、ゲームの勝敗を表示します。
     private func nextTurn() {
-        guard var turn = self.game.turn else { return }
+        guard var turn = self.game.value.turn else { return }
 
         turn.flip()
 
-        if !game.board.canPlaceAnyDisks(by: turn) {
-            if !game.board.canPlaceAnyDisks(by: turn.flipped) {
-                game.turn = nil
+        if !game.value.board.canPlaceAnyDisks(by: turn) {
+            if !game.value.board.canPlaceAnyDisks(by: turn.flipped) {
+                var value = game.value
+                value.turn = nil
+                game.accept(value)
                 viewController.updateMessageViews()
             } else {
-                game.turn = turn
+                var value = game.value
+                value.turn = turn
+                game.accept(value)
+
                 viewController.updateMessageViews()
 
                 viewController.showPassAlert() { [weak self] _ in
@@ -172,7 +180,9 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
                 }
             }
         } else {
-            game.turn = turn
+            var value = game.value
+            value.turn = turn
+            game.accept(value)
             viewController.updateMessageViews()
             waitForPlayer()
         }
@@ -180,22 +190,23 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
 
     /// ゲームの状態を初期化し、新しいゲームを開始します。
     private func newGame() {
-        game = ReversiGame.newGame()
+        let value = ReversiGame.newGame()
+        game.accept(value)
 
         for side in Disk.sides {
-            viewController.playerControls[side.index].selectedSegmentIndex = game.playerControls[side.index].rawValue
+            viewController.playerControls[side.index].selectedSegmentIndex = game.value.playerControls[side.index].rawValue
         }
 
-        for y in game.board.yRange {
-            for x in game.board.xRange {
-                viewController.boardView.setDisk(game.board.diskAt(x: x, y: y), atX: x, y: y, animated: false)
+        for y in game.value.board.yRange {
+            for x in game.value.board.xRange {
+                viewController.boardView.setDisk(value.board.diskAt(x: x, y: y), atX: x, y: y, animated: false)
             }
         }
 
         viewController.updateMessageViews()
         viewController.updateCountLabels()
 
-        try? repository.save(game)
+        try? repository.save(game.value)
     }
 
     /// `x`, `y` で指定されたセルに `disk` を置きます。
@@ -207,7 +218,7 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
     ///     もし `animated` が `false` の場合、このクロージャは次の run loop サイクルの初めに実行されます。
     /// - Throws: もし `disk` を `x`, `y` で指定されるセルに置けない場合、 `DiskPlacementError` を `throw` します。
     private func placeDisk(_ disk: Disk, atX x: Int, y: Int, animated isAnimated: Bool, completion: ((Bool) -> Void)? = nil) throws {
-        let diskCoordinates = game.board.flippedDiskCoordinatesByPlacingDisk(disk, atX: x, y: y)
+        let diskCoordinates = game.value.board.flippedDiskCoordinatesByPlacingDisk(disk, atX: x, y: y)
         if diskCoordinates.isEmpty {
             throw DiskPlacementError(disk: disk, x: x, y: y)
         }
@@ -224,22 +235,25 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
                 cleanUp()
 
                 completion?(isFinished)
-                try? repository.save(game)
+                try? repository.save(game.value)
                 self.viewController.updateCountLabels()
             }
         } else {
             dispatcher.async { [weak self] in
                 guard let self = self else { return }
-                self.game.board.setDisk(disk, atX: x, y: y)
+                var value = self.game.value
+                value.board.setDisk(disk, atX: x, y: y)
+                game.accept(value)
 
                 self.viewController.boardView.setDisk(disk, atX: x, y: y, animated: false)
                 for diskCoordinate in diskCoordinates {
-                    self.game.board.setDisk(disk, atX: diskCoordinate.x, y: diskCoordinate.y)
+                    value.board.setDisk(disk, atX: diskCoordinate.x, y: diskCoordinate.y)
+                    game.accept(value)
 
                     self.viewController.boardView.setDisk(disk, atX: diskCoordinate.x, y: diskCoordinate.y, animated: false)
                 }
                 completion?(true)
-                try? repository.save(game)
+                try? repository.save(game.value)
                 self.viewController.updateCountLabels()
             }
         }
@@ -258,7 +272,9 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
         }
 
         let animationCanceller = self.animationCanceller!
-        game.board.setDisk(disk, atX: coordinate.x, y: coordinate.y)
+        var value = game.value
+        value.board.setDisk(disk, atX: coordinate.x, y: coordinate.y)
+        game.accept(value)
 
         viewController.boardView.setDisk(disk, atX: coordinate.x, y: coordinate.y, animated: true) { [weak self] isFinished in
             guard let self = self else { return }
@@ -267,7 +283,9 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
                 self.animateSettingDisks(at: coordinates.dropFirst(), to: disk, completion: completion)
             } else {
                 for coordinate in coordinates {
-                    self.game.board.setDisk(disk, atX: coordinate.x, y: coordinate.y)
+                    var value = self.game.value
+                    value.board.setDisk(disk, atX: coordinate.x, y: coordinate.y)
+                    game.accept(value)
 
                     self.viewController.boardView.setDisk(disk, atX: coordinate.x, y: coordinate.y, animated: false)
                 }
