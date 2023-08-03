@@ -8,10 +8,10 @@
 
 import Foundation
 
-class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable> {
+class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
     /// リファクタリング最中の暫定措置として参照を持っているだけなので後で消す予定
     private weak var viewController: ViewController!
-    private let gameRepository: GameRepository
+    private let repository: Repository
     private let dispatcher: Dispatcher
 
     /// ゲームの状態を管理します
@@ -34,11 +34,11 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
 
     init(
         viewController: ViewController!,
-        gameRepository: GameRepository,
+        gameRepository: Repository,
         dispatcher: Dispatcher
     ) {
         self.viewController = viewController
-        self.gameRepository = gameRepository
+        self.repository = gameRepository
         self.dispatcher = dispatcher
     }
 
@@ -74,7 +74,7 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
     func changePlayerControl(of side: Disk, to player: Player) {
         game.playerControls[side.index] = player
 
-        try? gameRepository.save(game)
+        try? repository.save(game)
 
         if let canceller = playerCancellers[side] {
             canceller.cancel()
@@ -97,7 +97,7 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
 
     /// ゲームの状態をファイルから読み込み、復元します。
     private func loadGame() throws {
-        game = try gameRepository.load()
+        game = try repository.load()
 
         viewController.updateGame()
         viewController.updateMessageViews()
@@ -185,7 +185,7 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
         viewController.updateMessageViews()
         viewController.updateCountLabels()
 
-        try? gameRepository.save(game)
+        try? repository.save(game)
     }
 
     /// `x`, `y` で指定されたセルに `disk` を置きます。
@@ -214,7 +214,7 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
                 cleanUp()
 
                 completion?(isFinished)
-                try? gameRepository.save(game)
+                try? repository.save(game)
                 self.viewController.updateCountLabels()
             }
         } else {
@@ -229,7 +229,7 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
                     self.viewController.boardView.setDisk(disk, atX: diskCoordinate.x, y: diskCoordinate.y, animated: false)
                 }
                 completion?(true)
-                try? gameRepository.save(game)
+                try? repository.save(game)
                 self.viewController.updateCountLabels()
             }
         }
