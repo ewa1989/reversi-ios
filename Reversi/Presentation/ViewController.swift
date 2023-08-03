@@ -8,7 +8,7 @@ class ViewController: UIViewController {
     @IBOutlet private var messageLabel: UILabel!
     @IBOutlet private var messageDiskSizeConstraint: NSLayoutConstraint!
     
-    @IBOutlet var playerControls: [UISegmentedControl]!
+    @IBOutlet private var playerControls: [UISegmentedControl]!
     @IBOutlet private var countLabels: [UILabel]!
     @IBOutlet private var playerActivityIndicators: [UIActivityIndicatorView]!
 
@@ -43,6 +43,7 @@ class ViewController: UIViewController {
 extension ViewController {
     /// ViewControllerとViewModelをバインドします
     func bind() {
+        // FIXME: 全体的にbind(to:)を使えるように変更したい。型を導入するか、.darkと.lightで変数を分ける必要があるならその方がforループ回すよりシンプルかもしれないので検討してみる。
         viewModel.computerProcessing.subscribe { [weak self] processing in
             for side in Disk.sides {
                 processing[side.index]
@@ -72,6 +73,15 @@ extension ViewController {
             }
             self?.messageDiskView.disk = disk
         }.disposed(by: disposeBag)
+
+        viewModel.playerControls.subscribe { [weak self] controls in
+            guard let element = controls.element, element.count == Disk.sides.count else {
+                return
+            }
+            for side in Disk.sides {
+                self?.playerControls[side.index].selectedSegmentIndex = element[side.index].rawValue
+            }
+        }.disposed(by: disposeBag)
     }
 }
 
@@ -79,11 +89,6 @@ extension ViewController {
 
 extension ViewController {
     func updateGame() {
-        // players
-        for side in Disk.sides {
-            playerControls[side.index].selectedSegmentIndex = viewModel.game.value.playerControls[side.index].rawValue
-        }
-
         // board
         for x in viewModel.game.value.board.xRange {
             for y in viewModel.game.value.board.yRange {

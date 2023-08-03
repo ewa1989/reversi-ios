@@ -21,6 +21,7 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
 
     public let diskCount: Observable<[Int]>
     public let message: Observable<(Disk?, String)>
+    public let playerControls: Observable<[Player]>
 
     private var viewHasAppeared: Bool = false
 
@@ -71,6 +72,7 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
                 return (nil ,"Tied")
             }
         }
+        playerControls = game.map { $0.playerControls }
     }
 
     func viewDidLoad() {
@@ -206,10 +208,6 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
     private func newGame() {
         let value = ReversiGame.newGame()
         game.accept(value)
-
-        for side in Disk.sides {
-            viewController.playerControls[side.index].selectedSegmentIndex = game.value.playerControls[side.index].rawValue
-        }
 
         for y in game.value.board.yRange {
             for x in game.value.board.xRange {
