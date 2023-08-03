@@ -97,9 +97,9 @@ class ViewModel<GameRepository: ReversiGameRepository, Dispatcher: Dispatchable>
 
     /// ゲームの状態をファイルから読み込み、復元します。
     private func loadGame() throws {
-        let game = try gameRepository.load()
+        game = try gameRepository.load()
 
-        viewController.updateGame(game)
+        viewController.updateGame()
         viewController.updateMessageViews()
         viewController.updateCountLabels()
     }

@@ -61,12 +61,10 @@ extension ViewController {
         }
     }
 
-    func updateGame(_ game: ReversiGame) {
-        self.viewModel.game = game
-
+    func updateGame() {
         // players
         for side in Disk.sides {
-            playerControls[side.index].selectedSegmentIndex = game.playerControls[side.index].rawValue
+            playerControls[side.index].selectedSegmentIndex = viewModel.game.playerControls[side.index].rawValue
         }
 
         // board
