@@ -19,12 +19,13 @@ class ViewController: UIViewController {
         viewModel = ViewModel(
             viewController: self,
             gameRepository: ReversiGameRepositoryImpl(strategy: LocalFileSaveAndLoadStrategy()),
-            dispatcher: MainQueueDispatcher()
+            dispatcher: MainQueueDispatcher(),
+            initialDiskSize: messageDiskSizeConstraint.constant
         )
 
         boardView.delegate = self
 
-        viewModel.viewDidLoad(initialDiskSize: messageDiskSizeConstraint.constant)
+        viewModel.viewDidLoad()
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -48,11 +49,11 @@ extension ViewController {
     func updateMessageViews() {
         switch viewModel.game.state {
         case .move(side: let side):
-            messageDiskSizeConstraint.constant = viewModel.messageDiskSize
+            messageDiskSizeConstraint.constant = viewModel.initialDiskSize
             messageDiskView.disk = side
             messageLabel.text = "'s turn"
         case .win(winner: let winner):
-            messageDiskSizeConstraint.constant = viewModel.messageDiskSize
+            messageDiskSizeConstraint.constant = viewModel.initialDiskSize
             messageDiskView.disk = winner
             messageLabel.text = " won"
         case .draw:

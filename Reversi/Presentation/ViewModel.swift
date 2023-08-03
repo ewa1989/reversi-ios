@@ -24,8 +24,8 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
     /// `messageDiskSizeConstraint.constant` を `0` に設定します。
     /// その後、新しいゲームが開始されたときに `messageDiskSize` を
     /// 元のサイズで表示する必要があり、
-    /// その際に `messageDiskSize` に保管された値を使います。
-    var messageDiskSize: CGFloat!
+    /// その際に `initialDiskSize` に保管された値を使います。
+    let initialDiskSize: CGFloat
 
     private var animationCanceller: Canceller?
     private var isAnimating: Bool { animationCanceller != nil }
@@ -35,16 +35,16 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
     init(
         viewController: ViewController!,
         gameRepository: Repository,
-        dispatcher: Dispatcher
+        dispatcher: Dispatcher,
+        initialDiskSize: CGFloat
     ) {
         self.viewController = viewController
         self.repository = gameRepository
         self.dispatcher = dispatcher
+        self.initialDiskSize = initialDiskSize
     }
 
-    func viewDidLoad(initialDiskSize: CGFloat) {
-        messageDiskSize = initialDiskSize
-
+    func viewDidLoad() {
         do {
             try loadGame()
         } catch _ {
