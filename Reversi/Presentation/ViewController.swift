@@ -1,4 +1,5 @@
 import UIKit
+import RxSwift
 
 class ViewController: UIViewController {
     @IBOutlet var boardView: BoardView!
@@ -9,9 +10,10 @@ class ViewController: UIViewController {
     
     @IBOutlet var playerControls: [UISegmentedControl]!
     @IBOutlet private var countLabels: [UILabel]!
-    @IBOutlet var playerActivityIndicators: [UIActivityIndicatorView]!
+    @IBOutlet private var playerActivityIndicators: [UIActivityIndicatorView]!
 
     private var viewModel: ViewModel<ReversiGameRepositoryImpl<LocalFileSaveAndLoadStrategy>, MainQueueDispatcher>!
+    private let disposeBag = DisposeBag()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,6 +24,7 @@ class ViewController: UIViewController {
             dispatcher: MainQueueDispatcher(),
             initialDiskSize: messageDiskSizeConstraint.constant
         )
+        bind()
 
         boardView.delegate = self
 
@@ -32,6 +35,21 @@ class ViewController: UIViewController {
         super.viewDidAppear(animated)
 
         viewModel.viewDidAppear()
+    }
+}
+
+// MARK: bind ViewController with ViewModel
+
+extension ViewController {
+    /// ViewControllerとViewModelをバインドします
+    func bind() {
+        viewModel.computerProcessing.subscribe { [weak self] processing in
+            for side in Disk.sides {
+                processing[side.index]
+                ? self?.playerActivityIndicators[side.index].startAnimating()
+                : self?.playerActivityIndicators[side.index].stopAnimating()
+            }
+        }.disposed(by: disposeBag)
     }
 }
 

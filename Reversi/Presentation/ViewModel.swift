@@ -7,6 +7,8 @@
 //
 
 import Foundation
+import RxSwift
+import RxRelay
 
 class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
     /// リファクタリング最中の暫定措置として参照を持っているだけなので後で消す予定
@@ -31,6 +33,14 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
     private var isAnimating: Bool { animationCanceller != nil }
 
     private var playerCancellers: [Disk: Canceller] = [:]
+
+    private let _computerProcessing = BehaviorRelay(value: [false, false])
+    /// コンピューターの思考状態を表します。
+    /// `true`: 思考中です。
+    /// `false`: 思考中ではりません。
+    public var computerProcessing: Observable<[Bool]> {
+        _computerProcessing.asObservable()
+    }
 
     init(
         viewController: ViewController!,
@@ -120,11 +130,11 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
         guard let turn = self.game.turn else { preconditionFailure() }
         let coordinate = game.board.validMoves(for: turn).randomElement()!
 
-        viewController.playerActivityIndicators[turn.index].startAnimating()
+        _computerProcessing.start(side: turn)
 
         let cleanUp: () -> Void = { [weak self] in
             guard let self = self else { return }
-            self.viewController.playerActivityIndicators[turn.index].stopAnimating()
+            self._computerProcessing.finish(side: turn)
             self.playerCancellers[turn] = nil
         }
         let canceller = Canceller(cleanUp)
@@ -264,6 +274,24 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
                 completion(false)
             }
         }
+    }
+}
+
+private extension BehaviorRelay where Element == [Bool] {
+    /// 指定した側のコンピューターの思考状態を思考中に更新します。
+    /// - Parameter side: 状態を変更する側です。
+    func start(side: Disk) {
+        var value = self.value
+        value[side.index] = true
+        self.accept(value)
+    }
+
+    /// 指定した側のコンピューターの思考状態を思考終了に更新します。
+    /// - Parameter side: 状態を変更する側です。
+    func finish(side: Disk) {
+        var value = self.value
+        value[side.index] = false
+        self.accept(value)
     }
 }
 
