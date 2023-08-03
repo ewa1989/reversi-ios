@@ -97,13 +97,15 @@ extension ViewController {
         }
     }
 
-    func showPassAlert(_ handler: ((UIAlertAction) -> Void)?) {
+    func showPassAlert() {
         let alertController = UIAlertController(
             title: "Pass",
             message: "Cannot place a disk.",
             preferredStyle: .alert
         )
-        alertController.addAction(UIAlertAction(title: "Dismiss", style: .default, handler: handler))
+        alertController.addAction(UIAlertAction(title: "Dismiss", style: .default, handler: { [weak self] _ in
+            self?.viewModel.pass()
+        }))
         present(alertController, animated: true)
     }
 

@@ -136,6 +136,10 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
         viewController.updateGame()
     }
 
+    func pass() {
+        nextTurn()
+    }
+
     /// プレイヤーの行動を待ちます。
     private func waitForPlayer() {
         guard let turn = self.game.value.turn else { return }
@@ -191,10 +195,7 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
                 value.turn = turn
                 game.accept(value)
 
-
-                viewController.showPassAlert() { [weak self] _ in
-                    self?.nextTurn()
-                }
+                viewController.showPassAlert()
             }
         } else {
             var value = game.value
