@@ -47,6 +47,12 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
         _computerProcessing.asObservable()
     }
 
+    private let _passAlert = PublishRelay<Void>()
+    /// パスのアラートを表示すべきタイミングを通知します。
+    public var passAlert: Observable<Void> {
+        _passAlert.asObservable()
+    }
+
     init(
         viewController: ViewController!,
         gameRepository: Repository,
@@ -195,7 +201,7 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
                 value.turn = turn
                 game.accept(value)
 
-                viewController.showPassAlert()
+                _passAlert.accept(())
             }
         } else {
             var value = game.value

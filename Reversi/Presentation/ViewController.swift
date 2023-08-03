@@ -82,6 +82,10 @@ extension ViewController {
                 self?.playerControls[side.index].selectedSegmentIndex = element[side.index].rawValue
             }
         }.disposed(by: disposeBag)
+
+        viewModel.passAlert.subscribe(onNext: { [weak self] in
+            self?.showPassAlert()
+        }).disposed(by: disposeBag)
     }
 }
 
@@ -97,7 +101,7 @@ extension ViewController {
         }
     }
 
-    func showPassAlert() {
+    private func showPassAlert() {
         let alertController = UIAlertController(
             title: "Pass",
             message: "Cannot place a disk.",
