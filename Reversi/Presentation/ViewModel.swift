@@ -27,7 +27,8 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
     /// その後、新しいゲームが開始されたときに `messageDiskSize` を
     /// 元のサイズで表示する必要があり、
     /// その際に `initialDiskSize` に保管された値を使います。
-    let initialDiskSize: CGFloat
+    private let initialDiskSize: CGFloat
+    public let messageDiskSize: Observable<CGFloat>
 
     private var animationCanceller: Canceller?
     private var isAnimating: Bool { animationCanceller != nil }
@@ -52,6 +53,10 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
         self.repository = gameRepository
         self.dispatcher = dispatcher
         self.initialDiskSize = initialDiskSize
+
+        messageDiskSize = game.map { $0.state }.map { state in
+            state == .draw ? 0 : initialDiskSize
+        }
     }
 
     func viewDidLoad() {

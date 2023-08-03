@@ -50,6 +50,10 @@ extension ViewController {
                 : self?.playerActivityIndicators[side.index].stopAnimating()
             }
         }.disposed(by: disposeBag)
+
+        viewModel.messageDiskSize.subscribe { [weak self] size in
+            self?.messageDiskSizeConstraint.constant = size
+        }.disposed(by: disposeBag)
     }
 }
 
@@ -67,15 +71,12 @@ extension ViewController {
     func updateMessageViews() {
         switch viewModel.game.value.state {
         case .move(side: let side):
-            messageDiskSizeConstraint.constant = viewModel.initialDiskSize
             messageDiskView.disk = side
             messageLabel.text = "'s turn"
         case .win(winner: let winner):
-            messageDiskSizeConstraint.constant = viewModel.initialDiskSize
             messageDiskView.disk = winner
             messageLabel.text = " won"
         case .draw:
-            messageDiskSizeConstraint.constant = 0
             messageLabel.text = "Tied"
         }
     }
