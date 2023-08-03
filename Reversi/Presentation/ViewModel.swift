@@ -20,6 +20,7 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
     let game = BehaviorRelay(value: ReversiGame())
 
     public let diskCount: Observable<[Int]>
+    public let message: Observable<(Disk?, String)>
 
     private var viewHasAppeared: Bool = false
 
@@ -60,6 +61,16 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
             state == .draw ? 0 : initialDiskSize
         }
         diskCount = game.map { $0.board.diskCounts }
+        message = game.map { $0.state }.map {
+            switch $0 {
+            case .move(side: let side):
+                return (side, "'s turn")
+            case .win(winner: let winner):
+                return (winner, " won")
+            case .draw:
+                return (nil ,"Tied")
+            }
+        }
     }
 
     func viewDidLoad() {
@@ -121,7 +132,6 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
         game.accept(value)
 
         viewController.updateGame()
-        viewController.updateMessageViews()
     }
 
     /// プレイヤーの行動を待ちます。
@@ -174,13 +184,11 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
                 var value = game.value
                 value.turn = nil
                 game.accept(value)
-                viewController.updateMessageViews()
             } else {
                 var value = game.value
                 value.turn = turn
                 game.accept(value)
 
-                viewController.updateMessageViews()
 
                 viewController.showPassAlert() { [weak self] _ in
                     self?.nextTurn()
@@ -190,7 +198,6 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
             var value = game.value
             value.turn = turn
             game.accept(value)
-            viewController.updateMessageViews()
             waitForPlayer()
         }
     }
@@ -209,8 +216,6 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
                 viewController.boardView.setDisk(value.board.diskAt(x: x, y: y), atX: x, y: y, animated: false)
             }
         }
-
-        viewController.updateMessageViews()
 
         try? repository.save(game.value)
     }

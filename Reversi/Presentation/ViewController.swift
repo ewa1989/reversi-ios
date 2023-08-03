@@ -64,26 +64,20 @@ extension ViewController {
                 self?.countLabels[side.index].text = "\(element[side.index])"
             }
         }.disposed(by: disposeBag)
+
+        viewModel.message.subscribe { [weak self] (disk, label) in
+            self?.messageLabel.text = label
+            guard let disk = disk else {
+                return
+            }
+            self?.messageDiskView.disk = disk
+        }.disposed(by: disposeBag)
     }
 }
 
 // MARK: Views
 
 extension ViewController {
-    /// 現在の状況に応じてメッセージを表示します。
-    func updateMessageViews() {
-        switch viewModel.game.value.state {
-        case .move(side: let side):
-            messageDiskView.disk = side
-            messageLabel.text = "'s turn"
-        case .win(winner: let winner):
-            messageDiskView.disk = winner
-            messageLabel.text = " won"
-        case .draw:
-            messageLabel.text = "Tied"
-        }
-    }
-
     func updateGame() {
         // players
         for side in Disk.sides {
