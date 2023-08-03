@@ -19,7 +19,7 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
     /// ゲームの状態を管理します
     let game = BehaviorRelay(value: ReversiGame())
 
-    public let diskCount: Observable<[Int]>
+    public let diskCounts: Observable<[Int]>
     public let message: Observable<(Disk?, String)>
     public let playerControls: Observable<[Player]>
     public let messageDiskSize: Observable<CGFloat>
@@ -36,7 +36,7 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
     /// コンピューターの思考状態を表します。
     /// `true`: 思考中です。
     /// `false`: 思考中ではりません。
-    public var computerProcessing: Observable<[Bool]> {
+    public var computerProcessings: Observable<[Bool]> {
         _computerProcessing.asObservable()
     }
 
@@ -67,7 +67,7 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
         messageDiskSize = game.map { $0.state }.map { state in
             state == .draw ? 0 : initialDiskSize
         }
-        diskCount = game.map { $0.board.diskCounts }
+        diskCounts = game.map { $0.board.diskCounts }
         message = game.map { $0.state }.map {
             switch $0 {
             case .move(side: let side):

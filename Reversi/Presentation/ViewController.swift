@@ -44,9 +44,9 @@ extension ViewController {
     /// ViewControllerとViewModelをバインドします
     func bind() {
         // FIXME: 全体的にbind(to:)を使えるように変更したい。型を導入するか、.darkと.lightで変数を分ける必要があるならその方がforループ回すよりシンプルかもしれないので検討してみる。
-        viewModel.computerProcessing.subscribe { [weak self] processing in
+        viewModel.computerProcessings.subscribe { [weak self] processings in
             for side in Disk.sides {
-                processing[side.index]
+                processings[side.index]
                 ? self?.playerActivityIndicators[side.index].startAnimating()
                 : self?.playerActivityIndicators[side.index].stopAnimating()
             }
@@ -56,9 +56,9 @@ extension ViewController {
             self?.messageDiskSizeConstraint.constant = size
         }.disposed(by: disposeBag)
 
-        viewModel.diskCount.subscribe { [weak self] count in
+        viewModel.diskCounts.subscribe { [weak self] counts in
             // FIXME: ViewModel#diskCountの要素数がビルド時に確定しないから（？）かsubscribeしたときに[Int]ではなくEvent<[Int]>になるので、暫定対応としてguard letを入れている。入れずに済むように修正したい。
-            guard let element = count.element, element.count == Disk.sides.count else {
+            guard let element = counts.element, element.count == Disk.sides.count else {
                 return
             }
             for side in Disk.sides {
