@@ -46,6 +46,9 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
         _passAlert.asObservable()
     }
 
+    // 最終的には「裏返す予定のディスクの位置」のコレクションを持っておいて、そのコレクションが空=置き終わったとみなせるようにしたい
+    private let finishPlacingDisk = PublishRelay<Void>()
+
     private var viewHasAppeared: Bool = false
 
     private var animationCanceller: Canceller?
@@ -67,7 +70,7 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
         messageDiskSize = game.map { $0.state }.map { state in
             state == .draw ? 0 : initialDiskSize
         }
-        diskCounts = game.map { $0.board.diskCounts }
+        diskCounts = finishPlacingDisk.withLatestFrom(game) { $1.board.diskCounts }
         message = game.map { $0.state }.map {
             switch $0 {
             case .move(side: let side):
@@ -91,6 +94,7 @@ extension ViewModel {
         } catch _ {
             newGame()
         }
+        finishPlacingDisk.accept(())
     }
 
     func viewDidAppear() {
@@ -109,6 +113,7 @@ extension ViewModel {
         }
 
         newGame()
+        finishPlacingDisk.accept(())
         waitForPlayer()
     }
 
@@ -134,6 +139,7 @@ extension ViewModel {
         guard case .manual = game.value.playerControls[turn.index] else { return }
         // try? because doing nothing when an error occurs
         try? placeDisk(turn, atX: x, y: y, animated: true) { [weak self] _ in
+            self?.finishPlacingDisk.accept(())
             self?.nextTurn()
         }
     }
@@ -184,6 +190,7 @@ extension ViewModel {
             cleanUp()
 
             try! self.placeDisk(turn, atX: coordinate.x, y: coordinate.y, animated: true) { [weak self] _ in
+                self?.finishPlacingDisk.accept(())
                 self?.nextTurn()
             }
         }
