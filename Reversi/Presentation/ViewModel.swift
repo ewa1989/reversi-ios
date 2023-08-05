@@ -51,6 +51,7 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
 
     // 最終的には「裏返す予定のディスクの位置」のコレクションを持っておいて、そのコレクションが空=置き終わったとみなせるようにしたい
     private let finishPlacingDisk = PublishRelay<Void>()
+    private var placingDiskCompletion: (() -> Void)?
 
     private var viewHasAppeared: Bool = false
 
@@ -153,6 +154,8 @@ extension ViewModel {
 
     func finishToPlace(isFinished: Bool) {
         if disksToPlace.isEmpty {
+            placingDiskCompletion?()
+            placingDiskCompletion = nil
             return
         }
         if !isFinished {
@@ -184,7 +187,9 @@ extension ViewModel {
         let value = try repository.load()
         game.accept(value)
 
-        viewController.updateGame()
+        setAllCellToChange()
+        let first = disksToPlace.removeFirst()
+        diskToPlace.accept(first)
     }
 
     /// プレイヤーの行動を待ちます。
@@ -253,16 +258,20 @@ extension ViewModel {
         }
     }
 
-    /// ゲームの状態を初期化し、新しいゲームを開始します。
-    private func newGame() {
-        let value = ReversiGame.newGame()
-        game.accept(value)
-
+    fileprivate func setAllCellToChange() {
         for y in game.value.board.yRange {
             for x in game.value.board.xRange {
                 disksToPlace.append(DiskPlacement(disk: game.value.board.diskAt(x: x, y: y), coordinate: Coordinate(x: x, y: y), animated: false))
             }
         }
+    }
+
+    /// ゲームの状態を初期化し、新しいゲームを開始します。
+    private func newGame() {
+        let value = ReversiGame.newGame()
+        game.accept(value)
+
+        setAllCellToChange()
         let first = disksToPlace.removeFirst()
         diskToPlace.accept(first)
 

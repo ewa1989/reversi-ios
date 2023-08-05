@@ -98,15 +98,6 @@ extension ViewController {
 // MARK: Views
 
 extension ViewController {
-    func updateGame() {
-        // board
-        for x in viewModel.game.value.board.xRange {
-            for y in viewModel.game.value.board.yRange {
-                boardView.setDisk(viewModel.game.value.board.diskAt(x: x, y: y), atX: x, y: y, animated: false)
-            }
-        }
-    }
-
     private func showPassAlert() {
         let alertController = UIAlertController(
             title: "Pass",
