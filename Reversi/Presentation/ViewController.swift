@@ -86,6 +86,12 @@ extension ViewController {
         viewModel.passAlert.subscribe(onNext: { [weak self] in
             self?.showPassAlert()
         }).disposed(by: disposeBag)
+
+        viewModel.diskToPlace.subscribe { [weak self] placement in
+            self?.boardView.setDisk(placement.disk, atX: placement.coordinate.x, y: placement.coordinate.y, animated: placement.animated) { [weak self] isFinished in
+                self?.viewModel.finishToPlace(isFinished: isFinished)
+            }
+        }.disposed(by: disposeBag)
     }
 }
 

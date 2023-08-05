@@ -24,6 +24,9 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
     public let playerControls: Observable<[Player]>
     public let messageDiskSize: Observable<CGFloat>
 
+    public let diskToPlace = PublishRelay<DiskPlacement>()
+    private var disksToPlace: [DiskPlacement] = []
+
     /// Storyboard 上で設定されたサイズを保管します。
     /// 引き分けの際は `messageDiskView` の表示が必要ないため、
     /// `messageDiskSizeConstraint.constant` を `0` に設定します。
@@ -147,6 +150,30 @@ extension ViewModel {
     func pass() {
         nextTurn()
     }
+
+    func finishToPlace(isFinished: Bool) {
+        if disksToPlace.isEmpty {
+            return
+        }
+        if !isFinished {
+            disksToPlace = disksToPlace.map {
+                DiskPlacement(
+                    disk: $0.disk,
+                    coordinate: $0.coordinate,
+                    animated: false
+                )
+            }
+        }
+
+        // FIXME: DispatchQueueを使わないとReentrancy anomalyの警告が出てしまう。ディスクを裏返し続ける処理をDispatchQueueを挟んで処理を切ることで一旦警告は出なくなったけれど、他のスマートな方法があれば直したい。
+        dispatcher.async { [weak self] in
+            guard let self = self else {
+                return
+            }
+            let first = self.disksToPlace.removeFirst()
+            self.diskToPlace.accept(first)
+        }
+    }
 }
 
 // MARK: Game Management
@@ -233,9 +260,11 @@ extension ViewModel {
 
         for y in game.value.board.yRange {
             for x in game.value.board.xRange {
-                viewController.boardView.setDisk(value.board.diskAt(x: x, y: y), atX: x, y: y, animated: false)
+                disksToPlace.append(DiskPlacement(disk: game.value.board.diskAt(x: x, y: y), coordinate: Coordinate(x: x, y: y), animated: false))
             }
         }
+        let first = disksToPlace.removeFirst()
+        diskToPlace.accept(first)
 
         try? repository.save(game.value)
     }
@@ -363,4 +392,14 @@ struct DiskPlacementError: Error {
     let disk: Disk
     let x: Int
     let y: Int
+}
+
+struct DiskPlacement: Hashable {
+    let disk: Disk?
+    let coordinate: Coordinate
+    var animated: Bool
+
+    mutating func noAnimation() {
+        animated = false
+    }
 }
