@@ -278,6 +278,17 @@ extension ViewModel {
         try? repository.save(game.value)
     }
 
+    fileprivate func completionWithoutAnimation() -> () -> Void {
+        return { [weak self] in
+            guard let self = self else {
+                return
+            }
+            self.finishPlacingDisk.accept(())
+            self.nextTurn()
+            try? self.repository.save(self.game.value)
+        }
+    }
+
     /// `x`, `y` で指定されたセルに `disk` を置きます。
     /// - Parameter x: セルの列です。
     /// - Parameter y: セルの行です。
@@ -310,18 +321,20 @@ extension ViewModel {
             dispatcher.async { [weak self] in
                 guard let self = self else { return }
                 var value = self.game.value
-                value.board.setDisk(disk, atX: x, y: y)
-                game.accept(value)
 
-                self.viewController.boardView.setDisk(disk, atX: x, y: y, animated: false)
-                for diskCoordinate in diskCoordinates {
-                    value.board.setDisk(disk, atX: diskCoordinate.x, y: diskCoordinate.y)
-                    game.accept(value)
-
-                    self.viewController.boardView.setDisk(disk, atX: diskCoordinate.x, y: diskCoordinate.y, animated: false)
+                let allChanges: ([Coordinate]) = ([Coordinate(x: x, y: y)] + diskCoordinates)
+                allChanges.forEach {
+                    value.board.setDisk(disk, atX: $0.x, y: $0.y)
+                    self.game.accept(value)
                 }
-                completion?(true)
-                try? repository.save(game.value)
+                disksToPlace = allChanges.map {
+                    DiskPlacement(disk: disk, coordinate: $0, animated: false)
+                }
+
+                self.placingDiskCompletion = completionWithoutAnimation()
+
+                let first = disksToPlace.removeFirst()
+                diskToPlace.accept(first)
             }
         }
     }
