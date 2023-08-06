@@ -47,9 +47,9 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
         _computerProcessing.asObservable()
     }
 
-    private let _passAlert = PublishRelay<Void>()
+    private let _passAlert = PublishRelay<PassAlert>()
     /// パスのアラートを表示すべきタイミングを通知します。
-    public var passAlert: Observable<Void> {
+    public var passAlert: Observable<PassAlert> {
         _passAlert.asObservable()
     }
 
@@ -244,7 +244,7 @@ extension ViewModel {
                 value.turn = turn
                 game.accept(value)
 
-                _passAlert.accept(())
+                _passAlert.accept(PassAlert())
             }
         } else {
             var value = game.value
@@ -404,3 +404,5 @@ struct Message: Hashable {
     let disk: Disk?
     let label: String
 }
+
+struct PassAlert: Hashable {}

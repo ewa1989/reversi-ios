@@ -82,7 +82,7 @@ extension ViewController {
             }
         }.disposed(by: disposeBag)
 
-        viewModel.passAlert.subscribe(onNext: { [weak self] in
+        viewModel.passAlert.subscribe(onNext: { [weak self] _ in
             self?.showPassAlert()
         }).disposed(by: disposeBag)
 
