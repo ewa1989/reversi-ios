@@ -100,7 +100,6 @@ extension ViewModel {
         } catch _ {
             newGame()
         }
-        finishPlacingDisk.accept(())
     }
 
     func viewDidAppear() {
@@ -119,7 +118,6 @@ extension ViewModel {
         }
 
         newGame()
-        finishPlacingDisk.accept(())
         waitForPlayer()
     }
 
@@ -155,6 +153,7 @@ extension ViewModel {
         if disksWaitingToPlace.isEmpty {
             placingDiskCompletion?()
             placingDiskCompletion = nil
+            finishPlacingDisk.accept(())
             return
         }
         if !isFinished {
@@ -279,7 +278,6 @@ extension ViewModel {
             guard let self = self else {
                 return
             }
-            self.finishPlacingDisk.accept(())
             self.nextTurn()
             try? self.repository.save(self.game.value)
         }
@@ -292,7 +290,6 @@ extension ViewModel {
             if canceller.isCancelled { return }
             self.animationCanceller = nil
 
-            self.finishPlacingDisk.accept(())
             self.nextTurn()
             try? self.repository.save(self.game.value)
         }

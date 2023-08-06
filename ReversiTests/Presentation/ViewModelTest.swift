@@ -81,6 +81,7 @@ final class ViewModelTest: XCTestCase {
             switch event.element {
             case 1:
                 self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
+                self?.finishUpdatingAllCell()
             case 2:
                 self?.viewModel.viewDidAppear() // ViewControllerが表示され
             default:
@@ -142,6 +143,7 @@ final class ViewModelTest: XCTestCase {
             switch event.element {
             case 1:
                 self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
+                self?.finishUpdatingAllCell()
             case 2:
                 self?.viewModel.viewDidAppear() // ViewControllerが表示され
             case 3:
@@ -198,6 +200,7 @@ final class ViewModelTest: XCTestCase {
             switch event.element {
             case 1:
                 self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
+                self?.finishUpdatingAllCell()
             case 2:
                 self?.viewModel.viewDidAppear() // ViewControllerが表示され
             default:
@@ -400,6 +403,7 @@ final class ViewModelTest: XCTestCase {
             switch event.element {
             case 1:
                 self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
+                self?.finishUpdatingAllCell()
             case 2:
                 self?.viewModel.viewDidAppear() // ViewControllerが表示され
             case 3:
@@ -408,10 +412,7 @@ final class ViewModelTest: XCTestCase {
             case 4:
                 self?.viewModel.reset() // 3枚目の描画中にリセット
             default:
-                // reset時に描画されるセルを除く63セルを描画するため63回描画完了を通知する
-                (0...62).forEach { [weak self] _ in
-                    self?.viewModel.finishToPlace(isFinished: true)
-                }
+                self?.finishUpdatingAllCell()
             }
         }.disposed(by: disposeBag)
         scheduler.start()
@@ -425,12 +426,21 @@ final class ViewModelTest: XCTestCase {
         ])
         XCTAssertEqual(diskCounts.events, [
             .next(1, [16, 8]),   // ゲーム読み込み後
-            .next(4, [2, 2]),   // リセット時
+            .next(5, [2, 2]),   // リセット時
         ])
         XCTAssertEqual(message.events, [
             .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
             .next(1, Message(disk: .dark, label: "'s turn")),   // ゲーム読み込み後
         ])
         XCTAssertEqual(fakeStrategy.fakeOutput, TestData.newGame.rawValue)
+    }
+
+    // MARK: Helper
+
+    /// 読み込み・リセット時最初に描画される1セルと残り63セルを描画するため64回描画完了を通知する
+    fileprivate func finishUpdatingAllCell() {
+        (0...63).forEach { [weak self] _ in
+            self?.viewModel.finishToPlace(isFinished: true)
+        }
     }
 }
