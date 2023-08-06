@@ -22,8 +22,11 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
     public let playerControls: Observable<[Player]>
     public let messageDiskSize: Observable<CGFloat>
 
+    /// 直近で一番最初に画面更新する必要があるディスクを流すObservableです。
     public let diskToPlace = PublishRelay<DiskPlacement>()
-    private var disksToPlace: [DiskPlacement] = []
+
+    /// 画面更新待ちのディスクのコレクションです。
+    private var disksWaitingToPlace: [DiskPlacement] = []
 
     /// Storyboard 上で設定されたサイズを保管します。
     /// 引き分けの際は `messageDiskView` の表示が必要ないため、
@@ -146,13 +149,13 @@ extension ViewModel {
     }
 
     func finishToPlace(isFinished: Bool) {
-        if disksToPlace.isEmpty {
+        if disksWaitingToPlace.isEmpty {
             placingDiskCompletion?()
             placingDiskCompletion = nil
             return
         }
         if !isFinished {
-            disksToPlace = disksToPlace.map {
+            disksWaitingToPlace = disksWaitingToPlace.map {
                 DiskPlacement(
                     disk: $0.disk,
                     coordinate: $0.coordinate,
@@ -166,7 +169,7 @@ extension ViewModel {
             guard let self = self else {
                 return
             }
-            let first = self.disksToPlace.removeFirst()
+            let first = self.disksWaitingToPlace.removeFirst()
             self.diskToPlace.accept(first)
         }
     }
@@ -181,7 +184,7 @@ extension ViewModel {
         game.accept(value)
 
         setAllCellToChange()
-        let first = disksToPlace.removeFirst()
+        let first = disksWaitingToPlace.removeFirst()
         diskToPlace.accept(first)
     }
 
@@ -251,7 +254,7 @@ extension ViewModel {
     fileprivate func setAllCellToChange() {
         for y in game.value.board.yRange {
             for x in game.value.board.xRange {
-                disksToPlace.append(DiskPlacement(disk: game.value.board.diskAt(x: x, y: y), coordinate: Coordinate(x: x, y: y), animated: false))
+                disksWaitingToPlace.append(DiskPlacement(disk: game.value.board.diskAt(x: x, y: y), coordinate: Coordinate(x: x, y: y), animated: false))
             }
         }
     }
@@ -262,7 +265,7 @@ extension ViewModel {
         game.accept(value)
 
         setAllCellToChange()
-        let first = disksToPlace.removeFirst()
+        let first = disksWaitingToPlace.removeFirst()
         diskToPlace.accept(first)
 
         try? repository.save(game.value)
@@ -314,21 +317,21 @@ extension ViewModel {
             self.game.accept(value)
         }
 
-        disksToPlace = allChanges.map {
+        disksWaitingToPlace = allChanges.map {
             DiskPlacement(disk: disk, coordinate: $0, animated: true)
         }
 
         if isAnimated {
             let cleanUp: () -> Void = { [weak self] in
                 self?.animationCanceller = nil
-                self?.disksToPlace = []
+                self?.disksWaitingToPlace = []
                 self?.placingDiskCompletion = nil
             }
             animationCanceller = Canceller(cleanUp)
 
             placingDiskCompletion = completionWithAnimation()
 
-            let first = disksToPlace.removeFirst()
+            let first = disksWaitingToPlace.removeFirst()
             diskToPlace.accept(first)
         } else {
             dispatcher.async { [weak self] in
@@ -336,7 +339,7 @@ extension ViewModel {
 
                 self.placingDiskCompletion = completionWithoutAnimation()
 
-                let first = disksToPlace.removeFirst()
+                let first = disksWaitingToPlace.removeFirst()
                 diskToPlace.accept(first)
             }
         }
