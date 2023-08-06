@@ -80,15 +80,3 @@ final class ReversiGameRepositoryTest: XCTestCase {
         XCTAssertEqual(actual, expected)
     }
 }
-
-private class FakeFileSaveAndLoadStrategy: FileSaveAndLoadStrategy {
-    var fakeInput: String = ""
-    func load() throws -> String {
-        fakeInput
-    }
-
-    var fakeOutput: String?
-    func save(_ output: String) throws {
-        fakeOutput = output
-    }
-}
