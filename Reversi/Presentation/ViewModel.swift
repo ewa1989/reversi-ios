@@ -22,8 +22,11 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
     public let playerControls: Observable<[Player]>
     public let messageDiskSize: Observable<CGFloat>
 
+    private let _diskToPlace = PublishRelay<DiskPlacement>()
     /// 直近で一番最初に画面更新する必要があるディスクを流すObservableです。
-    public let diskToPlace = PublishRelay<DiskPlacement>()
+    public var diskToPlace: Observable<DiskPlacement> {
+        _diskToPlace.asObservable()
+    }
 
     /// 画面更新待ちのディスクのコレクションです。
     private var disksWaitingToPlace: [DiskPlacement] = []
@@ -170,7 +173,7 @@ extension ViewModel {
                 return
             }
             let first = self.disksWaitingToPlace.removeFirst()
-            self.diskToPlace.accept(first)
+            self._diskToPlace.accept(first)
         }
     }
 }
@@ -185,7 +188,7 @@ extension ViewModel {
 
         setAllCellToChange()
         let first = disksWaitingToPlace.removeFirst()
-        diskToPlace.accept(first)
+        _diskToPlace.accept(first)
     }
 
     /// プレイヤーの行動を待ちます。
@@ -266,7 +269,7 @@ extension ViewModel {
 
         setAllCellToChange()
         let first = disksWaitingToPlace.removeFirst()
-        diskToPlace.accept(first)
+        _diskToPlace.accept(first)
 
         try? repository.save(game.value)
     }
@@ -332,7 +335,7 @@ extension ViewModel {
             placingDiskCompletion = completionWithAnimation()
 
             let first = disksWaitingToPlace.removeFirst()
-            diskToPlace.accept(first)
+            _diskToPlace.accept(first)
         } else {
             dispatcher.async { [weak self] in
                 guard let self = self else { return }
@@ -340,7 +343,7 @@ extension ViewModel {
                 self.placingDiskCompletion = completionWithoutAnimation()
 
                 let first = disksWaitingToPlace.removeFirst()
-                diskToPlace.accept(first)
+                _diskToPlace.accept(first)
             }
         }
     }
