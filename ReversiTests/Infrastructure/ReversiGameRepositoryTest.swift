@@ -34,7 +34,7 @@ final class ReversiGameRepositoryTest: XCTestCase {
     func test_白のターンで始まるゲームを復元できる() throws {
         fakeStrategy.fakeInput = "o00\n--------\n--------\n--------\n---ox---\n---xo---\n--------\n--------\n--------\n"
 
-        let expected = newGameStartFromLight()
+        let expected = TestData.newGameStartFromLight.game
 
         let actual = try repository.load()
 
@@ -44,8 +44,7 @@ final class ReversiGameRepositoryTest: XCTestCase {
     func test_引き分け_プレイヤーモードどちらもコンピューター_左半分が黒で右半分が白のゲームを復元できる() throws {
         fakeStrategy.fakeInput = "-11\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\n"
 
-        let expected = tiedComputerMatchWithLeftSideDarkAndRightSideLightBoard()
-
+        let expected = TestData.tiedComputerMatchWithLeftSideDarkAndRightSideLightBoard.game
         let actual = try repository.load()
 
         XCTAssertEqual(actual, expected)
@@ -65,7 +64,7 @@ final class ReversiGameRepositoryTest: XCTestCase {
     func test_白のターンで始まるゲームを保存できる() throws {
         let expected = "o00\n--------\n--------\n--------\n---ox---\n---xo---\n--------\n--------\n--------\n"
 
-        try repository.save(newGameStartFromLight())
+        try repository.save(TestData.newGameStartFromLight.game)
         let actual = fakeStrategy.fakeOutput
 
         XCTAssertEqual(actual, expected)
@@ -74,7 +73,7 @@ final class ReversiGameRepositoryTest: XCTestCase {
     func test_引き分け_プレイヤーモードどちらもコンピューター_左半分が黒で右半分が白のゲームを保存できる() throws {
         let expected = "-11\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\n"
 
-        try repository.save(tiedComputerMatchWithLeftSideDarkAndRightSideLightBoard())
+        try repository.save(TestData.tiedComputerMatchWithLeftSideDarkAndRightSideLightBoard.game)
         let actual = fakeStrategy.fakeOutput
 
         XCTAssertEqual(actual, expected)

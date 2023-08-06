@@ -43,9 +43,9 @@ final class ViewModelTest: XCTestCase {
     }
 
     func test_保存されたゲームがある時_画面ロード時にロードされる() throws {
-        let expected = darkSurroundedByLightGame()
+        let expected = TestData.darkSurroundedByLightGame.game
 
-        fakeStrategy.fakeInput = "x00\n--------\n-ooo----\n-oxo----\n-ooo----\n--------\n--------\n--------\n--------\n"
+        fakeStrategy.fakeInput = TestData.darkSurroundedByLightGame.rawValue
 
         viewModel.viewDidLoad()
 

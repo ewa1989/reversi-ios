@@ -56,7 +56,7 @@ final class ReversiGameTest: XCTestCase {
     }
 
     func test_左半分に黒_右半分に白のディスクが置かれていると引き分け() throws {
-        let tiedGame = tiedComputerMatchWithLeftSideDarkAndRightSideLightBoard()
+        let tiedGame = TestData.tiedComputerMatchWithLeftSideDarkAndRightSideLightBoard.game
 
         XCTAssertNil(tiedGame.board.sideWithMoreDisks())
     }
@@ -76,7 +76,7 @@ final class ReversiGameTest: XCTestCase {
     func test_黒が白に囲まれた盤面で_右下に黒を置くと_置いた左上方向のディスクが裏返る() throws {
         let expected = [(3, 3)].toCoordinates()
 
-        let game = darkSurroundedByLightGame()
+        let game = TestData.darkSurroundedByLightGame.game
         let actual = game.board.flippedDiskCoordinatesByPlacingDisk(.dark, atX: 4, y: 4)
 
         XCTAssertEqual(actual, expected)
@@ -85,7 +85,7 @@ final class ReversiGameTest: XCTestCase {
     func test_黒が白に囲まれた盤面で_下に黒を置くと_置いた上方向のディスクが裏返る() throws {
         let expected = [(2, 3)].toCoordinates()
 
-        let game = darkSurroundedByLightGame()
+        let game = TestData.darkSurroundedByLightGame.game
         let actual = game.board.flippedDiskCoordinatesByPlacingDisk(.dark, atX: 2, y: 4)
 
         XCTAssertEqual(actual, expected)
@@ -94,7 +94,7 @@ final class ReversiGameTest: XCTestCase {
     func test_黒が白に囲まれた盤面で_左下に黒を置くと_置いた右上方向のディスクが裏返る() throws {
         let expected = [(1, 3)].toCoordinates()
 
-        let game = darkSurroundedByLightGame()
+        let game = TestData.darkSurroundedByLightGame.game
         let actual = game.board.flippedDiskCoordinatesByPlacingDisk(.dark, atX: 0, y: 4)
 
         XCTAssertEqual(actual, expected)
@@ -103,7 +103,7 @@ final class ReversiGameTest: XCTestCase {
     func test_黒が白に囲まれた盤面で_左に黒を置くと_置いた右方向のディスクが裏返る() throws {
         let expected = [(1, 2)].toCoordinates()
 
-        let game = darkSurroundedByLightGame()
+        let game = TestData.darkSurroundedByLightGame.game
         let actual = game.board.flippedDiskCoordinatesByPlacingDisk(.dark, atX: 0, y: 2)
 
         XCTAssertEqual(actual, expected)
@@ -112,7 +112,7 @@ final class ReversiGameTest: XCTestCase {
     func test_黒が白に囲まれた盤面で_左上に黒を置くと_置いた右下方向のディスクが裏返る() throws {
         let expected = [(1, 1)].toCoordinates()
 
-        let game = darkSurroundedByLightGame()
+        let game = TestData.darkSurroundedByLightGame.game
         let actual = game.board.flippedDiskCoordinatesByPlacingDisk(.dark, atX: 0, y: 0)
 
         XCTAssertEqual(actual, expected)
@@ -121,7 +121,7 @@ final class ReversiGameTest: XCTestCase {
     func test_黒が白に囲まれた盤面で_上に黒を置くと_置いた下方向のディスクが裏返る() throws {
         let expected = [(2, 1)].toCoordinates()
 
-        let game = darkSurroundedByLightGame()
+        let game = TestData.darkSurroundedByLightGame.game
         let actual = game.board.flippedDiskCoordinatesByPlacingDisk(.dark, atX: 2, y: 0)
 
         XCTAssertEqual(actual, expected)
@@ -130,7 +130,7 @@ final class ReversiGameTest: XCTestCase {
     func test_黒が白に囲まれた盤面で_右上に黒を置くと_置いた左下方向のディスクが裏返る() throws {
         let expected = [(3, 1)].toCoordinates()
 
-        let game = darkSurroundedByLightGame()
+        let game = TestData.darkSurroundedByLightGame.game
         let actual = game.board.flippedDiskCoordinatesByPlacingDisk(.dark, atX: 4, y: 0)
 
         XCTAssertEqual(actual, expected)
@@ -139,7 +139,7 @@ final class ReversiGameTest: XCTestCase {
     func test_黒が白に囲まれた盤面で_右に黒を置くと_置いた左方向のディスクが裏返る() throws {
         let expected = [(3, 2)].toCoordinates()
 
-        let game = darkSurroundedByLightGame()
+        let game = TestData.darkSurroundedByLightGame.game
         let actual = game.board.flippedDiskCoordinatesByPlacingDisk(.dark, atX: 4, y: 2)
 
         XCTAssertEqual(actual, expected)
@@ -181,7 +181,7 @@ final class ReversiGameTest: XCTestCase {
             (1, 2),
         ].toCoordinates()
 
-        let game = blankSurroundedByLightSurroundingByDark()
+        let game = TestData.blankSurroundedByLightSurroundingByDark.game
         let actual = game.board.flippedDiskCoordinatesByPlacingDisk(.dark, atX: 2, y: 2)
 
         XCTAssertEqual(actual, expected)
@@ -224,7 +224,7 @@ final class ReversiGameTest: XCTestCase {
     }
 
     func test_全て埋まった盤面では黒も白もどこにも置くことができない() throws {
-        let allCellFilledGame = tiedComputerMatchWithLeftSideDarkAndRightSideLightBoard()
+        let allCellFilledGame = TestData.tiedComputerMatchWithLeftSideDarkAndRightSideLightBoard.game
         XCTAssertTrue(allCellFilledGame.board.validMoves(for: .dark).isEmpty)
         XCTAssertTrue(allCellFilledGame.board.validMoves(for: .light).isEmpty)
     }
@@ -237,22 +237,22 @@ final class ReversiGameTest: XCTestCase {
     }
 
     func test_白で始まる初期盤面は白のターン() throws {
-        let newGameStartFromLight = newGameStartFromLight()
+        let newGameStartFromLight = TestData.newGameStartFromLight.game
         XCTAssertEqual(newGameStartFromLight.state, .move(side: .light))
     }
 
     func test_終了したゲームでディスク数が等しければ引き分け() throws {
-        let tiedGame = tiedComputerMatchWithLeftSideDarkAndRightSideLightBoard()
+        let tiedGame = TestData.tiedComputerMatchWithLeftSideDarkAndRightSideLightBoard.game
         XCTAssertEqual(tiedGame.state, .draw)
     }
 
     func test_test_終了したゲームで黒のディスクが多ければ黒の勝利() throws {
-        let winnerDarkGame = allDarkBoard()
+        let winnerDarkGame = TestData.allDarkBoard.game
         XCTAssertEqual(winnerDarkGame.state, .win(winner: .dark))
     }
 
     func test_test_終了したゲームで白のディスクが多ければ白の勝利() throws {
-        let winnerLightGame = allLightBoard()
+        let winnerLightGame = TestData.allLightBoard.game
         XCTAssertEqual(winnerLightGame.state, .win(winner: .light))
     }
 
@@ -266,7 +266,7 @@ final class ReversiGameTest: XCTestCase {
     }
 
     func test_黒が白に囲まれたゲームだと黒だけ置く位置がある() throws {
-        let game = darkSurroundedByLightGame()
+        let game = TestData.darkSurroundedByLightGame.game
 
         XCTAssertTrue(game.board.canPlaceAnyDisks(by: .dark))
         XCTAssertFalse(game.board.canPlaceAnyDisks(by: .light))
