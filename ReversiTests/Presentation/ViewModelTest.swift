@@ -77,7 +77,6 @@ final class ViewModelTest: XCTestCase {
             .next(3, (3)),
             .next(4, (4)),
         ]).subscribe { [weak self] event in
-            print("\(event)")
             switch event.element {
             case 1:
                 self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
@@ -87,7 +86,6 @@ final class ViewModelTest: XCTestCase {
                 self?.viewModel.finishToPlace(isFinished: true) // 1つ目と2つ目のセル(2, 0)の描画が終わる
             }
         }.disposed(by: disposeBag)
-
         scheduler.start()
 
         XCTAssertEqual(computerProcessing.events, [
