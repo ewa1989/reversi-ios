@@ -28,6 +28,8 @@ final class ViewModelTest: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
+    // MARK: viewDidLoad
+
     func test_保存されたゲームがない時_画面ロード時に新ゲームが生成され_保存もされる() throws {
         let expected = ReversiGame.newGame()
 
@@ -38,5 +40,15 @@ final class ViewModelTest: XCTestCase {
 
         XCTAssertEqual(try viewModel.game.toBlocking().first(), expected)
         XCTAssertEqual(try FileParser.makeGameParsing(fakeStrategy.fakeOutput!), expected)
+    }
+
+    func test_保存されたゲームがある時_画面ロード時にロードされる() throws {
+        let expected = darkSurroundedByLightGame()
+
+        fakeStrategy.fakeInput = "x00\n--------\n-ooo----\n-oxo----\n-ooo----\n--------\n--------\n--------\n--------\n"
+
+        viewModel.viewDidLoad()
+
+        XCTAssertEqual(try viewModel.game.toBlocking().first(), expected)
     }
 }
