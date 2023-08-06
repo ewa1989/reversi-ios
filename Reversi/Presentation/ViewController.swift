@@ -19,7 +19,6 @@ class ViewController: UIViewController {
         super.viewDidLoad()
 
         viewModel = ViewModel(
-            viewController: self,
             gameRepository: ReversiGameRepositoryImpl(strategy: LocalFileSaveAndLoadStrategy()),
             dispatcher: MainQueueDispatcher(),
             initialDiskSize: messageDiskSizeConstraint.constant

@@ -11,8 +11,6 @@ import RxSwift
 import RxRelay
 
 class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
-    /// リファクタリング最中の暫定措置として参照を持っているだけなので後で消す予定
-    private weak var viewController: ViewController!
     private let repository: Repository
     private let dispatcher: Dispatcher
 
@@ -61,12 +59,10 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
     private var playerCancellers: [Disk: Canceller] = [:]
 
     init(
-        viewController: ViewController!,
         gameRepository: Repository,
         dispatcher: Dispatcher,
         initialDiskSize: CGFloat
     ) {
-        self.viewController = viewController
         self.repository = gameRepository
         self.dispatcher = dispatcher
         self.initialDiskSize = initialDiskSize
@@ -304,7 +300,7 @@ extension ViewModel {
     ///     このクロージャは値を返さず、アニメーションが完了したかを示す真偽値を受け取ります。
     ///     もし `animated` が `false` の場合、このクロージャは次の run loop サイクルの初めに実行されます。
     /// - Throws: もし `disk` を `x`, `y` で指定されるセルに置けない場合、 `DiskPlacementError` を `throw` します。
-    private func placeDisk(_ disk: Disk, atX x: Int, y: Int, animated isAnimated: Bool, completion: ((Bool) -> Void)? = nil) throws {
+    private func placeDisk(_ disk: Disk, atX x: Int, y: Int, animated isAnimated: Bool) throws {
         let diskCoordinates = game.value.board.flippedDiskCoordinatesByPlacingDisk(disk, atX: x, y: y)
         if diskCoordinates.isEmpty {
             throw DiskPlacementError(disk: disk, x: x, y: y)
@@ -342,41 +338,6 @@ extension ViewModel {
 
                 let first = disksToPlace.removeFirst()
                 diskToPlace.accept(first)
-            }
-        }
-    }
-
-    /// `coordinates` で指定されたセルに、アニメーションしながら順番に `disk` を置く。
-    /// `coordinates` から先頭の座標を取得してそのセルに `disk` を置き、
-    /// 残りの座標についてこのメソッドを再帰呼び出しすることで処理が行われる。
-    /// すべてのセルに `disk` が置けたら `completion` ハンドラーが呼び出される。
-    private func animateSettingDisks<C: Collection>(at coordinates: C, to disk: Disk, completion: @escaping (Bool) -> Void)
-    where C.Element == Coordinate
-    {
-        guard let coordinate = coordinates.first else {
-            completion(true)
-            return
-        }
-
-        let animationCanceller = self.animationCanceller!
-        var value = game.value
-        value.board.setDisk(disk, atX: coordinate.x, y: coordinate.y)
-        game.accept(value)
-
-        viewController.boardView.setDisk(disk, atX: coordinate.x, y: coordinate.y, animated: true) { [weak self] isFinished in
-            guard let self = self else { return }
-            if animationCanceller.isCancelled { return }
-            if isFinished {
-                self.animateSettingDisks(at: coordinates.dropFirst(), to: disk, completion: completion)
-            } else {
-                for coordinate in coordinates {
-                    var value = self.game.value
-                    value.board.setDisk(disk, atX: coordinate.x, y: coordinate.y)
-                    game.accept(value)
-
-                    self.viewController.boardView.setDisk(disk, atX: coordinate.x, y: coordinate.y, animated: false)
-                }
-                completion(false)
             }
         }
     }
