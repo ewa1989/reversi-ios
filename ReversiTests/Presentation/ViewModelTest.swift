@@ -169,4 +169,48 @@ final class ViewModelTest: XCTestCase {
         // 描画が最後まで完了していれば保存処理が走っている
         XCTAssertEqual(fakeStrategy.fakeOutput, "x00\n--------\n--------\n----o---\n---oo---\n---xo---\n--------\n--------\n--------\n")
     }
+
+    func test_ユーザーが置けないセルをタップしても何も起こらない() throws {
+        fakeStrategy.fakeInput = TestData.newGameStartFromLight.rawValue
+
+        let computerProcessing = viewModel.computerProcessings.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let diskToPlace = viewModel.diskToPlace.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let playerControls = viewModel.playerControls.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let diskCounts = viewModel.diskCounts.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+
+        scheduler.createColdObservable([
+            .next(1, (1)),
+            .next(2, (2)),
+            .next(3, (3)),
+        ]).subscribe { [weak self] event in
+            switch event.element {
+            case 1:
+                self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
+            case 2:
+                self?.viewModel.viewDidAppear() // ViewControllerが表示され
+            default:
+                self?.viewModel.didSelectCellAt(x: 3, y: 2) // (3, 2)に白を置こうとするが何も起こらない
+            }
+        }.disposed(by: disposeBag)
+        scheduler.start()
+
+        XCTAssertEqual(computerProcessing.events, [
+            .next(0, [false, false]),   // 初期状態
+        ])
+        // time > 1のイベントでフィルターすることで、ゲーム読み込み時の全セルの描画イベントを除く
+        XCTAssertEqual(diskToPlace.events.filter { $0.time > 1 }.count, 0)
+        XCTAssertEqual(playerControls.events, [
+            .next(0, [.manual, .manual]),   // 初期状態
+        ])
+        XCTAssertEqual(diskCounts.events, [
+            .next(1, [2, 2]),   // ゲーム読み込み後
+        ])
+        XCTAssertEqual(message.events, [
+            .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
+            .next(1, Message(disk: .light, label: "'s turn")),   // ゲーム読み込み後
+        ])
+        // 保存処理は走らない
+        XCTAssertEqual(fakeStrategy.fakeOutput, nil)
+    }
 }
