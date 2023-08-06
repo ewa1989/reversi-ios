@@ -142,10 +142,7 @@ extension ViewModel {
         if isAnimating { return }
         guard case .manual = game.value.playerControls[turn.index] else { return }
         // try? because doing nothing when an error occurs
-        try? placeDisk(turn, atX: x, y: y, animated: true) { [weak self] _ in
-            self?.finishPlacingDisk.accept(())
-            self?.nextTurn()
-        }
+        try? placeDisk(turn, atX: x, y: y, animated: true)
     }
 
     func pass() {
@@ -221,10 +218,7 @@ extension ViewModel {
             if canceller.isCancelled { return }
             cleanUp()
 
-            try! self.placeDisk(turn, atX: coordinate.x, y: coordinate.y, animated: true) { [weak self] _ in
-                self?.finishPlacingDisk.accept(())
-                self?.nextTurn()
-            }
+            try! self.placeDisk(turn, atX: coordinate.x, y: coordinate.y, animated: true)
         }
 
         playerCancellers[turn] = canceller
@@ -289,6 +283,19 @@ extension ViewModel {
         }
     }
 
+    fileprivate func completionWithAnimation() -> () -> Void {
+        return { [weak self] in
+            guard let self = self else { return }
+            guard let canceller = self.animationCanceller else { return }
+            if canceller.isCancelled { return }
+            self.animationCanceller = nil
+
+            self.finishPlacingDisk.accept(())
+            self.nextTurn()
+            try? self.repository.save(self.game.value)
+        }
+    }
+
     /// `x`, `y` で指定されたセルに `disk` を置きます。
     /// - Parameter x: セルの列です。
     /// - Parameter y: セルの行です。
@@ -303,33 +310,33 @@ extension ViewModel {
             throw DiskPlacementError(disk: disk, x: x, y: y)
         }
 
+        let allChanges: ([Coordinate]) = ([Coordinate(x: x, y: y)] + diskCoordinates)
+
+        var value = self.game.value
+        allChanges.forEach {
+            value.board.setDisk(disk, atX: $0.x, y: $0.y)
+            self.game.accept(value)
+        }
+
+        disksToPlace = allChanges.map {
+            DiskPlacement(disk: disk, coordinate: $0, animated: true)
+        }
+
         if isAnimated {
             let cleanUp: () -> Void = { [weak self] in
                 self?.animationCanceller = nil
+                self?.disksToPlace = []
+                self?.placingDiskCompletion = nil
             }
             animationCanceller = Canceller(cleanUp)
-            animateSettingDisks(at: [Coordinate(x: x, y: y)] + diskCoordinates, to: disk) { [weak self] isFinished in
-                guard let self = self else { return }
-                guard let canceller = self.animationCanceller else { return }
-                if canceller.isCancelled { return }
-                cleanUp()
 
-                completion?(isFinished)
-                try? repository.save(game.value)
-            }
+            placingDiskCompletion = completionWithAnimation()
+
+            let first = disksToPlace.removeFirst()
+            diskToPlace.accept(first)
         } else {
             dispatcher.async { [weak self] in
                 guard let self = self else { return }
-                var value = self.game.value
-
-                let allChanges: ([Coordinate]) = ([Coordinate(x: x, y: y)] + diskCoordinates)
-                allChanges.forEach {
-                    value.board.setDisk(disk, atX: $0.x, y: $0.y)
-                    self.game.accept(value)
-                }
-                disksToPlace = allChanges.map {
-                    DiskPlacement(disk: disk, coordinate: $0, animated: false)
-                }
 
                 self.placingDiskCompletion = completionWithoutAnimation()
 
