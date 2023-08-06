@@ -114,13 +114,9 @@ final class ViewModelTest: XCTestCase {
             .next(2, DiskPlacement(disk: .dark, coordinate: Coordinate(x: 2, y: 0), animated: true)),
             .next(3, DiskPlacement(disk: .dark, coordinate: Coordinate(x: 1, y: 0), animated: true)),
         ])
-        // 現状game更新のたびに値が流れている
         XCTAssertEqual(playerControls.events, [
-            .next(0, [.manual, .manual]),
-            .next(1, [.computer, .manual]),
-            .next(2, [.computer, .manual]),
-            .next(2, [.computer, .manual]),
-            .next(4, [.computer, .manual]),
+            .next(0, [.manual, .manual]),   // 初期状態
+            .next(1, [.computer, .manual]), // ゲーム読み込み後
         ])
         XCTAssertEqual(diskCounts.events, [
             .next(1, [2, 2]),   // 初期状態

@@ -84,7 +84,7 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
                 return (nil ,"Tied")
             }
         }
-        playerControls = game.map { $0.playerControls }
+        playerControls = game.map { $0.playerControls }.distinctUntilChanged()
     }
 }
 
