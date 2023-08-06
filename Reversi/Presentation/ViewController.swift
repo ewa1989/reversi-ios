@@ -106,7 +106,9 @@ extension ViewController {
         alertController.addAction(UIAlertAction(title: "Dismiss", style: .default, handler: { [weak self] _ in
             self?.viewModel.pass()
         }))
-        present(alertController, animated: true)
+
+        // FIXME: 別のアラート表示中にアラートが新たに表示されずゲームが進行不可能になるため、暫定対策としてアラートを重ねて表示するよう修正。できれば1つ目のアラートを閉じたタイミングで次のアラートが表示されるように修正したい。
+        topController()?.present(alertController, animated: true)
     }
 
     fileprivate func showResetAlert(didOKSelect defaultHandler: ((UIAlertAction) -> Void)?, didCancelSelect cancelHandler: ((UIAlertAction) -> Void)?) {
@@ -117,7 +119,29 @@ extension ViewController {
         )
         alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: cancelHandler))
         alertController.addAction(UIAlertAction(title: "OK", style: .default, handler: defaultHandler))
-        present(alertController, animated: true)
+        topController()?.present(alertController, animated: true)
+    }
+
+    fileprivate func keyWindow() -> UIWindow? {
+        guard let windowScenes = UIApplication.shared.connectedScenes.first as? UIWindowScene else {
+            return nil
+        }
+
+        return windowScenes.windows.first(where: { $0.isKeyWindow })
+    }
+
+    private func topController() -> UIViewController? {
+        guard let keyWindow = keyWindow(), let rootViewController = keyWindow.rootViewController else {
+            return nil
+        }
+
+        var topController = rootViewController
+
+        while let newTopController = topController.presentedViewController {
+            topController = newTopController
+        }
+
+        return topController
     }
 }
 
