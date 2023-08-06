@@ -65,25 +65,10 @@ final class ViewModelTest: XCTestCase {
     func test_viewDidAppearが呼ばれるとゲームが開始され_コンピューターが思考しディスクを置き_セル2つの描画が更新され_描画が完了するとゲームが保存される() throws {
         fakeStrategy.fakeInput = TestData.startFromDarkComputerOnlyPlaceAt2_0.rawValue
 
-        let computerProcessing = scheduler.createObserver([Bool].self)
-        viewModel.computerProcessings
-            .bind(to: computerProcessing)
-            .disposed(by: disposeBag)
-
-        let diskToPlace = scheduler.createObserver(DiskPlacement.self)
-        viewModel.diskToPlace
-            .bind(to: diskToPlace)
-            .disposed(by: disposeBag)
-
-        let playerControls = scheduler.createObserver([Player].self)
-        viewModel.playerControls
-            .bind(to: playerControls)
-            .disposed(by: disposeBag)
-
-        let diskCounts = scheduler.createObserver([Int].self)
-        viewModel.diskCounts
-            .bind(to: diskCounts)
-            .disposed(by: disposeBag)
+        let computerProcessing = viewModel.computerProcessings.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let diskToPlace = viewModel.diskToPlace.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let playerControls = viewModel.playerControls.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let diskCounts = viewModel.diskCounts.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
 
         scheduler.createColdObservable([
             .next(1, (1)),

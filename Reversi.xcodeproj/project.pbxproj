@@ -12,6 +12,7 @@
 		0A0D90652A7BACE1009D77B2 /* RxRelay in Frameworks */ = {isa = PBXBuildFile; productRef = 0A0D90642A7BACE1009D77B2 /* RxRelay */; };
 		0A0D90672A7BACE1009D77B2 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 0A0D90662A7BACE1009D77B2 /* RxSwift */; };
 		0A0D90692A7BACE1009D77B2 /* RxTest in Frameworks */ = {isa = PBXBuildFile; productRef = 0A0D90682A7BACE1009D77B2 /* RxTest */; };
+		0A2001002A7FBA16006F943F /* TestableObserverFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000FF2A7FBA16006F943F /* TestableObserverFactory.swift */; };
 		0A391B052A7954DC00CE4B13 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A391B042A7954DC00CE4B13 /* ViewModel.swift */; };
 		0A3B35662A765BFB00527AB1 /* TestData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A3B35652A765BFB00527AB1 /* TestData.swift */; };
 		0A695BEC2A7A65F5003145C6 /* Dispatchable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A695BEB2A7A65F5003145C6 /* Dispatchable.swift */; };
@@ -50,6 +51,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0A2000FF2A7FBA16006F943F /* TestableObserverFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestableObserverFactory.swift; sourceTree = "<group>"; };
 		0A391B042A7954DC00CE4B13 /* ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
 		0A3B35652A765BFB00527AB1 /* TestData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestData.swift; sourceTree = "<group>"; };
 		0A695BEB2A7A65F5003145C6 /* Dispatchable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dispatchable.swift; sourceTree = "<group>"; };
@@ -114,6 +116,7 @@
 				0A3B35652A765BFB00527AB1 /* TestData.swift */,
 				0A79961E2A7E937D00B2F2B8 /* FakeFileSaveAndLoadStrategy.swift */,
 				0A7996202A7E95FA00B2F2B8 /* SynchronousDispatcher.swift */,
+				0A2000FF2A7FBA16006F943F /* TestableObserverFactory.swift */,
 			);
 			path = TestHelper;
 			sourceTree = "<group>";
@@ -352,6 +355,7 @@
 				0A700B062A757F7500CC14B6 /* ReversiGameRepositoryTest.swift in Sources */,
 				0A700B002A75771C00CC14B6 /* Disk.swift in Sources */,
 				0A79961D2A7E92B200B2F2B8 /* Dispatchable.swift in Sources */,
+				0A2001002A7FBA16006F943F /* TestableObserverFactory.swift in Sources */,
 				0A7996212A7E95FA00B2F2B8 /* SynchronousDispatcher.swift in Sources */,
 				0A3B35662A765BFB00527AB1 /* TestData.swift in Sources */,
 				0A700AFA2A756C5200CC14B6 /* ReversiGame.swift in Sources */,
