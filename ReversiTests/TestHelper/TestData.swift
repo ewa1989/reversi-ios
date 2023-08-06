@@ -61,6 +61,19 @@ enum TestData: String {
     /// ```
     case tiedComputerMatchWithLeftSideDarkAndRightSideLightBoard = "-11\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\n"
 
-    // プレイヤーモードはどちらもManual、中央に白黒2つずつディスクが置かれ黒から始まる新規ゲームを作成します。
+    /// プレイヤーモードはどちらもManual、中央に白黒2つずつディスクが置かれ黒から始まる新規ゲームを作成します。
     case newGame = "x00\n--------\n--------\n--------\n---ox---\n---xo---\n--------\n--------\n--------\n"
+
+    /// 黒のコンピューターから始まり、必ず(2, 0)に置かれるゲームを作成します。
+    /// ```
+    /// xo----xo
+    /// --------
+    /// --------
+    /// --------
+    /// --------
+    /// --------
+    /// --------
+    /// --------
+    /// ```
+    case startFromDarkComputerOnlyPlaceAt2_0 = "x10\nxo----xo\n--------\n--------\n--------\n--------\n--------\n--------\n--------\n"
 }
