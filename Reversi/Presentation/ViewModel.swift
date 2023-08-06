@@ -75,7 +75,7 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
 
         messageDiskSize = game.map { $0.state }.map { state in
             state == .draw ? 0 : initialDiskSize
-        }
+        }.distinctUntilChanged()
         diskCounts = finishPlacingDisk.withLatestFrom(game) { $1.board.diskCounts }
         message = game.map { $0.state }.map {
             switch $0 {

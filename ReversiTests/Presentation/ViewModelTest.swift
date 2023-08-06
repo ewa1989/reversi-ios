@@ -70,6 +70,7 @@ final class ViewModelTest: XCTestCase {
         let playerControls = viewModel.playerControls.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
         let diskCounts = viewModel.diskCounts.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
         let message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let messageDiskSize = viewModel.messageDiskSize.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
 
         scheduler.createColdObservable([
             .next(1, (1)),
@@ -111,6 +112,10 @@ final class ViewModelTest: XCTestCase {
             .next(1, Message(disk: .dark, label: "'s turn")),   // ゲーム読み込み後
             .next(4, Message(disk: .light, label: "'s turn")),  // コンピューターがディスクを置いた後
         ])
+        XCTAssertEqual(messageDiskSize.events, [
+            .next(0, 0),    // 初期状態
+            .next(1, 24),   // ゲーム読み込み後
+        ])
         // 描画が最後まで完了していれば保存処理が走っている
         XCTAssertEqual(fakeStrategy.fakeOutput, "o10\nxxx---xo\n--------\n--------\n--------\n--------\n--------\n--------\n--------\n")
     }
@@ -125,6 +130,7 @@ final class ViewModelTest: XCTestCase {
         let playerControls = viewModel.playerControls.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
         let diskCounts = viewModel.diskCounts.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
         let message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let messageDiskSize = viewModel.messageDiskSize.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
 
         scheduler.createColdObservable([
             .next(1, (1)),
@@ -166,6 +172,10 @@ final class ViewModelTest: XCTestCase {
             .next(1, Message(disk: .light, label: "'s turn")),   // ゲーム読み込み後
             .next(5, Message(disk: .dark, label: "'s turn")),  // ユーザーがディスクを置いた後
         ])
+        XCTAssertEqual(messageDiskSize.events, [
+            .next(0, 0),    // 初期状態
+            .next(1, 24),   // ゲーム読み込み後
+        ])
         // 描画が最後まで完了していれば保存処理が走っている
         XCTAssertEqual(fakeStrategy.fakeOutput, "x00\n--------\n--------\n----o---\n---oo---\n---xo---\n--------\n--------\n--------\n")
     }
@@ -178,6 +188,7 @@ final class ViewModelTest: XCTestCase {
         let playerControls = viewModel.playerControls.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
         let diskCounts = viewModel.diskCounts.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
         let message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let messageDiskSize = viewModel.messageDiskSize.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
 
         scheduler.createColdObservable([
             .next(1, (1)),
@@ -209,6 +220,10 @@ final class ViewModelTest: XCTestCase {
         XCTAssertEqual(message.events, [
             .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
             .next(1, Message(disk: .light, label: "'s turn")),   // ゲーム読み込み後
+        ])
+        XCTAssertEqual(messageDiskSize.events, [
+            .next(0, 0),    // 初期状態
+            .next(1, 24),   // ゲーム読み込み後
         ])
         // 保存処理は走らない
         XCTAssertEqual(fakeStrategy.fakeOutput, nil)
