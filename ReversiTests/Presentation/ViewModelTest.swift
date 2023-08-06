@@ -273,4 +273,63 @@ final class ViewModelTest: XCTestCase {
     }
 
     // TODO: ゲーム読み込み時からパスが必要なケースは現状バグがある。他のテストを書き終わった後にテストを作成し、バグ修正する
+
+    // MARK: プレイヤーモード変更
+
+    func test_進行中のゲームで_ManualからComputerにモードを変更すると_状態が保存される() throws {
+        fakeStrategy.fakeInput = TestData.newGame.rawValue
+
+        let playerControls = viewModel.playerControls.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+
+        scheduler.createColdObservable([
+            .next(1, (1)),
+            .next(2, (2)),
+            .next(3, (3)),
+        ]).subscribe { [weak self] event in
+            switch event.element {
+            case 1:
+                self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
+            case 2:
+                self?.viewModel.viewDidAppear() // ViewControllerが表示され
+            default:
+                self?.viewModel.changePlayerControl(of: .light, to: .computer)  // 白のモードをComputerにすると状態が保存される
+            }
+        }.disposed(by: disposeBag)
+        scheduler.start()
+
+        XCTAssertEqual(playerControls.events, [
+            .next(0, [.manual, .manual]),   // 初期状態
+            .next(3, [.manual, .computer]), // モード変更後
+        ])
+        XCTAssertEqual(fakeStrategy.fakeOutput, "x01\n--------\n--------\n--------\n---ox---\n---xo---\n--------\n--------\n--------\n")
+    }
+
+    func test_終了しているゲームで_ComputerからManualにモードを変更すると_状態が保存される() throws {
+        fakeStrategy.fakeInput = TestData.tiedComputerMatchWithLeftSideDarkAndRightSideLightBoard.rawValue
+
+        let playerControls = viewModel.playerControls.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+
+        scheduler.createColdObservable([
+            .next(1, (1)),
+            .next(2, (2)),
+            .next(3, (3)),
+        ]).subscribe { [weak self] event in
+            switch event.element {
+            case 1:
+                self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
+            case 2:
+                self?.viewModel.viewDidAppear() // ViewControllerが表示され
+            default:
+                self?.viewModel.changePlayerControl(of: .dark, to: .manual)  // 黒のモードをManualにすると状態が保存される
+            }
+        }.disposed(by: disposeBag)
+        scheduler.start()
+
+        XCTAssertEqual(playerControls.events, [
+            .next(0, [.manual, .manual]),   // 初期状態
+            .next(1, [.computer, .computer]),   // ゲーム読み込み後
+            .next(3, [.manual, .computer]), // モード変更後
+        ])
+        XCTAssertEqual(fakeStrategy.fakeOutput, "-01\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\n")
+    }
 }
