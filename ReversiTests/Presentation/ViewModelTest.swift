@@ -114,4 +114,59 @@ final class ViewModelTest: XCTestCase {
         // 描画が最後まで完了していれば保存処理が走っている
         XCTAssertEqual(fakeStrategy.fakeOutput, "o10\nxxx---xo\n--------\n--------\n--------\n--------\n--------\n--------\n--------\n")
     }
+
+    // MARK: ユーザーの試行
+
+    func test_白から始まる新規ゲームで_ユーザーが4_2にディスクを置くと_セル2つの描画が更新され_描画が完了するとゲームが保存される() throws {
+        fakeStrategy.fakeInput = TestData.newGameStartFromLight.rawValue
+
+        let computerProcessing = viewModel.computerProcessings.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let diskToPlace = viewModel.diskToPlace.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let playerControls = viewModel.playerControls.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let diskCounts = viewModel.diskCounts.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+
+        scheduler.createColdObservable([
+            .next(1, (1)),
+            .next(2, (2)),
+            .next(3, (3)),
+            .next(4, (4)),
+            .next(5, (5)),
+        ]).subscribe { [weak self] event in
+            switch event.element {
+            case 1:
+                self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
+            case 2:
+                self?.viewModel.viewDidAppear() // ViewControllerが表示され
+            case 3:
+                self?.viewModel.didSelectCellAt(x: 4, y: 2) // (4, 2)に白を置き
+            default:
+                self?.viewModel.finishToPlace(isFinished: true) // 2つのセルの描画が終わる
+            }
+        }.disposed(by: disposeBag)
+        scheduler.start()
+
+        XCTAssertEqual(computerProcessing.events, [
+            .next(0, [false, false]),   // 初期状態
+        ])
+        // time > 1のイベントでフィルターすることで、ゲーム読み込み時の全セルの描画イベントを除く
+        XCTAssertEqual(diskToPlace.events.filter { $0.time > 1 },[
+            .next(3, DiskPlacement(disk: .light, coordinate: Coordinate(x: 4, y: 2), animated: true)),
+            .next(4, DiskPlacement(disk: .light, coordinate: Coordinate(x: 4, y: 3), animated: true)),
+        ])
+        XCTAssertEqual(playerControls.events, [
+            .next(0, [.manual, .manual]),   // 初期状態
+        ])
+        XCTAssertEqual(diskCounts.events, [
+            .next(1, [2, 2]),   // ゲーム読み込み後
+            .next(5, [1, 4]),   // ユーザーがディスクを置いた後
+        ])
+        XCTAssertEqual(message.events, [
+            .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
+            .next(1, Message(disk: .light, label: "'s turn")),   // ゲーム読み込み後
+            .next(5, Message(disk: .dark, label: "'s turn")),  // ユーザーがディスクを置いた後
+        ])
+        // 描画が最後まで完了していれば保存処理が走っている
+        XCTAssertEqual(fakeStrategy.fakeOutput, "x00\n--------\n--------\n----o---\n---oo---\n---xo---\n--------\n--------\n--------\n")
+    }
 }
