@@ -12,7 +12,7 @@ import RxTest
 import RxSwift
 import RxCocoa
 
-final class ViewModelTest: XCTestCase {
+final class SynchronousDispatchViewModelTest: XCTestCase {
     private var viewModel: ViewModel<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>!
     private var fakeStrategy: FakeFileSaveAndLoadStrategy!
     private var dispatcher: SynchronousDispatcher!
@@ -440,6 +440,85 @@ final class ViewModelTest: XCTestCase {
     /// 読み込み・リセット時最初に描画される1セルと残り63セルを描画するため64回描画完了を通知する
     fileprivate func finishUpdatingAllCell() {
         (0...63).forEach { [weak self] _ in
+            self?.viewModel.finishToPlace(isFinished: true)
+        }
+    }
+}
+
+final class DispatchTimingControlledViewModelTest: XCTestCase {
+    private var viewModel: ViewModel<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, TimingControllableDispatcher>!
+    private var fakeStrategy: FakeFileSaveAndLoadStrategy!
+    private var dispatcher: TimingControllableDispatcher!
+    private var scheduler: TestScheduler!
+    private var disposeBag: DisposeBag!
+
+    override func setUpWithError() throws {
+        fakeStrategy = FakeFileSaveAndLoadStrategy()
+        dispatcher = TimingControllableDispatcher()
+        viewModel = ViewModel(
+            gameRepository: ReversiGameRepositoryImpl(strategy: fakeStrategy),
+            dispatcher: dispatcher,
+            initialDiskSize: 24
+        )
+
+        scheduler = TestScheduler(initialClock: 0)
+        disposeBag = DisposeBag()
+    }
+
+    func test_コンピューターの思考中に_モードをManualに変更すると_ターンは変わらなず_保存されている() {
+        fakeStrategy.fakeInput = TestData.startFromDarkComputerOnlyPlaceAt2_0.rawValue
+
+        let computerProcessing = viewModel.computerProcessings.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let diskToPlace = viewModel.diskToPlace.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let playerControls = viewModel.playerControls.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let diskCounts = viewModel.diskCounts.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+
+        scheduler.createColdObservable([
+            .next(1, (1)),
+            .next(2, (2)),
+            .next(3, (3)),
+            .next(4, (4)),
+            .next(5, (5)),
+        ]).subscribe { [weak self] event in
+            switch event.element {
+            case 1:
+                self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
+                self?.finishUpdatingAllCell()
+            case 2:
+                self?.viewModel.viewDidAppear() // ViewControllerが表示され
+            default:
+                // dispatcher.workを実行する前にchangePlayerControlを呼ぶことで、コンピューターの思考中にモードを切り替えたことを再現する
+                self?.viewModel.changePlayerControl(of: .dark, to: .manual) // 黒のモードをManualに変更する
+            }
+        }.disposed(by: disposeBag)
+        scheduler.start()
+
+        XCTAssertEqual(computerProcessing.events, [
+            .next(0, [false, false]),   // 初期状態
+            .next(2, [true, false]),   // コンピューター思考開始
+            .next(3, [false, false])    // モード変更後
+        ])
+        // time > 1のイベントでフィルターすることで、ゲーム読み込み時の全セルの描画イベントを除く
+        XCTAssertEqual(diskToPlace.events.filter { $0.time > 1 }.count, 0)
+        XCTAssertEqual(playerControls.events, [
+            .next(0, [.manual, .manual]),   // 初期状態
+            .next(1, [.computer, .manual]),   // ゲーム読み込み後
+            .next(3, [.manual, .manual]),   // 初期状態
+        ])
+        XCTAssertEqual(diskCounts.events, [
+            .next(1, [2, 2]),   // ゲーム読み込み後
+        ])
+        XCTAssertEqual(message.events, [
+            .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
+            .next(1, Message(disk: .dark, label: "'s turn")),   // ゲーム読み込み後
+        ])
+        XCTAssertEqual(fakeStrategy.fakeOutput, "x00\nxo----xo\n--------\n--------\n--------\n--------\n--------\n--------\n--------\n")
+    }
+
+    fileprivate func finishUpdatingAllCell() {
+        (0...63).forEach { [weak self] _ in            self?.dispatcher.work?()
+            self?.dispatcher.work = nil
             self?.viewModel.finishToPlace(isFinished: true)
         }
     }
