@@ -65,9 +65,9 @@ extension ViewController {
             }
         }.disposed(by: disposeBag)
 
-        viewModel.message.subscribe { [weak self] (disk, label) in
-            self?.messageLabel.text = label
-            guard let disk = disk else {
+        viewModel.message.subscribe { [weak self] message in
+            self?.messageLabel.text = message.label
+            guard let disk = message.disk else {
                 return
             }
             self?.messageDiskView.disk = disk

@@ -36,7 +36,7 @@ final class ViewModelTest: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    // MARK: viewDidLoad
+    // MARK: ゲーム読み込み
 
     func test_保存されたゲームがない時_画面ロード時に新ゲームが生成され_保存もされる() throws {
         let expected = ReversiGame.newGame()
@@ -60,7 +60,7 @@ final class ViewModelTest: XCTestCase {
         XCTAssertEqual(try viewModel.game.toBlocking().first(), expected)
     }
 
-    // MARK: viewDidAppear
+    // MARK: コンピューターの試行
 
     func test_viewDidAppearが呼ばれるとゲームが開始され_コンピューターが思考しディスクを置き_セル2つの描画が更新され_描画が完了するとゲームが保存される() throws {
         fakeStrategy.fakeInput = TestData.startFromDarkComputerOnlyPlaceAt2_0.rawValue
@@ -69,6 +69,7 @@ final class ViewModelTest: XCTestCase {
         let diskToPlace = viewModel.diskToPlace.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
         let playerControls = viewModel.playerControls.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
         let diskCounts = viewModel.diskCounts.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
 
         scheduler.createColdObservable([
             .next(1, (1)),
@@ -104,8 +105,13 @@ final class ViewModelTest: XCTestCase {
             .next(1, [.computer, .manual]), // ゲーム読み込み後
         ])
         XCTAssertEqual(diskCounts.events, [
-            .next(1, [2, 2]),   // 初期状態
+            .next(1, [2, 2]),   // ゲーム読み込み後
             .next(4, [4, 1]),   // コンピューターがディスクを置いた後
+        ])
+        XCTAssertEqual(message.events, [
+            .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
+            .next(1, Message(disk: .dark, label: "'s turn")),   // ゲーム読み込み後
+            .next(4, Message(disk: .light, label: "'s turn")),  // コンピューターがディスクを置いた後
         ])
         // 描画が最後まで完了していれば保存処理が走っている
         XCTAssertEqual(fakeStrategy.fakeOutput, "o10\nxxx---xo\n--------\n--------\n--------\n--------\n--------\n--------\n--------\n")

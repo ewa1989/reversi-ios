@@ -18,7 +18,7 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
     let game = BehaviorRelay(value: ReversiGame())
 
     public let diskCounts: Observable<[Int]>
-    public let message: Observable<(Disk?, String)>
+    public let message: Observable<Message>
     public let playerControls: Observable<[Player]>
     public let messageDiskSize: Observable<CGFloat>
 
@@ -80,13 +80,13 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
         message = game.map { $0.state }.map {
             switch $0 {
             case .move(side: let side):
-                return (side, "'s turn")
+                return Message(disk: side, label: "'s turn")
             case .win(winner: let winner):
-                return (winner, " won")
+                return Message(disk: winner, label: " won")
             case .draw:
-                return (nil ,"Tied")
+                return Message(disk: nil, label: "Tied")
             }
-        }
+        }.distinctUntilChanged()
         playerControls = game.map { $0.playerControls }.distinctUntilChanged()
     }
 }
@@ -398,4 +398,9 @@ struct DiskPlacement: Hashable {
     mutating func noAnimation() {
         animated = false
     }
+}
+
+struct Message: Hashable {
+    let disk: Disk?
+    let label: String
 }
