@@ -379,4 +379,58 @@ final class ViewModelTest: XCTestCase {
         ])
         XCTAssertEqual(fakeStrategy.fakeOutput, TestData.newGame.rawValue)
     }
+
+    // MARK: 処理キャンセル
+
+    func test_裏返し中のリセット() throws {
+        fakeStrategy.fakeInput = TestData.blankSurroundedByLightSurroundingByDark.rawValue
+
+        let diskToPlace = viewModel.diskToPlace.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let playerControls = viewModel.playerControls.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let diskCounts = viewModel.diskCounts.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+
+        scheduler.createColdObservable([
+            .next(1, (1)),
+            .next(2, (2)),
+            .next(3, (3)),
+            .next(4, (4)),
+            .next(5, (5)),
+        ]).subscribe { [weak self] event in
+            switch event.element {
+            case 1:
+                self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
+            case 2:
+                self?.viewModel.viewDidAppear() // ViewControllerが表示され
+            case 3:
+                self?.viewModel.didSelectCellAt(x: 2, y: 2) // (2, 2)に黒を置くと置いた1枚＋裏返る8枚の計9枚の再描画が始まる
+                self?.viewModel.finishToPlace(isFinished: true) // 2枚目まで描画させる
+            case 4:
+                self?.viewModel.reset() // 3枚目の描画中にリセット
+            default:
+                // reset時に描画されるセルを除く63セルを描画するため63回描画完了を通知する
+                (0...62).forEach { [weak self] _ in
+                    self?.viewModel.finishToPlace(isFinished: true)
+                }
+            }
+        }.disposed(by: disposeBag)
+        scheduler.start()
+
+        // ディスクを置いたことによる描画は2枚目で止まっている
+        XCTAssertEqual(diskToPlace.events.filter { $0.time == 3 }.count, 2)
+        // リセットによる描画は全セル行われている
+        XCTAssertEqual(diskToPlace.events.filter { $0.time > 3 }.count, 64)
+        XCTAssertEqual(playerControls.events, [
+            .next(0, [.manual, .manual]),   // 初期状態
+        ])
+        XCTAssertEqual(diskCounts.events, [
+            .next(1, [16, 8]),   // ゲーム読み込み後
+            .next(4, [2, 2]),   // リセット時
+        ])
+        XCTAssertEqual(message.events, [
+            .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
+            .next(1, Message(disk: .dark, label: "'s turn")),   // ゲーム読み込み後
+        ])
+        XCTAssertEqual(fakeStrategy.fakeOutput, TestData.newGame.rawValue)
+    }
 }
