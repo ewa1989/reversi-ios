@@ -9,6 +9,7 @@
 import Foundation
 import RxSwift
 import RxTest
+import RxCocoa
 
 extension Observable {
     func makeTestableObserver(testScheduler: TestScheduler, disposeBag: DisposeBag) -> TestableObserver<Element> {

@@ -7,10 +7,8 @@
 //
 
 import XCTest
-import RxBlocking
 import RxTest
 import RxSwift
-import RxCocoa
 
 final class SynchronousDispatchViewModelTest: XCTestCase {
     private var viewModel: ViewModel<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>!
