@@ -232,6 +232,56 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
         XCTAssertEqual(fakeStrategy.fakeOutput, nil)
     }
 
+    func test_すでに置いてあるセルをタップしても何も起こらない() throws {
+        fakeStrategy.fakeInput = TestData.blankSurroundedByLightSurroundingByDark.rawValue
+
+        let computerProcessing = viewModel.computerProcessings.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let diskToPlace = viewModel.diskToPlace.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let playerControls = viewModel.playerControls.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let diskCounts = viewModel.diskCounts.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let messageDiskSize = viewModel.messageDiskSize.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+
+        scheduler.createColdObservable([
+            .next(1, (1)),
+            .next(2, (2)),
+            .next(3, (3)),
+        ]).subscribe { [weak self] event in
+            switch event.element {
+            case 1:
+                self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
+                self?.viewModel.finishUpdatingCells()
+            case 2:
+                self?.viewModel.viewDidAppear() // ViewControllerが表示され
+            default:
+                self?.viewModel.didSelectCellAt(x: 2, y: 1) // すでにディスクがある(2, 1)に黒を置こうとするが何も起こらない
+            }
+        }.disposed(by: disposeBag)
+        scheduler.start()
+
+        XCTAssertEqual(computerProcessing.events, [
+            .next(0, [false, false]),   // 初期状態
+        ])
+        // time > 1のイベントでフィルターすることで、ゲーム読み込み時の全セルの描画イベントを除く
+        XCTAssertEqual(diskToPlace.events.filter { $0.time > 1 }.count, 0)
+        XCTAssertEqual(playerControls.events, [
+            .next(0, [.manual, .manual]),   // 初期状態
+        ])
+        XCTAssertEqual(diskCounts.events, [
+            .next(1, [16, 8]),   // ゲーム読み込み後
+        ])
+        XCTAssertEqual(message.events, [
+            .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
+            .next(1, Message(disk: .dark, label: "'s turn")),   // ゲーム読み込み後
+        ])
+        XCTAssertEqual(messageDiskSize.events, [
+            .next(0, 0),    // 初期状態
+            .next(1, 24),   // ゲーム読み込み後
+        ])
+        // 保存処理は走らない
+        XCTAssertEqual(fakeStrategy.fakeOutput, nil)
+    }
+
     // MARK: パスの判定が正しくされ了承でターンが変わる
 
     func test_ディスクが置かれターンが変わった時_置く場所がないとアラートが表示され_了承するとターンが変わる() throws {
