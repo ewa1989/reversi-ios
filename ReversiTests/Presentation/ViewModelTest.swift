@@ -518,7 +518,7 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
 
     // MARK: 処理キャンセル
 
-    func test_裏返し中のリセット() throws {
+    func test_裏返す描画中にリセットすると_未描画のセルは描画がキャンセルされ_初期状態に戻り_保存もされる() throws {
         fakeStrategy.fakeInput = TestData.blankSurroundedByLightSurroundingByDark.rawValue
 
         scheduler.createColdObservable([
