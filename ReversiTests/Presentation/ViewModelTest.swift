@@ -559,6 +559,54 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
         ])
         XCTAssertEqual(fakeStrategy.fakeOutput, TestData.newGame.rawValue)
     }
+
+    func test_画面描画中_システムからアニメーション描画完了前にcompletionが呼ばれた場合_残りの描画はアニメーションなしで実施する() throws {
+        fakeStrategy.fakeInput = TestData.blankSurroundedByLightSurroundingByDark.rawValue
+
+        scheduler.createColdObservable([
+            .next(1, (1)),
+            .next(2, (2)),
+            .next(3, (3)),
+            .next(4, (4)),
+        ]).subscribe { [weak self] event in
+            switch event.element {
+            case 1:
+                self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
+                self?.viewModel.finishUpdatingCells()
+            case 2:
+                self?.viewModel.viewDidAppear() // ViewControllerが表示され
+            case 3:
+                self?.viewModel.didSelectCellAt(x: 2, y: 2) // (2, 2)に黒を置くと置いた1枚＋裏返る8枚の計9枚の再描画が始まる
+                self?.viewModel.finishToPlace(isFinished: false) // 1枚目の描画中、システムから描画完了前にcompletionが呼ばれる
+            default:
+                self?.viewModel.finishUpdatingCells(times: 8)
+            }
+        }.disposed(by: disposeBag)
+        scheduler.start()
+
+        // ディスクは置いた1枚+左上から時計回りで8枚全て描画されている
+        XCTAssertEqual(diskToPlace.events.filter { $0.time > 1 }, [
+            .next(3, DiskPlacement(disk: .dark, coordinate: Coordinate(x: 2, y: 2), animated: true)),   // 1枚目はアニメーションありで描画
+            .next(3, DiskPlacement(disk: .dark, coordinate: Coordinate(x: 1, y: 1), animated: false)),  // 2枚目以降はアニメーションなしでの描画に変更されている
+            .next(4, DiskPlacement(disk: .dark, coordinate: Coordinate(x: 2, y: 1), animated: false)),
+            .next(4, DiskPlacement(disk: .dark, coordinate: Coordinate(x: 3, y: 1), animated: false)),
+            .next(4, DiskPlacement(disk: .dark, coordinate: Coordinate(x: 3, y: 2), animated: false)),
+            .next(4, DiskPlacement(disk: .dark, coordinate: Coordinate(x: 3, y: 3), animated: false)),
+            .next(4, DiskPlacement(disk: .dark, coordinate: Coordinate(x: 2, y: 3), animated: false)),
+            .next(4, DiskPlacement(disk: .dark, coordinate: Coordinate(x: 1, y: 3), animated: false)),
+            .next(4, DiskPlacement(disk: .dark, coordinate: Coordinate(x: 1, y: 2), animated: false)),
+        ])
+        XCTAssertEqual(diskCounts.events, [
+            .next(1, [16, 8]),   // ゲーム読み込み後
+            .next(4, [25, 0]),   // リセット時
+        ])
+        XCTAssertEqual(message.events, [
+            .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
+            .next(1, Message(disk: .dark, label: "'s turn")),   // ゲーム読み込み後
+            .next(4, Message(disk: .dark, label: " won")),   // 描画完了後
+        ])
+        XCTAssertEqual(fakeStrategy.fakeOutput, "-00\nxxxxx---\nxxxxx---\nxxxxx---\nxxxxx---\nxxxxx---\n--------\n--------\n--------\n")
+    }
 }
 
 final class DispatchTimingControlledViewModelTest: XCTestCase {
