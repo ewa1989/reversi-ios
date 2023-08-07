@@ -19,6 +19,14 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
     private var scheduler: TestScheduler!
     private var disposeBag: DisposeBag!
 
+    private var computerProcessing: TestableObserver<[Bool]>!
+    private var diskToPlace: TestableObserver<DiskPlacement>!
+    private var playerControls: TestableObserver<[Player]>!
+    private var diskCounts: TestableObserver<[Int]>!
+    private var message: TestableObserver<Message>!
+    private var messageDiskSize: TestableObserver<CGFloat>!
+    private var passAlert: TestableObserver<PassAlert>!
+
     override func setUpWithError() throws {
         fakeStrategy = FakeFileSaveAndLoadStrategy()
         dispatcher = SynchronousDispatcher()
@@ -30,6 +38,14 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
 
         scheduler = TestScheduler(initialClock: 0)
         disposeBag = DisposeBag()
+
+        computerProcessing = viewModel.computerProcessings.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        diskToPlace = viewModel.diskToPlace.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        playerControls = viewModel.playerControls.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        diskCounts = viewModel.diskCounts.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        messageDiskSize = viewModel.messageDiskSize.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        passAlert = viewModel.passAlert.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
     }
 
     override func tearDownWithError() throws {
@@ -64,13 +80,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
 
     func test_viewDidAppearが呼ばれるとゲームが開始され_コンピューターが思考しディスクを置き_セル2つの描画が更新され_描画が完了するとゲームが保存される() throws {
         fakeStrategy.fakeInput = TestData.startFromDarkComputerOnlyPlaceAt2_0.rawValue
-
-        let computerProcessing = viewModel.computerProcessings.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let diskToPlace = viewModel.diskToPlace.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let playerControls = viewModel.playerControls.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let diskCounts = viewModel.diskCounts.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let messageDiskSize = viewModel.messageDiskSize.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
 
         scheduler.createColdObservable([
             .next(1, (1)),
@@ -126,13 +135,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
     func test_白から始まる新規ゲームで_ユーザーが4_2にディスクを置くと_セル2つの描画が更新され_描画が完了するとゲームが保存される() throws {
         fakeStrategy.fakeInput = TestData.newGameStartFromLight.rawValue
 
-        let computerProcessing = viewModel.computerProcessings.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let diskToPlace = viewModel.diskToPlace.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let playerControls = viewModel.playerControls.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let diskCounts = viewModel.diskCounts.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let messageDiskSize = viewModel.messageDiskSize.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-
         scheduler.createColdObservable([
             .next(1, (1)),
             .next(2, (2)),
@@ -185,13 +187,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
     func test_ユーザーが置けないセルをタップしても何も起こらない() throws {
         fakeStrategy.fakeInput = TestData.newGameStartFromLight.rawValue
 
-        let computerProcessing = viewModel.computerProcessings.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let diskToPlace = viewModel.diskToPlace.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let playerControls = viewModel.playerControls.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let diskCounts = viewModel.diskCounts.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let messageDiskSize = viewModel.messageDiskSize.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-
         scheduler.createColdObservable([
             .next(1, (1)),
             .next(2, (2)),
@@ -234,13 +229,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
 
     func test_すでに置いてあるセルをタップしても何も起こらない() throws {
         fakeStrategy.fakeInput = TestData.blankSurroundedByLightSurroundingByDark.rawValue
-
-        let computerProcessing = viewModel.computerProcessings.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let diskToPlace = viewModel.diskToPlace.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let playerControls = viewModel.playerControls.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let diskCounts = viewModel.diskCounts.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let messageDiskSize = viewModel.messageDiskSize.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
 
         scheduler.createColdObservable([
             .next(1, (1)),
@@ -287,9 +275,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
     func test_ディスクが置かれターンが変わった時_置く場所がないとアラートが表示され_了承するとターンが変わる() throws {
         fakeStrategy.fakeInput = TestData.mustPassOnNextTurn.rawValue
 
-        let message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let passAlert = viewModel.passAlert.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-
         scheduler.createColdObservable([
             .next(1, (1)),
             .next(2, (2)),
@@ -325,9 +310,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
     func test＿ゲーム読み込み時から先手がパスが必要な場合_表示直後にパスするアラートが表示され_パスを了承しても保存はされない() throws {
         fakeStrategy.fakeInput = TestData.mustPassOnThisTurn.rawValue
 
-        let message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let passAlert = viewModel.passAlert.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-
         scheduler.createColdObservable([
             .next(1, (1)),
             .next(2, (2)),
@@ -359,10 +341,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
 
     func test_置く場所がどちらもなくなり_ゲーム終了と判定され_保存される() {
         fakeStrategy.fakeInput = TestData.blankSurroundedByLightSurroundingByDark.rawValue
-
-        let diskCounts = viewModel.diskCounts.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let messageDiskSize = viewModel.messageDiskSize.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
 
         scheduler.createColdObservable([
             .next(1, (1)),
@@ -400,10 +378,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
 
     func test_全セルが埋まり_ゲーム終了引き分けと判定され_保存される() {
         fakeStrategy.fakeInput = TestData.willDrawOnNextTurn.rawValue
-
-        let diskCounts = viewModel.diskCounts.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let messageDiskSize = viewModel.messageDiskSize.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
 
         scheduler.createColdObservable([
             .next(1, (1)),
@@ -445,8 +419,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
     func test_進行中のゲームで_ManualからComputerにモードを変更すると_状態が保存される() throws {
         fakeStrategy.fakeInput = TestData.newGame.rawValue
 
-        let playerControls = viewModel.playerControls.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-
         scheduler.createColdObservable([
             .next(1, (1)),
             .next(2, (2)),
@@ -473,8 +445,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
 
     func test_終了しているゲームで_ComputerからManualにモードを変更すると_状態が保存される() throws {
         fakeStrategy.fakeInput = TestData.tiedComputerMatchWithLeftSideDarkAndRightSideLightBoard.rawValue
-
-        let playerControls = viewModel.playerControls.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
 
         scheduler.createColdObservable([
             .next(1, (1)),
@@ -505,11 +475,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
 
     func test_進行中のゲームを_リセットすると初期状態に戻り_保存もされる() throws {
         fakeStrategy.fakeInput = TestData.darkSurroundedByLightGame.rawValue
-
-        let diskToPlace = viewModel.diskToPlace.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let playerControls = viewModel.playerControls.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let diskCounts = viewModel.diskCounts.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
 
         scheduler.createColdObservable([
             .next(1, (1)),
@@ -547,12 +512,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
 
     func test_引き分け終了しているゲームを_リセットすると初期状態に戻り_保存もされる() throws {
         fakeStrategy.fakeInput = TestData.tiedComputerMatchWithLeftSideDarkAndRightSideLightBoard.rawValue
-
-        let diskToPlace = viewModel.diskToPlace.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let playerControls = viewModel.playerControls.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let diskCounts = viewModel.diskCounts.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let messageDiskSize = viewModel.messageDiskSize.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
 
         scheduler.createColdObservable([
             .next(1, (1)),
@@ -598,11 +557,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
 
     func test_裏返し中のリセット() throws {
         fakeStrategy.fakeInput = TestData.blankSurroundedByLightSurroundingByDark.rawValue
-
-        let diskToPlace = viewModel.diskToPlace.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let playerControls = viewModel.playerControls.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let diskCounts = viewModel.diskCounts.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
 
         scheduler.createColdObservable([
             .next(1, (1)),
@@ -654,6 +608,12 @@ final class DispatchTimingControlledViewModelTest: XCTestCase {
     private var scheduler: TestScheduler!
     private var disposeBag: DisposeBag!
 
+    private var computerProcessing: TestableObserver<[Bool]>!
+    private var diskToPlace: TestableObserver<DiskPlacement>!
+    private var playerControls: TestableObserver<[Player]>!
+    private var diskCounts: TestableObserver<[Int]>!
+    private var message: TestableObserver<Message>!
+
     override func setUpWithError() throws {
         fakeStrategy = FakeFileSaveAndLoadStrategy()
         dispatcher = TimingControllableDispatcher()
@@ -665,16 +625,16 @@ final class DispatchTimingControlledViewModelTest: XCTestCase {
 
         scheduler = TestScheduler(initialClock: 0)
         disposeBag = DisposeBag()
+
+        computerProcessing = viewModel.computerProcessings.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        diskToPlace = viewModel.diskToPlace.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        playerControls = viewModel.playerControls.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        diskCounts = viewModel.diskCounts.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
     }
 
     func test_コンピューターの思考中に_モードをManualに変更すると_ターンは変わらなず_保存されている() {
         fakeStrategy.fakeInput = TestData.startFromDarkComputerOnlyPlaceAt2_0.rawValue
-
-        let computerProcessing = viewModel.computerProcessings.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let diskToPlace = viewModel.diskToPlace.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let playerControls = viewModel.playerControls.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let diskCounts = viewModel.diskCounts.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-        let message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
 
         scheduler.createColdObservable([
             .next(1, (1)),
