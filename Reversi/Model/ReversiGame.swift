@@ -104,6 +104,11 @@ struct Board: Hashable {
         cells.filter { $0.disk == side }.count
     }
 
+    /// 各色のディスクの枚数のコレクションを返します。
+    public var diskCounts: [Int] {
+        Disk.sides.map { countDisks(of: $0) }
+    }
+
     /// 盤上に置かれたディスクの枚数が多い方の色を返します。
     /// 引き分けの場合は `nil` が返されます。
     /// - Returns: 盤上に置かれたディスクの枚数が多い方の色です。引き分けの場合は `nil` を返します。

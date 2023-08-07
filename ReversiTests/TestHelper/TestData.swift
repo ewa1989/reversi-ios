@@ -37,7 +37,7 @@ enum TestData: String {
     /// --------
     /// --------
     /// ```
-    case blankSurroundedByLightSurroundingByDark = "x00\nxxxxx---\nxooox---\nxo#ox---\nxooox---\nxxxxx---\n--------\n--------\n--------\n"
+    case blankSurroundedByLightSurroundingByDark = "x00\nxxxxx---\nxooox---\nxo-ox---\nxooox---\nxxxxx---\n--------\n--------\n--------\n"
 
     /// 全マス黒で埋まったゲームを作成します。
     case allDarkBoard = "-00\nxxxxxxxx\nxxxxxxxx\nxxxxxxxx\nxxxxxxxx\nxxxxxxxx\nxxxxxxxx\nxxxxxxxx\nxxxxxxxx\n"
@@ -61,6 +61,58 @@ enum TestData: String {
     /// ```
     case tiedComputerMatchWithLeftSideDarkAndRightSideLightBoard = "-11\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\n"
 
-    // プレイヤーモードはどちらもManual、中央に白黒2つずつディスクが置かれ黒から始まる新規ゲームを作成します。
+    /// プレイヤーモードはどちらもManual、中央に白黒2つずつディスクが置かれ黒から始まる新規ゲームを作成します。
     case newGame = "x00\n--------\n--------\n--------\n---ox---\n---xo---\n--------\n--------\n--------\n"
+
+    /// 黒のコンピューターから始まり、必ず(2, 0)に置かれるゲームを作成します。
+    /// ```
+    /// xo----xo
+    /// --------
+    /// --------
+    /// --------
+    /// --------
+    /// --------
+    /// --------
+    /// --------
+    /// ```
+    case startFromDarkComputerOnlyPlaceAt2_0 = "x10\nxo----xo\n--------\n--------\n--------\n--------\n--------\n--------\n--------\n"
+
+    /// 黒から始まり次の白のターンで必ずパスが発生するゲームを作成します。
+    /// ```
+    /// xo------
+    /// o-------
+    /// --------
+    /// --------
+    /// --------
+    /// --------
+    /// --------
+    /// --------
+    /// ```
+    case mustPassOnNextTurn = "x00\nxo------\no-------\n--------\n--------\n--------\n--------\n--------\n--------\n"
+
+    /// 白から始まり1手で必ず引き分けになるゲームを作成します。
+    /// ```
+    /// xxxxoooo
+    /// xxxxoooo
+    /// xxxxoooo
+    /// xxxxoooo
+    /// xxxxoooo
+    /// xxxxoooo
+    /// xxxxoooo
+    /// xxxxoox-
+    /// ```
+    case willDrawOnNextTurn = "o00\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoox-\n"
+
+    /// 両プレイヤーコンピューター、白から始まるけれどどこにも置けず、すぐパスが必要なゲームを作成します。
+    /// ```
+    /// xo------
+    /// o-------
+    /// --------
+    /// --------
+    /// --------
+    /// --------
+    /// --------
+    /// --------
+    /// ```
+    case mustPassOnThisTurn = "o11\nxo------\no-------\n--------\n--------\n--------\n--------\n--------\n--------\n"
 }

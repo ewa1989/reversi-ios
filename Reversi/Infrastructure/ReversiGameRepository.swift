@@ -45,7 +45,7 @@ struct ReversiGameRepositoryImpl<Strategy: FileSaveAndLoadStrategy>: ReversiGame
     }
 }
 
-fileprivate extension ReversiGame {
+private extension ReversiGame {
     func convertToSave() -> String {
         var output: String = ""
 
