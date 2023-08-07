@@ -10,7 +10,7 @@ import Foundation
 import RxSwift
 import RxRelay
 
-class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
+final class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
     private let repository: Repository
     private let dispatcher: Dispatcher
 
@@ -259,7 +259,7 @@ extension ViewModel {
         }
     }
 
-    fileprivate func setAllCellToChange() {
+    private func setAllCellToChange() {
         for y in game.value.board.yRange {
             for x in game.value.board.xRange {
                 disksWaitingToPlace.append(DiskPlacement(disk: game.value.board.diskAt(x: x, y: y), coordinate: Coordinate(x: x, y: y), animated: false))
@@ -279,7 +279,7 @@ extension ViewModel {
         try? repository.save(game.value)
     }
 
-    fileprivate func completionWithoutAnimation() -> () -> Void {
+    private func completionWithoutAnimation() -> () -> Void {
         return { [weak self] in
             guard let self = self else {
                 return
@@ -289,7 +289,7 @@ extension ViewModel {
         }
     }
 
-    fileprivate func completionWithAnimation() -> () -> Void {
+    private func completionWithAnimation() -> () -> Void {
         return { [weak self] in
             guard let self = self else { return }
             guard let canceller = self.animationCanceller else { return }

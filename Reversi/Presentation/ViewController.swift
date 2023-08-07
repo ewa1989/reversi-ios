@@ -109,7 +109,7 @@ extension ViewController {
         present(alertController, animated: true)
     }
 
-    fileprivate func showResetAlert(didOKSelect defaultHandler: ((UIAlertAction) -> Void)?, didCancelSelect cancelHandler: ((UIAlertAction) -> Void)?) {
+    private func showResetAlert(didOKSelect defaultHandler: ((UIAlertAction) -> Void)?, didCancelSelect cancelHandler: ((UIAlertAction) -> Void)?) {
         let alertController = UIAlertController(
             title: "Confirmation",
             message: "Do you really want to reset the game?",
