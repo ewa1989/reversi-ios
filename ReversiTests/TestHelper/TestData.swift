@@ -37,7 +37,7 @@ enum TestData: String {
     /// --------
     /// --------
     /// ```
-    case blankSurroundedByLightSurroundingByDark = "x00\nxxxxx---\nxooox---\nxo#ox---\nxooox---\nxxxxx---\n--------\n--------\n--------\n"
+    case blankSurroundedByLightSurroundingByDark = "x00\nxxxxx---\nxooox---\nxo-ox---\nxooox---\nxxxxx---\n--------\n--------\n--------\n"
 
     /// 全マス黒で埋まったゲームを作成します。
     case allDarkBoard = "-00\nxxxxxxxx\nxxxxxxxx\nxxxxxxxx\nxxxxxxxx\nxxxxxxxx\nxxxxxxxx\nxxxxxxxx\nxxxxxxxx\n"

@@ -81,7 +81,7 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
             switch event.element {
             case 1:
                 self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
-                self?.viewModel.finishUpdatingAllCell()
+                self?.viewModel.finishUpdatingCells()
             case 2:
                 self?.viewModel.viewDidAppear() // ViewControllerが表示され
             default:
@@ -143,7 +143,7 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
             switch event.element {
             case 1:
                 self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
-                self?.viewModel.finishUpdatingAllCell()
+                self?.viewModel.finishUpdatingCells()
             case 2:
                 self?.viewModel.viewDidAppear() // ViewControllerが表示され
             case 3:
@@ -200,7 +200,7 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
             switch event.element {
             case 1:
                 self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
-                self?.viewModel.finishUpdatingAllCell()
+                self?.viewModel.finishUpdatingCells()
             case 2:
                 self?.viewModel.viewDidAppear() // ViewControllerが表示され
             default:
@@ -276,6 +276,49 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
     }
 
     // TODO: ゲーム読み込み時からパスが必要なケースは現状バグがある。他のテストを書き終わった後にテストを作成し、バグ修正する
+
+    // MARK: ゲームの終了判定が正しく行われる
+
+    func test_置く場所がどちらもなくなり_ゲーム終了と判定され_保存される() {
+        fakeStrategy.fakeInput = TestData.blankSurroundedByLightSurroundingByDark.rawValue
+
+        let diskCounts = viewModel.diskCounts.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let messageDiskSize = viewModel.messageDiskSize.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+
+        scheduler.createColdObservable([
+            .next(1, (1)),
+            .next(2, (2)),
+            .next(3, (3)),
+        ]).subscribe { [weak self] event in
+            switch event.element {
+            case 1:
+                self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
+                self?.viewModel.finishUpdatingCells()
+            case 2:
+                self?.viewModel.viewDidAppear() // ViewControllerが表示され
+            default:
+                self?.viewModel.didSelectCellAt(x: 2, y: 2) // 黒が(2, 2)に置くと白が8枚裏返り全て黒になる
+                self?.viewModel.finishUpdatingCells(times: 9)
+            }
+        }.disposed(by: disposeBag)
+        scheduler.start()
+
+        XCTAssertEqual(diskCounts.events, [
+            .next(1, [16, 8]),   // ゲーム読み込み後
+            .next(3, [25, 0])   // ゲーム終了時
+        ])
+        XCTAssertEqual(message.events, [
+            .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
+            .next(1, Message(disk: .dark, label: "'s turn")),   // ゲーム読み込み後
+            .next(3, Message(disk: .dark, label: " won")),   // ゲーム終了時
+        ])
+        XCTAssertEqual(messageDiskSize.events, [
+            .next(0, 0),    // 初期状態
+            .next(1, 24),   // ゲーム読み込み後
+        ])
+        XCTAssertEqual(fakeStrategy.fakeOutput, "-00\nxxxxx---\nxxxxx---\nxxxxx---\nxxxxx---\nxxxxx---\n--------\n--------\n--------\n")
+    }
 
     // MARK: プレイヤーモード変更
 
@@ -403,7 +446,7 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
             switch event.element {
             case 1:
                 self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
-                self?.viewModel.finishUpdatingAllCell()
+                self?.viewModel.finishUpdatingCells()
             case 2:
                 self?.viewModel.viewDidAppear() // ViewControllerが表示され
             case 3:
@@ -412,7 +455,7 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
             case 4:
                 self?.viewModel.reset() // 3枚目の描画中にリセット
             default:
-                self?.viewModel.finishUpdatingAllCell()
+                self?.viewModel.finishUpdatingCells()
             }
         }.disposed(by: disposeBag)
         scheduler.start()
@@ -475,7 +518,7 @@ final class DispatchTimingControlledViewModelTest: XCTestCase {
             switch event.element {
             case 1:
                 self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
-                self?.viewModel.finishUpdatingAllCell() {
+                self?.viewModel.finishUpdatingCells() {
                     self?.dispatcher.work?()
                     self?.dispatcher.work = nil
                 }
@@ -516,8 +559,8 @@ final class DispatchTimingControlledViewModelTest: XCTestCase {
 private extension ViewModel {
     /// 読み込み・リセット時最初に描画される1セルと残り63セルを描画するため64回描画完了を通知する。
     /// - Parameter onEveryBeginning: 毎回描画完了通知に先立って実行する。
-    func finishUpdatingAllCell(_ onEveryBeginning: (() -> Void)? = nil) {
-        (0...63).forEach { [weak self] _ in
+    func finishUpdatingCells(times: Int = 64, onEveryBeginning: (() -> Void)? = nil) {
+        (0..<times).forEach { [weak self] _ in
             onEveryBeginning?()
             self?.finishToPlace(isFinished: true)
         }
