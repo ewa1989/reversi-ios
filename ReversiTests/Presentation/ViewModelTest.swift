@@ -55,25 +55,34 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
     // MARK: ゲーム読み込みが保存ゲームの有無で正しく分岐する
 
     func test_保存されたゲームがない時_画面ロード時に新ゲームが生成され_保存もされる() throws {
-        let expected = ReversiGame.newGame()
-
         // 保存されたゲームを復元できない＝保存されたゲームがない
         fakeStrategy.fakeInput = ""
 
-        viewModel.viewDidLoad()
+        scheduler.createColdObservable([
+            .next(1, (1)),
+        ]).subscribe { [weak self] event in
+            self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
+            self?.viewModel.finishUpdatingCells()
+        }.disposed(by: disposeBag)
+        scheduler.start()
 
-        XCTAssertEqual(try viewModel.game.toBlocking().first(), expected)
-        XCTAssertEqual(try FileParser.makeGameParsing(fakeStrategy.fakeOutput!), expected)
+        XCTAssertEqual(diskToPlace.events.count, 64)
+        XCTAssertEqual(fakeStrategy.fakeOutput, TestData.newGame.rawValue)
     }
 
     func test_保存されたゲームがある時_画面ロード時にロードされる() throws {
-        let expected = TestData.darkSurroundedByLightGame.game
-
         fakeStrategy.fakeInput = TestData.darkSurroundedByLightGame.rawValue
 
-        viewModel.viewDidLoad()
+        scheduler.createColdObservable([
+            .next(1, (1)),
+        ]).subscribe { [weak self] event in
+            self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
+            self?.viewModel.finishUpdatingCells()
+        }.disposed(by: disposeBag)
+        scheduler.start()
 
-        XCTAssertEqual(try viewModel.game.toBlocking().first(), expected)
+        XCTAssertEqual(diskToPlace.events.count, 64)
+        XCTAssertEqual(fakeStrategy.fakeOutput, nil)
     }
 
     // MARK: コンピューターの試行でセルの描画が正しく行われる

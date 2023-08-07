@@ -15,7 +15,7 @@ class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
     private let dispatcher: Dispatcher
 
     /// ゲームの状態を管理します
-    let game = BehaviorRelay(value: ReversiGame())
+    private let game = BehaviorRelay(value: ReversiGame())
 
     public let diskCounts: Observable<[Int]>
     public let message: Observable<Message>
