@@ -320,6 +320,48 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
         XCTAssertEqual(fakeStrategy.fakeOutput, "-00\nxxxxx---\nxxxxx---\nxxxxx---\nxxxxx---\nxxxxx---\n--------\n--------\n--------\n")
     }
 
+    func test_全セルが埋まり_ゲーム終了引き分けと判定され_保存される() {
+        fakeStrategy.fakeInput = TestData.willDrawOnNextTurn.rawValue
+
+        let diskCounts = viewModel.diskCounts.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let messageDiskSize = viewModel.messageDiskSize.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+
+        scheduler.createColdObservable([
+            .next(1, (1)),
+            .next(2, (2)),
+            .next(3, (3)),
+        ]).subscribe { [weak self] event in
+            switch event.element {
+            case 1:
+                self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
+                self?.viewModel.finishUpdatingCells()
+            case 2:
+                self?.viewModel.viewDidAppear() // ViewControllerが表示され
+            default:
+                self?.viewModel.didSelectCellAt(x: 7, y: 7) // 白が(7, 7)に置くと黒が1枚裏返り、左半分が黒、右半分が白になる
+                self?.viewModel.finishUpdatingCells(times: 2)
+            }
+        }.disposed(by: disposeBag)
+        scheduler.start()
+
+        XCTAssertEqual(diskCounts.events, [
+            .next(1, [33, 30]),   // ゲーム読み込み後
+            .next(3, [32, 32])   // ゲーム終了時
+        ])
+        XCTAssertEqual(message.events, [
+            .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
+            .next(1, Message(disk: .light, label: "'s turn")),   // ゲーム読み込み後
+            .next(3, Message(disk: nil, label: "Tied")),   // ゲーム終了時
+        ])
+        XCTAssertEqual(messageDiskSize.events, [
+            .next(0, 0),    // 初期状態
+            .next(1, 24),   // ゲーム読み込み後
+            .next(3, 0),   // ゲーム終了時
+        ])
+        XCTAssertEqual(fakeStrategy.fakeOutput, "-00\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\n")
+    }
+
     // MARK: プレイヤーモード変更
 
     func test_進行中のゲームで_ManualからComputerにモードを変更すると_状態が保存される() throws {

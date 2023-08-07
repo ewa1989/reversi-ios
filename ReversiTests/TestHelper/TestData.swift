@@ -89,4 +89,17 @@ enum TestData: String {
     /// --------
     /// ```
     case mustPassOnNextTurn = "x00\nxo------\no-------\n--------\n--------\n--------\n--------\n--------\n--------\n"
+
+    /// 白から始まり1手で必ず引き分けになるゲームを作成します。
+    /// ```
+    /// xxxxoooo
+    /// xxxxoooo
+    /// xxxxoooo
+    /// xxxxoooo
+    /// xxxxoooo
+    /// xxxxoooo
+    /// xxxxoooo
+    /// xxxxoox-
+    /// ```
+    case willDrawOnNextTurn = "o00\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoox-\n"
 }
