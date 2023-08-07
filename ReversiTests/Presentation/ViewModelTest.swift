@@ -290,11 +290,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
         let message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
         let passAlert = viewModel.passAlert.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
 
-        // 描画完了を通知するタイミングはアサーション上重要ではないのでコントロールせず、即描画完了とする
-        viewModel.diskToPlace.subscribe{ [weak self] _ in
-            self?.viewModel.finishToPlace(isFinished: true)
-        }.disposed(by: disposeBag)
-
         scheduler.createColdObservable([
             .next(1, (1)),
             .next(2, (2)),
@@ -304,10 +299,12 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
             switch event.element {
             case 1:
                 self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
+                self?.viewModel.finishUpdatingCells()
             case 2:
                 self?.viewModel.viewDidAppear() // ViewControllerが表示され
             case 3:
                 self?.viewModel.didSelectCellAt(x: 2, y: 0) // (2, 0)に黒を置くと白はどこにも置けなくなる
+                self?.viewModel.finishUpdatingCells(times: 2)
             default:
                 self?.viewModel.pass()  // パスを了承すると黒のターンに変わる
             }
@@ -427,6 +424,7 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
             switch event.element {
             case 1:
                 self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
+                self?.viewModel.finishUpdatingCells()
             case 2:
                 self?.viewModel.viewDidAppear() // ViewControllerが表示され
             default:
@@ -455,6 +453,7 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
             switch event.element {
             case 1:
                 self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
+                self?.viewModel.finishUpdatingCells()
             case 2:
                 self?.viewModel.viewDidAppear() // ViewControllerが表示され
             default:
@@ -481,11 +480,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
         let diskCounts = viewModel.diskCounts.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
         let message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
 
-        // 描画完了を通知するタイミングはアサーション上重要ではないのでコントロールせず、即描画完了とする
-        viewModel.diskToPlace.subscribe{ [weak self] _ in
-            self?.viewModel.finishToPlace(isFinished: true)
-        }.disposed(by: disposeBag)
-
         scheduler.createColdObservable([
             .next(1, (1)),
             .next(2, (2)),
@@ -494,10 +488,12 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
             switch event.element {
             case 1:
                 self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
+                self?.viewModel.finishUpdatingCells()
             case 2:
                 self?.viewModel.viewDidAppear() // ViewControllerが表示され
             default:
                 self?.viewModel.reset() // リセット
+                self?.viewModel.finishUpdatingCells()
             }
         }.disposed(by: disposeBag)
         scheduler.start()
@@ -527,11 +523,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
         let message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
         let messageDiskSize = viewModel.messageDiskSize.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
 
-        // 描画完了を通知するタイミングはアサーション上重要ではないのでコントロールせず、即描画完了とする
-        viewModel.diskToPlace.subscribe{ [weak self] _ in
-            self?.viewModel.finishToPlace(isFinished: true)
-        }.disposed(by: disposeBag)
-
         scheduler.createColdObservable([
             .next(1, (1)),
             .next(2, (2)),
@@ -540,10 +531,12 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
             switch event.element {
             case 1:
                 self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
+                self?.viewModel.finishUpdatingCells()
             case 2:
                 self?.viewModel.viewDidAppear() // ViewControllerが表示され
             default:
                 self?.viewModel.reset() // リセット
+                self?.viewModel.finishUpdatingCells()
             }
         }.disposed(by: disposeBag)
         scheduler.start()
