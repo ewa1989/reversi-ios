@@ -322,7 +322,38 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
         XCTAssertEqual(fakeStrategy.fakeOutput, "o00\nxxx-----\no-------\n--------\n--------\n--------\n--------\n--------\n--------\n")
     }
 
-    // TODO: ゲーム読み込み時からパスが必要なケースは現状バグがある。他のテストを書き終わった後にテストを作成し、バグ修正する
+    func test＿ゲーム読み込み時から先手がパスが必要な場合_表示直後にパスするアラートが表示され_パスを了承しても保存はされない() throws {
+        fakeStrategy.fakeInput = TestData.mustPassOnThisTurn.rawValue
+
+        let message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let passAlert = viewModel.passAlert.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+
+        scheduler.createColdObservable([
+            .next(1, (1)),
+            .next(2, (2)),
+            .next(3, (3)),
+        ]).subscribe { [weak self] event in
+            switch event.element {
+            case 1:
+                self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
+                self?.viewModel.finishUpdatingCells()
+            case 2:
+                self?.viewModel.viewDidAppear() // ViewControllerが表示され
+            default:
+                self?.viewModel.pass()  // どこにも置けずパスすると黒のターンに変わる
+            }
+        }.disposed(by: disposeBag)
+        scheduler.start()
+
+        XCTAssertEqual(message.events, [
+            .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
+            .next(1, Message(disk: .light, label: "'s turn")),   // ゲーム読み込み後、パスするアラートが表示されてる最中は白のターンと表示される
+            .next(3, Message(disk: .dark, label: "'s turn")),  // パスすると黒にターンが移る
+        ])
+        XCTAssertEqual(passAlert.events, [.next(2, PassAlert())])
+        // パスするアラート表示、パス了承では保存はされない
+        XCTAssertEqual(fakeStrategy.fakeOutput, nil)
+    }
 
     // MARK: ゲームの終了判定が正しく行われる
 

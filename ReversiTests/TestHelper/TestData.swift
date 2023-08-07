@@ -102,4 +102,17 @@ enum TestData: String {
     /// xxxxoox-
     /// ```
     case willDrawOnNextTurn = "o00\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoox-\n"
+
+    /// 両プレイヤーコンピューター、白から始まるけれどどこにも置けず、すぐパスが必要なゲームを作成します。
+    /// ```
+    /// xo------
+    /// o-------
+    /// --------
+    /// --------
+    /// --------
+    /// --------
+    /// --------
+    /// --------
+    /// ```
+    case mustPassOnThisTurn = "o11\nxo------\no-------\n--------\n--------\n--------\n--------\n--------\n--------\n"
 }
