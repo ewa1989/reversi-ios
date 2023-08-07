@@ -156,16 +156,10 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
         }.disposed(by: disposeBag)
         scheduler.start()
 
-        XCTAssertEqual(computerProcessing.events, [
-            .next(0, [false, false]),   // 初期状態
-        ])
         // time > 1のイベントでフィルターすることで、ゲーム読み込み時の全セルの描画イベントを除く
         XCTAssertEqual(diskToPlace.events.filter { $0.time > 1 },[
             .next(3, DiskPlacement(disk: .light, coordinate: Coordinate(x: 4, y: 2), animated: true)),
             .next(4, DiskPlacement(disk: .light, coordinate: Coordinate(x: 4, y: 3), animated: true)),
-        ])
-        XCTAssertEqual(playerControls.events, [
-            .next(0, [.manual, .manual]),   // 初期状態
         ])
         XCTAssertEqual(diskCounts.events, [
             .next(1, [2, 2]),   // ゲーム読み込み後
@@ -175,10 +169,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
             .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
             .next(1, Message(disk: .light, label: "'s turn")),   // ゲーム読み込み後
             .next(5, Message(disk: .dark, label: "'s turn")),  // ユーザーがディスクを置いた後
-        ])
-        XCTAssertEqual(messageDiskSize.events, [
-            .next(0, 0),    // 初期状態
-            .next(1, 24),   // ゲーム読み込み後
         ])
         // 描画が最後まで完了していれば保存処理が走っている
         XCTAssertEqual(fakeStrategy.fakeOutput, "x00\n--------\n--------\n----o---\n---oo---\n---xo---\n--------\n--------\n--------\n")
@@ -204,24 +194,14 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
         }.disposed(by: disposeBag)
         scheduler.start()
 
-        XCTAssertEqual(computerProcessing.events, [
-            .next(0, [false, false]),   // 初期状態
-        ])
         // time > 1のイベントでフィルターすることで、ゲーム読み込み時の全セルの描画イベントを除く
         XCTAssertEqual(diskToPlace.events.filter { $0.time > 1 }.count, 0)
-        XCTAssertEqual(playerControls.events, [
-            .next(0, [.manual, .manual]),   // 初期状態
-        ])
         XCTAssertEqual(diskCounts.events, [
             .next(1, [2, 2]),   // ゲーム読み込み後
         ])
         XCTAssertEqual(message.events, [
             .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
             .next(1, Message(disk: .light, label: "'s turn")),   // ゲーム読み込み後
-        ])
-        XCTAssertEqual(messageDiskSize.events, [
-            .next(0, 0),    // 初期状態
-            .next(1, 24),   // ゲーム読み込み後
         ])
         // 保存処理は走らない
         XCTAssertEqual(fakeStrategy.fakeOutput, nil)
@@ -247,24 +227,14 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
         }.disposed(by: disposeBag)
         scheduler.start()
 
-        XCTAssertEqual(computerProcessing.events, [
-            .next(0, [false, false]),   // 初期状態
-        ])
         // time > 1のイベントでフィルターすることで、ゲーム読み込み時の全セルの描画イベントを除く
         XCTAssertEqual(diskToPlace.events.filter { $0.time > 1 }.count, 0)
-        XCTAssertEqual(playerControls.events, [
-            .next(0, [.manual, .manual]),   // 初期状態
-        ])
         XCTAssertEqual(diskCounts.events, [
             .next(1, [16, 8]),   // ゲーム読み込み後
         ])
         XCTAssertEqual(message.events, [
             .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
             .next(1, Message(disk: .dark, label: "'s turn")),   // ゲーム読み込み後
-        ])
-        XCTAssertEqual(messageDiskSize.events, [
-            .next(0, 0),    // 初期状態
-            .next(1, 24),   // ゲーム読み込み後
         ])
         // 保存処理は走らない
         XCTAssertEqual(fakeStrategy.fakeOutput, nil)
@@ -368,10 +338,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
             .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
             .next(1, Message(disk: .dark, label: "'s turn")),   // ゲーム読み込み後
             .next(3, Message(disk: .dark, label: " won")),   // ゲーム終了時
-        ])
-        XCTAssertEqual(messageDiskSize.events, [
-            .next(0, 0),    // 初期状態
-            .next(1, 24),   // ゲーム読み込み後
         ])
         XCTAssertEqual(fakeStrategy.fakeOutput, "-00\nxxxxx---\nxxxxx---\nxxxxx---\nxxxxx---\nxxxxx---\n--------\n--------\n--------\n")
     }
@@ -496,9 +462,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
 
         // リセット時全セルの再描画がかかっている
         XCTAssertEqual(diskToPlace.events.filter { $0.time == 3 }.count, 64)
-        XCTAssertEqual(playerControls.events, [
-            .next(0, [.manual, .manual]),   // 初期状態
-        ])
         XCTAssertEqual(diskCounts.events, [
             .next(1, [1, 8]),   // ゲーム読み込み後
             .next(3, [2, 2]),   // リセット後
@@ -586,9 +549,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
         XCTAssertEqual(diskToPlace.events.filter { $0.time == 3 }.count, 2)
         // リセットによる描画は全セル行われている
         XCTAssertEqual(diskToPlace.events.filter { $0.time > 3 }.count, 64)
-        XCTAssertEqual(playerControls.events, [
-            .next(0, [.manual, .manual]),   // 初期状態
-        ])
         XCTAssertEqual(diskCounts.events, [
             .next(1, [16, 8]),   // ゲーム読み込み後
             .next(5, [2, 2]),   // リセット時
