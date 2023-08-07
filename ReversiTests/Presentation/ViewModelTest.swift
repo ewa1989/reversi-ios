@@ -423,7 +423,7 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
 
     // MARK: リセット
 
-    func test_リセットすると初期状態に戻り_保存もされる() throws {
+    func test_進行中のゲームを_リセットすると初期状態に戻り_保存もされる() throws {
         fakeStrategy.fakeInput = TestData.darkSurroundedByLightGame.rawValue
 
         let diskToPlace = viewModel.diskToPlace.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
@@ -464,6 +464,58 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
         XCTAssertEqual(message.events, [
             .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
             .next(1, Message(disk: .dark, label: "'s turn")),   // ゲーム読み込み後
+        ])
+        XCTAssertEqual(fakeStrategy.fakeOutput, TestData.newGame.rawValue)
+    }
+
+    func test_引き分け終了しているゲームを_リセットすると初期状態に戻り_保存もされる() throws {
+        fakeStrategy.fakeInput = TestData.tiedComputerMatchWithLeftSideDarkAndRightSideLightBoard.rawValue
+
+        let diskToPlace = viewModel.diskToPlace.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let playerControls = viewModel.playerControls.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let diskCounts = viewModel.diskCounts.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let message = viewModel.message.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        let messageDiskSize = viewModel.messageDiskSize.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+
+        // 描画完了を通知するタイミングはアサーション上重要ではないのでコントロールせず、即描画完了とする
+        viewModel.diskToPlace.subscribe{ [weak self] _ in
+            self?.viewModel.finishToPlace(isFinished: true)
+        }.disposed(by: disposeBag)
+
+        scheduler.createColdObservable([
+            .next(1, (1)),
+            .next(2, (2)),
+            .next(3, (3)),
+        ]).subscribe { [weak self] event in
+            switch event.element {
+            case 1:
+                self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
+            case 2:
+                self?.viewModel.viewDidAppear() // ViewControllerが表示され
+            default:
+                self?.viewModel.reset() // リセット
+            }
+        }.disposed(by: disposeBag)
+        scheduler.start()
+
+        // リセット時全セルの再描画がかかっている
+        XCTAssertEqual(diskToPlace.events.filter { $0.time == 3 }.count, 64)
+        XCTAssertEqual(playerControls.events, [
+            .next(0, [.manual, .manual]),   // 初期状態
+            .next(1, [.computer, .computer]),   // ゲーム読み込み後
+            .next(3, [.manual, .manual])    // リセット後
+        ])
+        XCTAssertEqual(diskCounts.events, [
+            .next(1, [32, 32]),   // ゲーム読み込み後
+            .next(3, [2, 2]),   // リセット後
+        ])
+        XCTAssertEqual(message.events, [
+            .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
+            .next(3, Message(disk: .dark, label: "'s turn")),   // リセット後
+        ])
+        XCTAssertEqual(messageDiskSize.events, [
+            .next(0, 0),    // 初期状態
+            .next(3, 24),   // リセット後
         ])
         XCTAssertEqual(fakeStrategy.fakeOutput, TestData.newGame.rawValue)
     }
