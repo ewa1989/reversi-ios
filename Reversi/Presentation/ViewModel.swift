@@ -11,23 +11,39 @@ import RxSwift
 import RxRelay
 
 final class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchable> {
-    private let repository: Repository
-    private let dispatcher: Dispatcher
-
-    /// ゲームの状態を管理します
-    private let game = BehaviorRelay(value: ReversiGame())
-
+    // MARK: publicのストリーム
     public let diskCounts: Observable<[Int]>
     public let message: Observable<Message>
     public let playerControls: Observable<[Player]>
     public let messageDiskSize: Observable<CGFloat>
-
-    private let _diskToPlace = PublishRelay<DiskPlacement>()
     /// 直近で一番最初に画面更新する必要があるディスクを流すObservableです。
     public var diskToPlace: Observable<DiskPlacement> {
         _diskToPlace.asObservable()
     }
+    /// コンピューターの思考状態を表します。
+    /// `true`: 思考中です。
+    /// `false`: 思考中ではりません。
+    public var computerProcessings: Observable<[Bool]> {
+        _computerProcessing.asObservable()
+    }
+    /// パスのアラートを表示すべきタイミングを通知します。
+    public var passAlert: Observable<PassAlert> {
+        _passAlert.asObservable()
+    }
 
+    // MARK: DIされたもの
+    private let repository: Repository
+    private let dispatcher: Dispatcher
+
+    // MARK: privateのストリーム
+    /// ゲームの状態を管理します
+    private let game = BehaviorRelay(value: ReversiGame())
+    private let _computerProcessing = BehaviorRelay(value: [false, false])
+    private let _passAlert = PublishRelay<PassAlert>()
+    private let _diskToPlace = PublishRelay<DiskPlacement>()
+    private let finishPlacingDisk = PublishRelay<Void>()
+
+    // MARK: 状態管理
     /// 画面更新待ちのディスクのコレクションです。
     private var disksWaitingToPlace: [DiskPlacement] = []
 
@@ -38,23 +54,6 @@ final class ViewModel<Repository: ReversiGameRepository, Dispatcher: Dispatchabl
     /// 元のサイズで表示する必要があり、
     /// その際に `initialDiskSize` に保管された値を使います。
     private let initialDiskSize: CGFloat
-
-    private let _computerProcessing = BehaviorRelay(value: [false, false])
-    /// コンピューターの思考状態を表します。
-    /// `true`: 思考中です。
-    /// `false`: 思考中ではりません。
-    public var computerProcessings: Observable<[Bool]> {
-        _computerProcessing.asObservable()
-    }
-
-    private let _passAlert = PublishRelay<PassAlert>()
-    /// パスのアラートを表示すべきタイミングを通知します。
-    public var passAlert: Observable<PassAlert> {
-        _passAlert.asObservable()
-    }
-
-    // 最終的には「裏返す予定のディスクの位置」のコレクションを持っておいて、そのコレクションが空=置き終わったとみなせるようにしたい
-    private let finishPlacingDisk = PublishRelay<Void>()
     private var placingDiskCompletion: (() -> Void)?
 
     private var viewHasAppeared: Bool = false
