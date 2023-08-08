@@ -10,5 +10,9 @@ import Foundation
 
 /// ユーザー入力待ちを表すアプリの状態です。
 class UserInputWaitingState: AppState {
-    
+    var game: ReversiGame
+
+    init(game: ReversiGame) {
+        self.game = game
+    }
 }

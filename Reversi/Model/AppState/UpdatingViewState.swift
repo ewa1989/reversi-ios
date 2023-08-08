@@ -10,5 +10,9 @@ import Foundation
 
 /// 画面描画中を表すアプリの状態です。
 class UpdatingViewState: AppState {
+    var game: ReversiGame
 
+    init(game: ReversiGame) {
+        self.game = game
+    }
 }

@@ -10,5 +10,9 @@ import Foundation
 
 /// パス了承待ちを表すアプリの状態です。
 class PassAcceptWaitingState: AppState {
+    var game: ReversiGame
 
+    init(game: ReversiGame) {
+        self.game = game
+    }
 }

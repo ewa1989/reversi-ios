@@ -10,5 +10,9 @@ import Foundation
 
 /// ゲーム終了を表すアプリの状態です。
 class GameFinishedState: AppState {
+    var game: ReversiGame
 
+    init(game: ReversiGame) {
+        self.game = game
+    }
 }

@@ -14,4 +14,6 @@ import Foundation
 /// - パス了承待ち
 /// - 画面描画中
 /// - ゲーム終了
-protocol AppState {}
+protocol AppState {
+    var game: ReversiGame { get }
+}

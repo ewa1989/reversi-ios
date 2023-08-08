@@ -16,18 +16,18 @@ struct AppStateFactory {
         switch game.state {
         case .move(side: let side):
             if (game.needsPass()) {
-                return PassAcceptWaitingState()
+                return PassAcceptWaitingState(game: game)
             }
             switch game.playerControls[side.index] {
             case .manual:
-                return UserInputWaitingState()
+                return UserInputWaitingState(game: game)
             case .computer:
-                return ComputerInputWaitingState()
+                return ComputerInputWaitingState(game: game)
             }
         case .win(winner: _):
             fallthrough
         case .draw:
-            return GameFinishedState()
+            return GameFinishedState(game: game)
         }
     }
 }
