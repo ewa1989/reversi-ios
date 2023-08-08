@@ -9,15 +9,31 @@
 import Foundation
 
 /// パス了承待ちを表すアプリの状態です。
-class PassAcceptWaitingState: AppState {
+class PassAcceptWaitingState<Repository: ReversiGameRepository, Dispatcher: Dispatchable>: AppState {
     var game: ReversiGame
 
-    init(game: ReversiGame) {
+    private let repository: Repository
+    private let dispatcher: Dispatcher
+    private let output: AppStateOutput
+
+    init(
+        game: ReversiGame,
+        repository: Repository,
+        dispatcher: Dispatcher,
+        output: AppStateOutput
+    ) {
         precondition(
             game.turn != nil &&
             game.needsPass()
         )
         self.game = game
+        self.repository = repository
+        self.dispatcher = dispatcher
+        self.output = output
+    }
+
+    func start() {
+
     }
 
     func inputByUser(coordinate: Coordinate) throws -> AppState {

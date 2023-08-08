@@ -9,16 +9,32 @@
 import Foundation
 
 /// コンピューター入力待ちを表すアプリの状態です。
-class ComputerInputWaitingState: AppState {
+class ComputerInputWaitingState<Repository: ReversiGameRepository, Dispatcher: Dispatchable>: AppState {
     var game: ReversiGame
 
-    init(game: ReversiGame) {
+    private let repository: Repository
+    private let dispatcher: Dispatcher
+    private let output: AppStateOutput
+
+    init(
+        game: ReversiGame,
+        repository: Repository,
+        dispatcher: Dispatcher,
+        output: AppStateOutput
+    ) {
         precondition(
             game.turn != nil &&
             game.playerControls[game.turn!.index] == .computer &&
             !game.needsPass()
         )
         self.game = game
+        self.repository = repository
+        self.dispatcher = dispatcher
+        self.output = output
+    }
+
+    func start() {
+
     }
 
     func inputByUser(coordinate: Coordinate) throws -> AppState {

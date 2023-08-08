@@ -7,12 +7,26 @@
 //
 
 import XCTest
+import RxRelay
 
 final class AppStateFactoryTest: XCTestCase {
-    private var factory: AppStateFactory!
+    private var factory: AppStateFactory<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>!
 
     override func setUpWithError() throws {
-        factory = AppStateFactory()
+        let repository = ReversiGameRepositoryImpl(strategy: FakeFileSaveAndLoadStrategy())
+        let dispatcher = SynchronousDispatcher()
+        let output = AppStateOutput(
+            game: PublishRelay<ReversiGame>(),
+            computerProcessing: PublishRelay<[Bool]>(),
+            passAlert: PublishRelay<PassAlert>(),
+            diskToPlace: PublishRelay<DiskPlacement>(),
+            finishComputerProcessing: PublishRelay<Coordinate>()
+        )
+        factory = AppStateFactory(
+            repository: repository,
+            dispatcher: dispatcher,
+            output: output
+        )
     }
 
     override func tearDownWithError() throws {
@@ -21,26 +35,26 @@ final class AppStateFactoryTest: XCTestCase {
 
     func test_新規ゲームはユーザー入力待ち() throws {
         let appState = factory.make(from: TestData.newGame.game)
-        XCTAssertTrue(appState is UserInputWaitingState)
+        XCTAssertTrue(appState is UserInputWaitingState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
     }
 
     func test_コンピューターから始まるゲームはコンピューター入力待ち() throws {
         let appState = factory.make(from: TestData.startFromDarkComputerOnlyPlaceAt2_0.game)
-        XCTAssertTrue(appState is ComputerInputWaitingState)
+        XCTAssertTrue(appState is ComputerInputWaitingState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
     }
 
     func test_パスするしかない状態で始まるゲームはパス了承待ち() throws {
         let appState = factory.make(from: TestData.mustPassOnThisTurn.game)
-        XCTAssertTrue(appState is PassAcceptWaitingState)
+        XCTAssertTrue(appState is PassAcceptWaitingState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
     }
 
     func test_引き分けゲームはゲーム終了() throws {
         let appState = factory.make(from: TestData.tiedComputerMatchWithLeftSideDarkAndRightSideLightBoard.game)
-        XCTAssertTrue(appState is GameFinishedState)
+        XCTAssertTrue(appState is GameFinishedState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
     }
 
     func test_どちらかが勝っているゲームはゲーム終了() throws {
         let appState = factory.make(from: TestData.allLightBoard.game)
-        XCTAssertTrue(appState is GameFinishedState)
+        XCTAssertTrue(appState is GameFinishedState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
     }
 }

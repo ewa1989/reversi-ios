@@ -9,14 +9,30 @@
 import Foundation
 
 /// ゲーム終了を表すアプリの状態です。
-class GameFinishedState: AppState {
+class GameFinishedState<Repository: ReversiGameRepository, Dispatcher: Dispatchable>: AppState {
     var game: ReversiGame
 
-    init(game: ReversiGame) {
+    private let repository: Repository
+    private let dispatcher: Dispatcher
+    private let output: AppStateOutput
+
+    init(
+        game: ReversiGame,
+        repository: Repository,
+        dispatcher: Dispatcher,
+        output: AppStateOutput
+    ) {
         precondition(
             game.turn == nil
         )
         self.game = game
+        self.repository = repository
+        self.dispatcher = dispatcher
+        self.output = output
+    }
+
+    func start() {
+
     }
 
     func inputByUser(coordinate: Coordinate) throws -> AppState {

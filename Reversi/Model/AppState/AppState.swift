@@ -17,6 +17,9 @@ import Foundation
 protocol AppState {
     var game: ReversiGame { get }
 
+    /// 状態としての処理を実行します。
+    func start()
+
     /// ユーザー入力が行われた時に状態を変更します。
     /// - Parameter coordinate: ユーザー入力されたセルの位置です。
     /// - Returns: 行動後の状態です

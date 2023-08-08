@@ -9,11 +9,27 @@
 import Foundation
 
 /// 画面描画中を表すアプリの状態です。
-class UpdatingViewState: AppState {
+class UpdatingViewState<Repository: ReversiGameRepository, Dispatcher: Dispatchable>: AppState {
     var game: ReversiGame
 
-    init(game: ReversiGame) {
+    private let repository: Repository
+    private let dispatcher: Dispatcher
+    private let output: AppStateOutput
+
+    init(
+        game: ReversiGame,
+        repository: Repository,
+        dispatcher: Dispatcher,
+        output: AppStateOutput
+    ) {
         self.game = game
+        self.repository = repository
+        self.dispatcher = dispatcher
+        self.output = output
+    }
+
+    func start() {
+
     }
 
     func inputByUser(coordinate: Coordinate) throws -> AppState {
