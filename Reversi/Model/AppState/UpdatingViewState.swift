@@ -15,4 +15,8 @@ class UpdatingViewState: AppState {
     init(game: ReversiGame) {
         self.game = game
     }
+
+    func inputByUser(coordinate: Coordinate) throws -> AppState {
+        throw InvalidActionError()
+    }
 }

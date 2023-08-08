@@ -20,4 +20,8 @@ class UserInputWaitingState: AppState {
         )
         self.game = game
     }
+
+    func inputByUser(coordinate: Coordinate) throws -> AppState {
+        self
+    }
 }
