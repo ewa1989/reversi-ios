@@ -37,6 +37,10 @@ protocol AppState {
     ///   - player: プレイヤーモードを変更する先です。
     /// - Returns: 行動後の状態です。
     func changePlayerMode(of side: Disk, to player: Player) -> AppState
+
+    /// リセットした時に状態を変更します。
+    /// - Returns: 行動後の状態です。
+    func reset() -> AppState
 }
 
 /// 各アプリの状態で無効な行動が選択された時に投げるエラーです。

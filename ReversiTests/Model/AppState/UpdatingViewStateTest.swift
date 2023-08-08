@@ -38,4 +38,9 @@ final class UpdatingViewStateTest: XCTestCase {
         state = UpdatingViewState(game: TestData.willDrawOnNextTurn.game)
         XCTAssertNoThrow(state.changePlayerMode(of: .dark, to: .manual))
     }
+
+    func test_画面描画中の時_リセット可能() throws {
+        state = UpdatingViewState(game: TestData.willDrawOnNextTurn.game)
+        XCTAssertNoThrow(state.reset())
+    }
 }

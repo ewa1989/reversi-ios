@@ -31,4 +31,8 @@ class UpdatingViewState: AppState {
     func changePlayerMode(of side: Disk, to player: Player) -> AppState {
         self
     }
+
+    func reset() -> AppState {
+        self
+    }
 }
