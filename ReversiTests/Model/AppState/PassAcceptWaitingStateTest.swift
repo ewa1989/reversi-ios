@@ -43,4 +43,9 @@ final class PassAcceptWaitingStateTest: XCTestCase {
         state = PassAcceptWaitingState(game: TestData.mustPassOnThisTurn.game)
         XCTAssertNoThrow(state.reset())
     }
+
+    func test_パス了承待ちの時_セル描画完了不可能() throws {
+        state = PassAcceptWaitingState(game: TestData.mustPassOnThisTurn.game)
+        XCTAssertThrowsError(try state.finishUpdatingOneCell())
+    }
 }

@@ -38,4 +38,8 @@ class GameFinishedState: AppState {
     func reset() -> AppState {
         self
     }
+
+    func finishUpdatingOneCell() throws -> AppState {
+        throw InvalidActionError()
+    }
 }

@@ -43,4 +43,9 @@ final class ComputerInputWaitingStateTest: XCTestCase {
         state = ComputerInputWaitingState(game: TestData.startFromDarkComputerOnlyPlaceAt2_0.game)
         XCTAssertNoThrow(state.reset())
     }
+
+    func test_コンピューター入力待ちの時_セル描画完了不可能() throws {
+        state = ComputerInputWaitingState(game: TestData.startFromDarkComputerOnlyPlaceAt2_0.game)
+        XCTAssertThrowsError(try state.finishUpdatingOneCell())
+    }
 }

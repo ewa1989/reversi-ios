@@ -43,4 +43,9 @@ final class GameFinishedStateTest: XCTestCase {
         state = GameFinishedState(game: TestData.allLightBoard.game)
         XCTAssertNoThrow(state.reset())
     }
+
+    func test_ゲーム終了の時_セル描画完了不可能() throws {
+        state = GameFinishedState(game: TestData.allLightBoard.game)
+        XCTAssertThrowsError(try state.finishUpdatingOneCell())
+    }
 }

@@ -40,4 +40,8 @@ class ComputerInputWaitingState: AppState {
     func reset() -> AppState {
         self
     }
+
+    func finishUpdatingOneCell() throws -> AppState {
+        throw InvalidActionError()
+    }
 }

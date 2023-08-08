@@ -39,4 +39,8 @@ class PassAcceptWaitingState: AppState {
     func reset() -> AppState {
         self
     }
+
+    func finishUpdatingOneCell() throws -> AppState {
+        throw InvalidActionError()
+    }
 }

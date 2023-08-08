@@ -43,4 +43,9 @@ final class UpdatingViewStateTest: XCTestCase {
         state = UpdatingViewState(game: TestData.willDrawOnNextTurn.game)
         XCTAssertNoThrow(state.reset())
     }
+
+    func test_画面描画中の時_セル描画完了可能() throws {
+        state = UpdatingViewState(game: TestData.willDrawOnNextTurn.game)
+        XCTAssertNoThrow(try state.finishUpdatingOneCell())
+    }
 }

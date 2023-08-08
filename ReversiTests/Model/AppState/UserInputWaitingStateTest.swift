@@ -43,4 +43,9 @@ final class UserInputWaitingStateTest: XCTestCase {
         state = UserInputWaitingState(game: TestData.newGame.game)
         XCTAssertNoThrow(state.reset())
     }
+
+    func test_ユーザー入力待ちの時_セル描画完了不可能() throws {
+        state = UserInputWaitingState(game: TestData.newGame.game)
+        XCTAssertThrowsError(try state.finishUpdatingOneCell())
+    }
 }

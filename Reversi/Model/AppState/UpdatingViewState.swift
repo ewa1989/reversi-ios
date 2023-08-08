@@ -35,4 +35,8 @@ class UpdatingViewState: AppState {
     func reset() -> AppState {
         self
     }
+
+    func finishUpdatingOneCell() throws -> AppState {
+        self
+    }
 }
