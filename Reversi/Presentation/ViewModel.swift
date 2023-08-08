@@ -105,7 +105,7 @@ extension ViewModel {
         if viewHasAppeared { return }
         viewHasAppeared = true
 
-        if needsPass() {
+        if game.value.needsPass() {
             _passAlert.accept(PassAlert())
             return
         }
@@ -348,14 +348,6 @@ extension ViewModel {
                 _diskToPlace.accept(first)
             }
         }
-    }
-
-    private func needsPass() -> Bool {
-        guard let turn = self.game.value.turn else { return false }
-        if game.value.board.canPlaceAnyDisks(by: turn) {
-            return false
-        }
-        return game.value.board.canPlaceAnyDisks(by: turn.flipped)
     }
 }
 
