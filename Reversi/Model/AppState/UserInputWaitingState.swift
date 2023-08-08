@@ -28,4 +28,8 @@ class UserInputWaitingState: AppState {
     func inputByComputer(coordinate: Coordinate) throws -> AppState {
         throw InvalidActionError()
     }
+
+    func acceptPass() throws -> AppState {
+        throw InvalidActionError()
+    }
 }

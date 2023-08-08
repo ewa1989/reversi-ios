@@ -27,4 +27,8 @@ class PassAcceptWaitingState: AppState {
     func inputByComputer(coordinate: Coordinate) throws -> AppState {
         throw InvalidActionError()
     }
+
+    func acceptPass() throws -> AppState {
+        self
+    }
 }

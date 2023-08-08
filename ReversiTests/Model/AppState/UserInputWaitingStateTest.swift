@@ -28,4 +28,9 @@ final class UserInputWaitingStateTest: XCTestCase {
         state = UserInputWaitingState(game: TestData.newGame.game)
         XCTAssertThrowsError(try state.inputByComputer(coordinate: Coordinate(x: 0, y: 0)))
     }
+
+    func test_ユーザー入力待ちの時_パス了承不可能() throws {
+        state = UserInputWaitingState(game: TestData.newGame.game)
+        XCTAssertThrowsError(try state.acceptPass())
+    }
 }

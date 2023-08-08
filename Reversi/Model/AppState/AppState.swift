@@ -26,6 +26,10 @@ protocol AppState {
     /// - Parameter coordinate: ユーザー入力されたセルの位置です。
     /// - Returns: 行動後の状態です
     func inputByComputer(coordinate: Coordinate) throws -> AppState
+
+    /// パスを了承した時に状態を変更します。
+    /// - Returns: 行動後の状態です。
+    func acceptPass() throws -> AppState
 }
 
 /// 各アプリの状態で無効な行動が選択された時に投げるエラーです。

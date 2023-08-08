@@ -28,4 +28,9 @@ final class PassAcceptWaitingStateTest: XCTestCase {
         state = PassAcceptWaitingState(game: TestData.mustPassOnThisTurn.game)
         XCTAssertThrowsError(try state.inputByComputer(coordinate: Coordinate(x: 0, y: 0)))
     }
+
+    func test_パス了承待ちの時_パス了承可能() throws {
+        state = PassAcceptWaitingState(game: TestData.mustPassOnThisTurn.game)
+        XCTAssertNoThrow(try state.acceptPass())
+    }
 }

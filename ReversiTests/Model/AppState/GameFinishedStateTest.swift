@@ -28,4 +28,9 @@ final class GameFinishedStateTest: XCTestCase {
         state = GameFinishedState(game: TestData.allLightBoard.game)
         XCTAssertThrowsError(try state.inputByComputer(coordinate: Coordinate(x: 0, y: 0)))
     }
+
+    func test_ゲーム終了の時_パス了承不可能() throws {
+        state = GameFinishedState(game: TestData.allLightBoard.game)
+        XCTAssertThrowsError(try state.acceptPass())
+    }
 }

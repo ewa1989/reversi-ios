@@ -28,4 +28,9 @@ final class UpdatingViewStateTest: XCTestCase {
         state = UpdatingViewState(game: TestData.willDrawOnNextTurn.game)
         XCTAssertThrowsError(try state.inputByComputer(coordinate: Coordinate(x: 0, y: 0)))
     }
+
+    func test_画面描画中の時_パス了承不可能() throws {
+        state = UpdatingViewState(game: TestData.willDrawOnNextTurn.game)
+        XCTAssertThrowsError(try state.acceptPass())
+    }
 }
