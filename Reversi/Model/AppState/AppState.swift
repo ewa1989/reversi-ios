@@ -21,6 +21,11 @@ protocol AppState {
     /// - Parameter coordinate: ユーザー入力されたセルの位置です。
     /// - Returns: 行動後の状態です
     func inputByUser(coordinate: Coordinate) throws -> AppState
+
+    /// コンピューター入力が行われた時に状態を変更します。
+    /// - Parameter coordinate: ユーザー入力されたセルの位置です。
+    /// - Returns: 行動後の状態です
+    func inputByComputer(coordinate: Coordinate) throws -> AppState
 }
 
 /// 各アプリの状態で無効な行動が選択された時に投げるエラーです。

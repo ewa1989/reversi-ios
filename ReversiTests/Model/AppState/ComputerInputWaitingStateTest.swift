@@ -19,8 +19,13 @@ final class ComputerInputWaitingStateTest: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func test_ユーザー入力不可能() throws {
+    func test_コンピューター入力待ちの時_ユーザー入力不可能() throws {
         state = ComputerInputWaitingState(game: TestData.startFromDarkComputerOnlyPlaceAt2_0.game)
         XCTAssertThrowsError(try state.inputByUser(coordinate: Coordinate(x: 0, y: 0)))
+    }
+
+    func test_コンピューター入力待ちの時_コンピューター入力可能() throws {
+        state = ComputerInputWaitingState(game: TestData.startFromDarkComputerOnlyPlaceAt2_0.game)
+        XCTAssertNoThrow(try state.inputByComputer(coordinate: Coordinate(x: 0, y: 0)))
     }
 }

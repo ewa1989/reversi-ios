@@ -19,8 +19,13 @@ final class PassAcceptWaitingStateTest: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func test_ユーザー入力不可能() throws {
+    func test_パス了承待ちの時_ユーザー入力不可能() throws {
         state = PassAcceptWaitingState(game: TestData.mustPassOnThisTurn.game)
         XCTAssertThrowsError(try state.inputByUser(coordinate: Coordinate(x: 0, y: 0)))
+    }
+
+    func test_パス了承待ちの時_コンピューター入力不可能() throws {
+        state = PassAcceptWaitingState(game: TestData.mustPassOnThisTurn.game)
+        XCTAssertThrowsError(try state.inputByComputer(coordinate: Coordinate(x: 0, y: 0)))
     }
 }

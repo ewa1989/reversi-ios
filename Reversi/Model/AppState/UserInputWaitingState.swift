@@ -24,4 +24,8 @@ class UserInputWaitingState: AppState {
     func inputByUser(coordinate: Coordinate) throws -> AppState {
         self
     }
+
+    func inputByComputer(coordinate: Coordinate) throws -> AppState {
+        throw InvalidActionError()
+    }
 }

@@ -19,4 +19,8 @@ class UpdatingViewState: AppState {
     func inputByUser(coordinate: Coordinate) throws -> AppState {
         throw InvalidActionError()
     }
+
+    func inputByComputer(coordinate: Coordinate) throws -> AppState {
+        throw InvalidActionError()
+    }
 }
