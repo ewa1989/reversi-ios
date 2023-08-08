@@ -13,6 +13,11 @@ class ComputerInputWaitingState: AppState {
     var game: ReversiGame
 
     init(game: ReversiGame) {
+        precondition(
+            game.turn != nil &&
+            game.playerControls[game.turn!.index] == .computer &&
+            !game.needsPass()
+        )
         self.game = game
     }
 }

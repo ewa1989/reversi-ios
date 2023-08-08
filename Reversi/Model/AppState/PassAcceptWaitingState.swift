@@ -13,6 +13,10 @@ class PassAcceptWaitingState: AppState {
     var game: ReversiGame
 
     init(game: ReversiGame) {
+        precondition(
+            game.turn != nil &&
+            game.needsPass()
+        )
         self.game = game
     }
 }

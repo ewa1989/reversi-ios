@@ -13,6 +13,9 @@ class GameFinishedState: AppState {
     var game: ReversiGame
 
     init(game: ReversiGame) {
+        precondition(
+            game.turn == nil
+        )
         self.game = game
     }
 }

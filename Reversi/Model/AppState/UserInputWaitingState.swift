@@ -13,6 +13,11 @@ class UserInputWaitingState: AppState {
     var game: ReversiGame
 
     init(game: ReversiGame) {
+        precondition(
+            game.turn != nil &&
+            game.playerControls[game.turn!.index] == .manual &&
+            !game.needsPass()
+        )
         self.game = game
     }
 }
