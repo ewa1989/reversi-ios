@@ -351,7 +351,7 @@ extension ViewModel {
     }
 
     private func needsPass() -> Bool {
-        guard var turn = self.game.value.turn else { return false }
+        guard let turn = self.game.value.turn else { return false }
         if game.value.board.canPlaceAnyDisks(by: turn) {
             return false
         }
