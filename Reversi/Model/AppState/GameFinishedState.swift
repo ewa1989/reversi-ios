@@ -30,4 +30,8 @@ class GameFinishedState: AppState {
     func acceptPass() throws -> AppState {
         throw InvalidActionError()
     }
+
+    func changePlayerMode(of side: Disk, to player: Player) -> AppState {
+        self
+    }
 }

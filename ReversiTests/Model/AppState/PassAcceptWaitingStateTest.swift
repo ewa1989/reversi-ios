@@ -33,4 +33,9 @@ final class PassAcceptWaitingStateTest: XCTestCase {
         state = PassAcceptWaitingState(game: TestData.mustPassOnThisTurn.game)
         XCTAssertNoThrow(try state.acceptPass())
     }
+
+    func test_パス了承待ちの時_モード切り替え可能() throws {
+        state = PassAcceptWaitingState(game: TestData.mustPassOnThisTurn.game)
+        XCTAssertNoThrow(state.changePlayerMode(of: .dark, to: .manual))
+    }
 }

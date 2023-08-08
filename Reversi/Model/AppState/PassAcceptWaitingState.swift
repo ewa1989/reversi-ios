@@ -31,4 +31,8 @@ class PassAcceptWaitingState: AppState {
     func acceptPass() throws -> AppState {
         self
     }
+
+    func changePlayerMode(of side: Disk, to player: Player) -> AppState {
+        self
+    }
 }

@@ -33,4 +33,9 @@ final class ComputerInputWaitingStateTest: XCTestCase {
         state = ComputerInputWaitingState(game: TestData.startFromDarkComputerOnlyPlaceAt2_0.game)
         XCTAssertThrowsError(try state.acceptPass())
     }
+
+    func test_コンピューター入力待ちの時_モード切り替え可能() throws {
+        state = ComputerInputWaitingState(game: TestData.startFromDarkComputerOnlyPlaceAt2_0.game)
+        XCTAssertNoThrow(state.changePlayerMode(of: .dark, to: .manual))
+    }
 }

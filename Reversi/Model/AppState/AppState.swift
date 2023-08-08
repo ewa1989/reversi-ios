@@ -30,6 +30,13 @@ protocol AppState {
     /// パスを了承した時に状態を変更します。
     /// - Returns: 行動後の状態です。
     func acceptPass() throws -> AppState
+
+    /// プレイヤーモードを変更した時に状態を変更します。
+    /// - Parameters:
+    ///   - side: プレイヤーモードを変更するプレイヤーです。
+    ///   - player: プレイヤーモードを変更する先です。
+    /// - Returns: 行動後の状態です。
+    func changePlayerMode(of side: Disk, to player: Player) -> AppState
 }
 
 /// 各アプリの状態で無効な行動が選択された時に投げるエラーです。

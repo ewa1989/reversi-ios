@@ -33,4 +33,9 @@ final class GameFinishedStateTest: XCTestCase {
         state = GameFinishedState(game: TestData.allLightBoard.game)
         XCTAssertThrowsError(try state.acceptPass())
     }
+
+    func test_ゲーム終了の時_モード切り替え可能() throws {
+        state = GameFinishedState(game: TestData.allLightBoard.game)
+        XCTAssertNoThrow(state.changePlayerMode(of: .dark, to: .manual))
+    }
 }
