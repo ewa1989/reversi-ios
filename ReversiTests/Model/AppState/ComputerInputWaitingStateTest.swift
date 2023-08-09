@@ -114,14 +114,15 @@ final class ComputerInputWaitingStateTest: XCTestCase {
         XCTAssertThrowsError(try state.inputByUser(coordinate: Coordinate(x: 0, y: 0)))
     }
 
-    func test_コンピューター入力待ちの時_コンピューター入力可能() throws {
+    func test_コンピューター入力待ちの時_コンピューター入力すると画面描画中になる() throws {
         state = ComputerInputWaitingState(
             game: TestData.startFromDarkComputerOnlyPlaceAt2_0.game,
             repository: repository,
             dispatcher: dispatcher,
             output: output
         )
-        XCTAssertNoThrow(try state.inputByComputer(coordinate: Coordinate(x: 0, y: 0)))
+        let newState = try state.inputByComputer(coordinate: Coordinate(x: 2, y: 0))
+        XCTAssertTrue(newState is UpdatingViewState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
     }
 
     func test_コンピューター入力待ちの時_パス了承不可能() throws {

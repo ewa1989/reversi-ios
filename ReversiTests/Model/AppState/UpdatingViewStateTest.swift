@@ -38,7 +38,8 @@ final class UpdatingViewStateTest: XCTestCase {
             game: TestData.willDrawOnNextTurn.game,
             repository: repository,
             dispatcher: dispatcher,
-            output: output
+            output: output,
+            updates: [DiskPlacement(disk: nil, coordinate: Coordinate(x: 0, y: 0), animated: false)]
         )
         XCTAssertThrowsError(try state.inputByUser(coordinate: Coordinate(x: 0, y: 0)))
     }
@@ -48,7 +49,8 @@ final class UpdatingViewStateTest: XCTestCase {
             game: TestData.willDrawOnNextTurn.game,
             repository: repository,
             dispatcher: dispatcher,
-            output: output
+            output: output,
+            updates: [DiskPlacement(disk: nil, coordinate: Coordinate(x: 0, y: 0), animated: false)]
         )
         XCTAssertThrowsError(try state.inputByComputer(coordinate: Coordinate(x: 0, y: 0)))
     }
@@ -58,7 +60,8 @@ final class UpdatingViewStateTest: XCTestCase {
             game: TestData.willDrawOnNextTurn.game,
             repository: repository,
             dispatcher: dispatcher,
-            output: output
+            output: output,
+            updates: [DiskPlacement(disk: nil, coordinate: Coordinate(x: 0, y: 0), animated: false)]
         )
         XCTAssertThrowsError(try state.acceptPass())
     }
@@ -68,7 +71,8 @@ final class UpdatingViewStateTest: XCTestCase {
             game: TestData.willDrawOnNextTurn.game,
             repository: repository,
             dispatcher: dispatcher,
-            output: output
+            output: output,
+            updates: [DiskPlacement(disk: nil, coordinate: Coordinate(x: 0, y: 0), animated: false)]
         )
         XCTAssertNoThrow(state.changePlayerMode(of: .dark, to: .manual))
     }
@@ -78,7 +82,8 @@ final class UpdatingViewStateTest: XCTestCase {
             game: TestData.willDrawOnNextTurn.game,
             repository: repository,
             dispatcher: dispatcher,
-            output: output
+            output: output,
+            updates: [DiskPlacement(disk: nil, coordinate: Coordinate(x: 0, y: 0), animated: false)]
         )
         XCTAssertNoThrow(state.reset())
     }
@@ -88,7 +93,8 @@ final class UpdatingViewStateTest: XCTestCase {
             game: TestData.willDrawOnNextTurn.game,
             repository: repository,
             dispatcher: dispatcher,
-            output: output
+            output: output,
+            updates: [DiskPlacement(disk: nil, coordinate: Coordinate(x: 0, y: 0), animated: false)]
         )
         XCTAssertNoThrow(try state.finishUpdatingOneCell())
     }

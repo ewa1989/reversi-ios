@@ -16,16 +16,24 @@ class UpdatingViewState<Repository: ReversiGameRepository, Dispatcher: Dispatcha
     private let dispatcher: Dispatcher
     private let output: AppStateOutput
 
+    private var updates: [DiskPlacement]
+
     init(
         game: ReversiGame,
         repository: Repository,
         dispatcher: Dispatcher,
-        output: AppStateOutput
+        output: AppStateOutput,
+        updates: [DiskPlacement]
     ) {
+        precondition(
+            game.turn != nil &&
+            !updates.isEmpty
+        )
         self.game = game
         self.repository = repository
         self.dispatcher = dispatcher
         self.output = output
+        self.updates = updates
     }
 
     func start() {
