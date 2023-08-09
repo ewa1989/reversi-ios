@@ -39,7 +39,7 @@ protocol AppState {
     ///   - side: プレイヤーモードを変更するプレイヤーです。
     ///   - player: プレイヤーモードを変更する先です。
     /// - Returns: 行動後の状態です。
-    func changePlayerMode(of side: Disk, to player: Player) -> AppState
+    func changePlayerControl(of side: Disk, to player: Player) throws -> AppState
 
     /// リセットした時に状態を変更します。
     /// - Returns: 行動後の状態です。

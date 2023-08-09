@@ -135,14 +135,28 @@ final class ComputerInputWaitingStateTest: XCTestCase {
         XCTAssertThrowsError(try state.acceptPass())
     }
 
-    func test_コンピューター入力待ちの時_モード切り替え可能() throws {
+    func test_コンピューター入力待ちの時_攻め手のモード切り替えするとユーザー入力待ちになり_保存される() throws {
         state = ComputerInputWaitingState(
             game: TestData.startFromDarkComputerOnlyPlaceAt2_0.game,
             repository: repository,
             dispatcher: dispatcher,
             output: output
         )
-        XCTAssertNoThrow(state.changePlayerMode(of: .dark, to: .manual))
+        let newState = try state.changePlayerControl(of: .dark, to: .manual)
+        XCTAssertTrue(newState is UserInputWaitingState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
+        XCTAssertEqual(strategy.fakeOutput, "x00\nxo----xo\n--------\n--------\n--------\n--------\n--------\n--------\n--------\n")
+    }
+
+    func test_コンピューター入力待ちの時_待ち手のモード切り替えするとコンピューター入力待ち継続し_保存される() throws {
+        state = ComputerInputWaitingState(
+            game: TestData.startFromDarkComputerOnlyPlaceAt2_0.game,
+            repository: repository,
+            dispatcher: dispatcher,
+            output: output
+        )
+        let newState = try state.changePlayerControl(of: .light, to: .computer)
+        XCTAssertTrue(newState is ComputerInputWaitingState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
+        XCTAssertEqual(strategy.fakeOutput, "x11\nxo----xo\n--------\n--------\n--------\n--------\n--------\n--------\n--------\n")
     }
 
     func test_コンピューター入力待ちの時_リセット可能() throws {

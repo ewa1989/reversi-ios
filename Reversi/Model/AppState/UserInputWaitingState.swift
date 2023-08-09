@@ -49,7 +49,7 @@ class UserInputWaitingState<Repository: ReversiGameRepository, Dispatcher: Dispa
         throw InvalidActionError()
     }
 
-    func changePlayerMode(of side: Disk, to player: Player) -> AppState {
+    func changePlayerControl(of side: Disk, to player: Player) throws -> AppState {
         self
     }
 

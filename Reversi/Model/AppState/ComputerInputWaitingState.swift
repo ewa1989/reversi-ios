@@ -75,8 +75,18 @@ class ComputerInputWaitingState<Repository: ReversiGameRepository, Dispatcher: D
         throw InvalidActionError()
     }
 
-    func changePlayerMode(of side: Disk, to player: Player) -> AppState {
-        self
+    func changePlayerControl(of side: Disk, to player: Player) throws -> AppState {
+        game.playerControls[side.index] = player
+        try repository.save(game)
+        if (side == game.turn && player == .manual) {
+            return UserInputWaitingState(
+                game: game,
+                repository: repository,
+                dispatcher: dispatcher,
+                output: output
+            )
+        }
+        return self
     }
 
     func reset() -> AppState {

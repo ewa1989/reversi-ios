@@ -74,7 +74,7 @@ final class UpdatingViewStateTest: XCTestCase {
             output: output,
             updates: [DiskPlacement(disk: nil, coordinate: Coordinate(x: 0, y: 0), animated: false)]
         )
-        XCTAssertNoThrow(state.changePlayerMode(of: .dark, to: .manual))
+        XCTAssertNoThrow(try state.changePlayerControl(of: .dark, to: .manual))
     }
 
     func test_画面描画中の時_リセット可能() throws {

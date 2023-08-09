@@ -48,7 +48,7 @@ class PassAcceptWaitingState<Repository: ReversiGameRepository, Dispatcher: Disp
         self
     }
 
-    func changePlayerMode(of side: Disk, to player: Player) -> AppState {
+    func changePlayerControl(of side: Disk, to player: Player) throws -> AppState {
         self
     }
 

@@ -70,7 +70,7 @@ final class GameFinishedStateTest: XCTestCase {
             dispatcher: dispatcher,
             output: output
         )
-        XCTAssertNoThrow(state.changePlayerMode(of: .dark, to: .manual))
+        XCTAssertNoThrow(try state.changePlayerControl(of: .dark, to: .manual))
     }
 
     func test_ゲーム終了の時_リセット可能() throws {

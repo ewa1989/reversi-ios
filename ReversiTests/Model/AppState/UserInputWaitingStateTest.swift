@@ -70,7 +70,7 @@ final class UserInputWaitingStateTest: XCTestCase {
             dispatcher: dispatcher,
             output: output
         )
-        XCTAssertNoThrow(state.changePlayerMode(of: .dark, to: .manual))
+        XCTAssertNoThrow(try state.changePlayerControl(of: .dark, to: .manual))
     }
 
     func test_ユーザー入力待ちの時_リセット可能() throws {
