@@ -8,6 +8,8 @@
 
 import XCTest
 import RxRelay
+import RxTest
+import RxSwift
 
 final class UpdatingViewStateTest: XCTestCase {
     private var state: UpdatingViewState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>!
@@ -15,6 +17,15 @@ final class UpdatingViewStateTest: XCTestCase {
     private var repository: ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>!
     private var dispatcher: SynchronousDispatcher!
     private var output: AppStateOutput!
+
+    private var scheduler: TestScheduler!
+    private var disposeBag: DisposeBag!
+
+    private var game: TestableObserver<ReversiGame>!
+    private var computerProcessing: TestableObserver<[Bool]>!
+    private var passAlert: TestableObserver<PassAlert>!
+    private var diskToPlace: TestableObserver<DiskPlacement>!
+    private var finishComputerProcessing: TestableObserver<Coordinate>!
 
     override func setUpWithError() throws {
         strategy = FakeFileSaveAndLoadStrategy()
@@ -27,10 +38,41 @@ final class UpdatingViewStateTest: XCTestCase {
             diskToPlace: PublishRelay<DiskPlacement>(),
             finishComputerProcessing: PublishRelay<Coordinate>()
         )
+
+        scheduler = TestScheduler(initialClock: 0)
+        disposeBag = DisposeBag()
+
+        game = output.game.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        computerProcessing = output.computerProcessing.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        passAlert = output.passAlert.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        diskToPlace = output.diskToPlace.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        finishComputerProcessing = output.finishComputerProcessing.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
     }
 
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
+    }
+
+    func test_画面描画中の処理を実行すると_画面描画情報が通知される() throws {
+        state = UpdatingViewState(
+            game: TestData.willDrawOnNextTurn.game,
+            repository: repository,
+            dispatcher: dispatcher,
+            output: output,
+            updates: [
+                DiskPlacement(disk: .dark, coordinate: Coordinate(x: 0, y: 0), animated: true),
+                DiskPlacement(disk: .dark, coordinate: Coordinate(x: 1, y: 0), animated: true),
+            ]
+        )
+
+        scheduler.createColdObservable([
+            .next(1, (1)),
+        ]).subscribe { [weak self] _ in
+            self?.state.start()
+        }.disposed(by: disposeBag)
+        scheduler.start()
+
+        XCTAssertEqual(diskToPlace.events, [.next(1, DiskPlacement(disk: .dark, coordinate: Coordinate(x: 0, y: 0), animated: true))])
     }
 
     func test_画面描画中の時_ユーザー入力不可能() throws {

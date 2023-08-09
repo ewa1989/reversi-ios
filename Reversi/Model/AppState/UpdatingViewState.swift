@@ -37,7 +37,11 @@ class UpdatingViewState<Repository: ReversiGameRepository, Dispatcher: Dispatcha
     }
 
     func start() {
-
+        dispatcher.async { [weak self] in
+            guard let self = self else { return }
+            let first = self.updates.removeFirst()
+            self.output.diskToPlace.accept(first)
+        }
     }
 
     func inputByUser(coordinate: Coordinate) throws -> AppState {
