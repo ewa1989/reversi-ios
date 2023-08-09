@@ -18,3 +18,11 @@ extension Observable {
         return testable
     }
 }
+
+extension PublishRelay {
+    func makeTestableObserver(testScheduler: TestScheduler, disposeBag: DisposeBag) -> TestableObserver<Element> {
+        let testable = testScheduler.createObserver(Element.self)
+        self.bind(to: testable).disposed(by: disposeBag)
+        return testable
+    }
+}
