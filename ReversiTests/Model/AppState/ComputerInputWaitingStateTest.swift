@@ -47,13 +47,7 @@ final class ComputerInputWaitingStateTest: XCTestCase {
         passAlert = output.passAlert.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
         diskToPlace = output.diskToPlace.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
         finishComputerProcessing = output.finishComputerProcessing.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
-    }
 
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
-    func test_処理を実行すると_思考後置く位置が決まる() throws {
         state = ComputerInputWaitingState(
             game: TestData.startFromDarkComputerOnlyPlaceAt2_0.game,
             repository: repository,
@@ -61,6 +55,13 @@ final class ComputerInputWaitingStateTest: XCTestCase {
             output: output
         )
 
+    }
+
+    override func tearDownWithError() throws {
+        // Put teardown code here. This method is called after the invocation of each test method in the class.
+    }
+
+    func test_コンピューター入力待ちの処理を実行すると_思考後置く位置が決まる() throws {
         scheduler.createColdObservable([
             .next(1, (1)),
         ]).subscribe { [weak self] _ in
@@ -76,14 +77,7 @@ final class ComputerInputWaitingStateTest: XCTestCase {
         XCTAssertEqual(finishComputerProcessing.events, [.next(1, Coordinate(x: 2, y: 0))])
     }
 
-    func test_処理を実行し_思考完了前にリセットがかかっていると_ディスクは置かない() throws {
-        state = ComputerInputWaitingState(
-            game: TestData.startFromDarkComputerOnlyPlaceAt2_0.game,
-            repository: repository,
-            dispatcher: dispatcher,
-            output: output
-        )
-
+    func test_コンピューター入力待ちの処理を実行し_思考完了前にリセットがかかっていると_ディスクは置かない() throws {
         scheduler.createColdObservable([
             .next(1, (1)),
             .next(2, (2)),
@@ -105,78 +99,36 @@ final class ComputerInputWaitingStateTest: XCTestCase {
     }
 
     func test_コンピューター入力待ちの時_ユーザー入力不可能() throws {
-        state = ComputerInputWaitingState(
-            game: TestData.startFromDarkComputerOnlyPlaceAt2_0.game,
-            repository: repository,
-            dispatcher: dispatcher,
-            output: output
-        )
         XCTAssertThrowsError(try state.inputByUser(coordinate: Coordinate(x: 0, y: 0)))
     }
 
     func test_コンピューター入力待ちの時_コンピューター入力すると画面描画中になる() throws {
-        state = ComputerInputWaitingState(
-            game: TestData.startFromDarkComputerOnlyPlaceAt2_0.game,
-            repository: repository,
-            dispatcher: dispatcher,
-            output: output
-        )
         let newState = try state.inputByComputer(coordinate: Coordinate(x: 2, y: 0))
         XCTAssertTrue(newState is UpdatingViewState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
     }
 
     func test_コンピューター入力待ちの時_パス了承不可能() throws {
-        state = ComputerInputWaitingState(
-            game: TestData.startFromDarkComputerOnlyPlaceAt2_0.game,
-            repository: repository,
-            dispatcher: dispatcher,
-            output: output
-        )
         XCTAssertThrowsError(try state.acceptPass())
     }
 
     func test_コンピューター入力待ちの時_攻め手のモード切り替えするとユーザー入力待ちになり_保存される() throws {
-        state = ComputerInputWaitingState(
-            game: TestData.startFromDarkComputerOnlyPlaceAt2_0.game,
-            repository: repository,
-            dispatcher: dispatcher,
-            output: output
-        )
         let newState = try state.changePlayerControl(of: .dark, to: .manual)
         XCTAssertTrue(newState is UserInputWaitingState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
         XCTAssertEqual(strategy.fakeOutput, "x00\nxo----xo\n--------\n--------\n--------\n--------\n--------\n--------\n--------\n")
     }
 
     func test_コンピューター入力待ちの時_待ち手のモード切り替えするとコンピューター入力待ち継続し_保存される() throws {
-        state = ComputerInputWaitingState(
-            game: TestData.startFromDarkComputerOnlyPlaceAt2_0.game,
-            repository: repository,
-            dispatcher: dispatcher,
-            output: output
-        )
         let newState = try state.changePlayerControl(of: .light, to: .computer)
         XCTAssertTrue(newState is ComputerInputWaitingState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
         XCTAssertEqual(strategy.fakeOutput, "x11\nxo----xo\n--------\n--------\n--------\n--------\n--------\n--------\n--------\n")
     }
 
     func test_コンピューター入力待ちの時_リセットすると画面描画中になる() throws {
-        state = ComputerInputWaitingState(
-            game: TestData.startFromDarkComputerOnlyPlaceAt2_0.game,
-            repository: repository,
-            dispatcher: dispatcher,
-            output: output
-        )
         let newState = state.reset()
         XCTAssertTrue(newState is UpdatingViewState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
     }
 
     func test_コンピューター入力待ちの時_セル描画完了不可能() throws {
-        state = ComputerInputWaitingState(
-            game: TestData.startFromDarkComputerOnlyPlaceAt2_0.game,
-            repository: repository,
-            dispatcher: dispatcher,
-            output: output
-        )
         XCTAssertThrowsError(try state.finishUpdatingOneCell())
     }
 }
