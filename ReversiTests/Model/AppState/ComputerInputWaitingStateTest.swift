@@ -159,14 +159,15 @@ final class ComputerInputWaitingStateTest: XCTestCase {
         XCTAssertEqual(strategy.fakeOutput, "x11\nxo----xo\n--------\n--------\n--------\n--------\n--------\n--------\n--------\n")
     }
 
-    func test_コンピューター入力待ちの時_リセット可能() throws {
+    func test_コンピューター入力待ちの時_リセットすると画面描画中になる() throws {
         state = ComputerInputWaitingState(
             game: TestData.startFromDarkComputerOnlyPlaceAt2_0.game,
             repository: repository,
             dispatcher: dispatcher,
             output: output
         )
-        XCTAssertNoThrow(state.reset())
+        let newState = state.reset()
+        XCTAssertTrue(newState is UpdatingViewState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
     }
 
     func test_コンピューター入力待ちの時_セル描画完了不可能() throws {

@@ -91,7 +91,26 @@ class ComputerInputWaitingState<Repository: ReversiGameRepository, Dispatcher: D
 
     func reset() -> AppState {
         cancelled = true
-        return self
+        let newGame = ReversiGame.newGame()
+        var updates: [DiskPlacement] = []
+        for y in newGame.board.yRange {
+            for x in newGame.board.xRange {
+                let update = DiskPlacement(
+                    disk: newGame.board.diskAt(x: x, y: y),
+                    coordinate: Coordinate(x: x, y: y),
+                    animated: false
+                )
+                updates.append(update)
+            }
+        }
+
+        return UpdatingViewState(
+            game: newGame,
+            repository: repository,
+            dispatcher: dispatcher,
+            output: output,
+            updates: updates
+        )
     }
 
     func finishUpdatingOneCell() throws -> AppState {
