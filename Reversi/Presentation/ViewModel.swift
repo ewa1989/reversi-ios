@@ -110,6 +110,13 @@ extension ViewModel {
             return
         }
 
+        if game.value.nowhereToPlaceDisk() {
+            var value = game.value
+            value.turn = nil
+            game.accept(value)
+            return
+        }
+
         waitForPlayer()
     }
 
@@ -131,7 +138,9 @@ extension ViewModel {
         value.playerControls[side.index] = player
         game.accept(value)
 
-        try? repository.save(game.value)
+        if (disksWaitingToPlace.isEmpty) {
+            try? repository.save(game.value)
+        }
 
         if let canceller = playerCancellers[side] {
             canceller.cancel()

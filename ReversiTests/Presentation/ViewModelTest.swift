@@ -526,7 +526,7 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
     // MARK: 画面描画とプレイモード切り替えの処理競合
 
     /// この状態でアプリが再起動されると、どちらもどこにも置けないけれどturnがnilではないゲームがアプリ起動時に読み込まれゲーム続行不可能となるため、修正する必要がある
-    func test_画面描画中_プレイモードを変更すると保存処理が走り_どちらもどこにも置けないけれどturnがnilではないゲームが保存されてしまう() throws {
+    func test_画面描画中_プレイモードを変更しても保存はされない() throws {
         fakeStrategy.fakeInput = TestData.blankSurroundedByLightSurroundingByDark.rawValue
 
         scheduler.createColdObservable([
@@ -550,7 +550,7 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
         }.disposed(by: disposeBag)
         scheduler.start()
 
-        XCTAssertEqual(fakeStrategy.fakeOutput, "x10\nxxxxx---\nxxxxx---\nxxxxx---\nxxxxx---\nxxxxx---\n--------\n--------\n--------\n")
+        XCTAssertNil(fakeStrategy.fakeOutput)
     }
 
     func test_どちらもどこにも置けないけれどturnがnilではないゲームが_アプリ起動時読み込まれた際に_ゲーム終了とハンドリングできる() throws {
@@ -575,34 +575,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
             .next(1, Message(disk: .dark, label: "'s turn")),   // ゲーム読み込み後
             .next(2, Message(disk: .dark, label: " won")),   // 画面表示後
         ])
-    }
-
-    /// この状態でアプリが再起動されると、同じプレイヤーが連続してディスクを置けてしまうので修正する必要がある
-    func test_画面描画中_プレイモードを変更すると保存処理が走り_turnが変わっていないゲームが保存されてしまう() throws {
-        fakeStrategy.fakeInput = TestData.mustPassOnNextTurn.rawValue
-
-        scheduler.createColdObservable([
-            .next(1, (1)),
-            .next(2, (2)),
-            .next(3, (3)),
-            .next(4, (4)),
-        ]).subscribe { [weak self] event in
-            switch event.element {
-            case 1:
-                self?.viewModel.viewDidLoad()   // ViewControllerが読み込まれ
-                self?.viewModel.finishUpdatingCells()
-            case 2:
-                self?.viewModel.viewDidAppear() // ViewControllerが表示され
-            case 3:
-                self?.viewModel.didSelectCellAt(x: 2, y: 0) // (2, 0)に黒を置くと置いた1枚＋裏返る1枚の計2枚の再描画が始まる
-                self?.viewModel.finishToPlace(isFinished: true) // 1枚目まで描画完了し2枚目の描画を始める
-            default:
-                self?.viewModel.changePlayerControl(of: .dark, to: .computer)  // 2枚目の描画中にモードを切り替える
-            }
-        }.disposed(by: disposeBag)
-        scheduler.start()
-
-        XCTAssertEqual(fakeStrategy.fakeOutput, "x10\nxxx-----\no-------\n--------\n--------\n--------\n--------\n--------\n--------\n")
     }
 
     // MARK: 処理キャンセル
