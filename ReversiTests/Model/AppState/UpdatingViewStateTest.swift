@@ -108,7 +108,7 @@ final class UpdatingViewStateTest: XCTestCase {
         XCTAssertThrowsError(try state.acceptPass())
     }
 
-    func test_画面描画中の時_モード切り替え可能() throws {
+    func test_画面描画中の時_モード切り替えると画面描画中継続し_保存されない() throws {
         state = UpdatingViewState(
             game: TestData.willDrawOnNextTurn.game,
             repository: repository,
@@ -116,7 +116,9 @@ final class UpdatingViewStateTest: XCTestCase {
             output: output,
             updates: [DiskPlacement(disk: nil, coordinate: Coordinate(x: 0, y: 0), animated: false)]
         )
-        XCTAssertNoThrow(try state.changePlayerControl(of: .dark, to: .manual))
+        let newState = try state.changePlayerControl(of: .dark, to: .computer)
+        XCTAssertTrue(newState is UpdatingViewState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
+        XCTAssertNil(strategy.fakeOutput)
     }
 
     func test_画面描画中の時_リセット可能() throws {

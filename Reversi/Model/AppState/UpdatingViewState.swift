@@ -25,9 +25,9 @@ class UpdatingViewState<Repository: ReversiGameRepository, Dispatcher: Dispatcha
         output: AppStateOutput,
         updates: [DiskPlacement]
     ) {
+        // 最後の1セル描画中にモード切り替えが呼ばれた場合にupdatesは空になり得る
         precondition(
-            game.turn != nil &&
-            !updates.isEmpty
+            game.turn != nil
         )
         self.game = game
         self.repository = repository
@@ -57,7 +57,8 @@ class UpdatingViewState<Repository: ReversiGameRepository, Dispatcher: Dispatcha
     }
 
     func changePlayerControl(of side: Disk, to player: Player) throws -> AppState {
-        self
+        game.playerControls[side.index] = player
+        return self
     }
 
     func reset() -> AppState {
