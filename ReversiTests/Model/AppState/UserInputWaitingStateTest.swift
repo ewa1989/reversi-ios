@@ -100,8 +100,9 @@ final class UserInputWaitingStateTest: XCTestCase {
         XCTAssertEqual(strategy.fakeOutput, "x10\n--------\n--------\n--------\n---ox---\n---xo---\n--------\n--------\n--------\n")
     }
 
-    func test_ユーザー入力待ちの時_リセット可能() throws {
-        XCTAssertNoThrow(state.reset())
+    func test_ユーザー入力待ちの時_リセットすると画面描画中になる() throws {
+        let newState = state.reset()
+        XCTAssertTrue(newState is UpdatingViewState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
     }
 
     func test_ユーザー入力待ちの時_セル描画完了不可能() throws {

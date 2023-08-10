@@ -79,7 +79,17 @@ class UserInputWaitingState<Repository: ReversiGameRepository, Dispatcher: Dispa
     }
 
     func reset() -> AppState {
-        self
+        let newGame = ReversiGame.newGame()
+        let updates = DiskPlacement.allCellsFrom(game: newGame, animated: false)
+
+        return UpdatingViewState(
+            game: newGame,
+            repository: repository,
+            dispatcher: dispatcher,
+            output: output,
+            updates: updates,
+            isReset: true
+        )
     }
 
     func finishUpdatingOneCell(isFinished: Bool) throws -> AppState {
