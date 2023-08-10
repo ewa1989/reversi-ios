@@ -65,7 +65,17 @@ class UserInputWaitingState<Repository: ReversiGameRepository, Dispatcher: Dispa
     }
 
     func changePlayerControl(of side: Disk, to player: Player) throws -> AppState {
-        self
+        game.playerControls[side.index] = player
+        try repository.save(game)
+        if (side == game.turn && player == .computer) {
+            return ComputerInputWaitingState(
+                game: game,
+                repository: repository,
+                dispatcher: dispatcher,
+                output: output
+            )
+        }
+        return self
     }
 
     func reset() -> AppState {
