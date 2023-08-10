@@ -63,7 +63,7 @@ final class PassAcceptWaitingStateTest: XCTestCase {
         XCTAssertNoThrow(try state.acceptPass())
     }
 
-    func test_パス了承待ちの時_モード切り替え可能() throws {
+    func test_パス了承待ちの時_モード切り替え不可能() throws {
         state = PassAcceptWaitingState(
             game: TestData.mustPassOnThisTurn.game,
             repository: repository,
