@@ -105,7 +105,7 @@ public class BoardView: UIView {
     }
     
     /// 盤をゲーム開始時に状態に戻します。このメソッドはアニメーションを伴いません。
-    public func reset() {
+    private func reset() {
         for y in  yRange {
             for x in xRange {
                 setDisk(nil, atX: x, y: y, animated: false)
@@ -128,7 +128,7 @@ public class BoardView: UIView {
     /// - Parameter x: セルの列です。
     /// - Parameter y: セルの行です。
     /// - Returns: セルにディスクが置かれている場合はそのディスクの値を、置かれていない場合は `nil` を返します。
-    public func diskAt(x: Int, y: Int) -> Disk? {
+    private func diskAt(x: Int, y: Int) -> Disk? {
         cellViewAt(x: x, y: y)?.disk
     }
     

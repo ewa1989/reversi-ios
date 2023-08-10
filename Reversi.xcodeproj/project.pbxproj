@@ -3,10 +3,53 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A0D90612A7BACE1009D77B2 /* RxBlocking in Frameworks */ = {isa = PBXBuildFile; productRef = 0A0D90602A7BACE1009D77B2 /* RxBlocking */; };
+		0A0D90632A7BACE1009D77B2 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 0A0D90622A7BACE1009D77B2 /* RxCocoa */; };
+		0A0D90652A7BACE1009D77B2 /* RxRelay in Frameworks */ = {isa = PBXBuildFile; productRef = 0A0D90642A7BACE1009D77B2 /* RxRelay */; };
+		0A0D90672A7BACE1009D77B2 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 0A0D90662A7BACE1009D77B2 /* RxSwift */; };
+		0A0D90692A7BACE1009D77B2 /* RxTest in Frameworks */ = {isa = PBXBuildFile; productRef = 0A0D90682A7BACE1009D77B2 /* RxTest */; };
+		0A2001002A7FBA16006F943F /* TestableObserverFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2000FF2A7FBA16006F943F /* TestableObserverFactory.swift */; };
+		0A391B052A7954DC00CE4B13 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A391B042A7954DC00CE4B13 /* ViewModel.swift */; };
+		0A3B35662A765BFB00527AB1 /* TestData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A3B35652A765BFB00527AB1 /* TestData.swift */; };
+		0A695BEC2A7A65F5003145C6 /* Dispatchable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A695BEB2A7A65F5003145C6 /* Dispatchable.swift */; };
+		0A6D36432A825F19004D691A /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6D36422A825F19004D691A /* AppState.swift */; };
+		0A6D36462A825F4B004D691A /* AppStateFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6D36452A825F4B004D691A /* AppStateFactory.swift */; };
+		0A6D364A2A825F64004D691A /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6D36422A825F19004D691A /* AppState.swift */; };
+		0A6D364B2A825F66004D691A /* AppStateFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6D36452A825F4B004D691A /* AppStateFactory.swift */; };
+		0A6D364D2A825F9A004D691A /* UserInputWaitingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6D364C2A825F9A004D691A /* UserInputWaitingState.swift */; };
+		0A6D364E2A825F9A004D691A /* UserInputWaitingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6D364C2A825F9A004D691A /* UserInputWaitingState.swift */; };
+		0A6D36502A825FEF004D691A /* AppStateFactoryTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6D364F2A825FEF004D691A /* AppStateFactoryTest.swift */; };
+		0A6D36522A826165004D691A /* GameFinishedState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6D36512A826165004D691A /* GameFinishedState.swift */; };
+		0A6D36532A826165004D691A /* GameFinishedState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6D36512A826165004D691A /* GameFinishedState.swift */; };
+		0A6D36552A8261A0004D691A /* ComputerInputWaitingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6D36542A8261A0004D691A /* ComputerInputWaitingState.swift */; };
+		0A6D36562A8261A0004D691A /* ComputerInputWaitingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6D36542A8261A0004D691A /* ComputerInputWaitingState.swift */; };
+		0A6D36582A8261B8004D691A /* PassAcceptWaitingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6D36572A8261B8004D691A /* PassAcceptWaitingState.swift */; };
+		0A6D36592A8261B8004D691A /* PassAcceptWaitingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6D36572A8261B8004D691A /* PassAcceptWaitingState.swift */; };
+		0A6D365B2A8261D6004D691A /* UpdatingViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6D365A2A8261D6004D691A /* UpdatingViewState.swift */; };
+		0A6D365C2A8261D6004D691A /* UpdatingViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6D365A2A8261D6004D691A /* UpdatingViewState.swift */; };
+		0A6D365E2A82680F004D691A /* UserInputWaitingStateTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6D365D2A82680F004D691A /* UserInputWaitingStateTest.swift */; };
+		0A6D36602A826893004D691A /* ComputerInputWaitingStateTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6D365F2A826893004D691A /* ComputerInputWaitingStateTest.swift */; };
+		0A700AF92A756C4F00CC14B6 /* ReversiGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A700AF82A756C4F00CC14B6 /* ReversiGame.swift */; };
+		0A700AFA2A756C5200CC14B6 /* ReversiGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A700AF82A756C4F00CC14B6 /* ReversiGame.swift */; };
+		0A700AFF2A7576EA00CC14B6 /* ReversiGameTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A700AFE2A7576EA00CC14B6 /* ReversiGameTest.swift */; };
+		0A700B002A75771C00CC14B6 /* Disk.swift in Sources */ = {isa = PBXBuildFile; fileRef = D642BDD723AA0B5700396732 /* Disk.swift */; };
+		0A700B032A757ADC00CC14B6 /* ReversiGameRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A700B022A757ADC00CC14B6 /* ReversiGameRepository.swift */; };
+		0A700B062A757F7500CC14B6 /* ReversiGameRepositoryTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A700B052A757F7500CC14B6 /* ReversiGameRepositoryTest.swift */; };
+		0A700B072A757F7A00CC14B6 /* ReversiGameRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A700B022A757ADC00CC14B6 /* ReversiGameRepository.swift */; };
+		0A79961B2A7E929800B2F2B8 /* ViewModelTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A79961A2A7E929800B2F2B8 /* ViewModelTest.swift */; };
+		0A79961C2A7E929A00B2F2B8 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A391B042A7954DC00CE4B13 /* ViewModel.swift */; };
+		0A79961D2A7E92B200B2F2B8 /* Dispatchable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A695BEB2A7A65F5003145C6 /* Dispatchable.swift */; };
+		0A79961F2A7E937D00B2F2B8 /* FakeFileSaveAndLoadStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A79961E2A7E937D00B2F2B8 /* FakeFileSaveAndLoadStrategy.swift */; };
+		0A7996212A7E95FA00B2F2B8 /* TestDoubleDispatchers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7996202A7E95FA00B2F2B8 /* TestDoubleDispatchers.swift */; };
+		0AB46E012A82691600EEBA4A /* PassAcceptWaitingStateTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AB46E002A82691600EEBA4A /* PassAcceptWaitingStateTest.swift */; };
+		0AB46E032A82694000EEBA4A /* UpdatingViewStateTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AB46E022A82694000EEBA4A /* UpdatingViewStateTest.swift */; };
+		0AB46E052A82695F00EEBA4A /* GameFinishedStateTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AB46E042A82695F00EEBA4A /* GameFinishedStateTest.swift */; };
+		0AF8A13A2A82762300C0E6E1 /* AppStateOutput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF8A1392A82762300C0E6E1 /* AppStateOutput.swift */; };
+		0AF8A13B2A8277D700C0E6E1 /* AppStateOutput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF8A1392A82762300C0E6E1 /* AppStateOutput.swift */; };
 		D636B39F23D35043007F370F /* DiskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D636B39E23D35043007F370F /* DiskView.swift */; };
 		D642BDB423A9FE4500396732 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D642BDB323A9FE4500396732 /* AppDelegate.swift */; };
 		D642BDB623A9FE4500396732 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D642BDB523A9FE4500396732 /* SceneDelegate.swift */; };
@@ -14,7 +57,6 @@
 		D642BDBB23A9FE4500396732 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D642BDB923A9FE4500396732 /* Main.storyboard */; };
 		D642BDBD23A9FE4700396732 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D642BDBC23A9FE4700396732 /* Assets.xcassets */; };
 		D642BDC023A9FE4700396732 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D642BDBE23A9FE4700396732 /* LaunchScreen.storyboard */; };
-		D642BDCB23A9FE4700396732 /* ReversiTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D642BDCA23A9FE4700396732 /* ReversiTests.swift */; };
 		D642BDD623AA0B3900396732 /* CellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D642BDD523AA0B3900396732 /* CellView.swift */; };
 		D642BDD823AA0B5700396732 /* Disk.swift in Sources */ = {isa = PBXBuildFile; fileRef = D642BDD723AA0B5700396732 /* Disk.swift */; };
 		D642BDDC23AA137C00396732 /* BoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D642BDDB23AA137C00396732 /* BoardView.swift */; };
@@ -31,6 +73,31 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0A2000FF2A7FBA16006F943F /* TestableObserverFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestableObserverFactory.swift; sourceTree = "<group>"; };
+		0A391B042A7954DC00CE4B13 /* ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
+		0A3B35652A765BFB00527AB1 /* TestData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestData.swift; sourceTree = "<group>"; };
+		0A695BEB2A7A65F5003145C6 /* Dispatchable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dispatchable.swift; sourceTree = "<group>"; };
+		0A6D36422A825F19004D691A /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		0A6D36452A825F4B004D691A /* AppStateFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateFactory.swift; sourceTree = "<group>"; };
+		0A6D364C2A825F9A004D691A /* UserInputWaitingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInputWaitingState.swift; sourceTree = "<group>"; };
+		0A6D364F2A825FEF004D691A /* AppStateFactoryTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateFactoryTest.swift; sourceTree = "<group>"; };
+		0A6D36512A826165004D691A /* GameFinishedState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameFinishedState.swift; sourceTree = "<group>"; };
+		0A6D36542A8261A0004D691A /* ComputerInputWaitingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComputerInputWaitingState.swift; sourceTree = "<group>"; };
+		0A6D36572A8261B8004D691A /* PassAcceptWaitingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassAcceptWaitingState.swift; sourceTree = "<group>"; };
+		0A6D365A2A8261D6004D691A /* UpdatingViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatingViewState.swift; sourceTree = "<group>"; };
+		0A6D365D2A82680F004D691A /* UserInputWaitingStateTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInputWaitingStateTest.swift; sourceTree = "<group>"; };
+		0A6D365F2A826893004D691A /* ComputerInputWaitingStateTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComputerInputWaitingStateTest.swift; sourceTree = "<group>"; };
+		0A700AF82A756C4F00CC14B6 /* ReversiGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReversiGame.swift; sourceTree = "<group>"; };
+		0A700AFE2A7576EA00CC14B6 /* ReversiGameTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReversiGameTest.swift; sourceTree = "<group>"; };
+		0A700B022A757ADC00CC14B6 /* ReversiGameRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReversiGameRepository.swift; sourceTree = "<group>"; };
+		0A700B052A757F7500CC14B6 /* ReversiGameRepositoryTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReversiGameRepositoryTest.swift; sourceTree = "<group>"; };
+		0A79961A2A7E929800B2F2B8 /* ViewModelTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModelTest.swift; sourceTree = "<group>"; };
+		0A79961E2A7E937D00B2F2B8 /* FakeFileSaveAndLoadStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FakeFileSaveAndLoadStrategy.swift; sourceTree = "<group>"; };
+		0A7996202A7E95FA00B2F2B8 /* TestDoubleDispatchers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestDoubleDispatchers.swift; sourceTree = "<group>"; };
+		0AB46E002A82691600EEBA4A /* PassAcceptWaitingStateTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassAcceptWaitingStateTest.swift; sourceTree = "<group>"; };
+		0AB46E022A82694000EEBA4A /* UpdatingViewStateTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatingViewStateTest.swift; sourceTree = "<group>"; };
+		0AB46E042A82695F00EEBA4A /* GameFinishedStateTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameFinishedStateTest.swift; sourceTree = "<group>"; };
+		0AF8A1392A82762300C0E6E1 /* AppStateOutput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateOutput.swift; sourceTree = "<group>"; };
 		D636B39E23D35043007F370F /* DiskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskView.swift; sourceTree = "<group>"; };
 		D642BDB023A9FE4500396732 /* Reversi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Reversi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D642BDB323A9FE4500396732 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -41,7 +108,6 @@
 		D642BDBF23A9FE4700396732 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		D642BDC123A9FE4700396732 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D642BDC623A9FE4700396732 /* ReversiTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ReversiTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		D642BDCA23A9FE4700396732 /* ReversiTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReversiTests.swift; sourceTree = "<group>"; };
 		D642BDCC23A9FE4700396732 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D642BDD523AA0B3900396732 /* CellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellView.swift; sourceTree = "<group>"; };
 		D642BDD723AA0B5700396732 /* Disk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Disk.swift; sourceTree = "<group>"; };
@@ -53,6 +119,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A0D90672A7BACE1009D77B2 /* RxSwift in Frameworks */,
+				0A0D90652A7BACE1009D77B2 /* RxRelay in Frameworks */,
+				0A0D90632A7BACE1009D77B2 /* RxCocoa in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -60,12 +129,106 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A0D90692A7BACE1009D77B2 /* RxTest in Frameworks */,
+				0A0D90612A7BACE1009D77B2 /* RxBlocking in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0A391B032A7954CE00CE4B13 /* Presentation */ = {
+			isa = PBXGroup;
+			children = (
+				D642BDB723A9FE4500396732 /* ViewController.swift */,
+				0A391B042A7954DC00CE4B13 /* ViewModel.swift */,
+			);
+			path = Presentation;
+			sourceTree = "<group>";
+		};
+		0A3B35642A765BEB00527AB1 /* TestHelper */ = {
+			isa = PBXGroup;
+			children = (
+				0A3B35652A765BFB00527AB1 /* TestData.swift */,
+				0A79961E2A7E937D00B2F2B8 /* FakeFileSaveAndLoadStrategy.swift */,
+				0A7996202A7E95FA00B2F2B8 /* TestDoubleDispatchers.swift */,
+				0A2000FF2A7FBA16006F943F /* TestableObserverFactory.swift */,
+			);
+			path = TestHelper;
+			sourceTree = "<group>";
+		};
+		0A6D36412A825F10004D691A /* AppState */ = {
+			isa = PBXGroup;
+			children = (
+				0A6D36422A825F19004D691A /* AppState.swift */,
+				0AF8A1392A82762300C0E6E1 /* AppStateOutput.swift */,
+				0A6D36452A825F4B004D691A /* AppStateFactory.swift */,
+				0A6D364C2A825F9A004D691A /* UserInputWaitingState.swift */,
+				0A6D36542A8261A0004D691A /* ComputerInputWaitingState.swift */,
+				0A6D36572A8261B8004D691A /* PassAcceptWaitingState.swift */,
+				0A6D365A2A8261D6004D691A /* UpdatingViewState.swift */,
+				0A6D36512A826165004D691A /* GameFinishedState.swift */,
+			);
+			path = AppState;
+			sourceTree = "<group>";
+		};
+		0A6D36472A825F57004D691A /* AppState */ = {
+			isa = PBXGroup;
+			children = (
+				0A6D364F2A825FEF004D691A /* AppStateFactoryTest.swift */,
+				0A6D365D2A82680F004D691A /* UserInputWaitingStateTest.swift */,
+				0A6D365F2A826893004D691A /* ComputerInputWaitingStateTest.swift */,
+				0AB46E002A82691600EEBA4A /* PassAcceptWaitingStateTest.swift */,
+				0AB46E022A82694000EEBA4A /* UpdatingViewStateTest.swift */,
+				0AB46E042A82695F00EEBA4A /* GameFinishedStateTest.swift */,
+			);
+			path = AppState;
+			sourceTree = "<group>";
+		};
+		0A700AF72A756C4400CC14B6 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				0A6D36412A825F10004D691A /* AppState */,
+				D642BDD723AA0B5700396732 /* Disk.swift */,
+				0A700AF82A756C4F00CC14B6 /* ReversiGame.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		0A700AFD2A7576DB00CC14B6 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				0A6D36472A825F57004D691A /* AppState */,
+				0A700AFE2A7576EA00CC14B6 /* ReversiGameTest.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		0A700B012A757ACB00CC14B6 /* Infrastructure */ = {
+			isa = PBXGroup;
+			children = (
+				0A700B022A757ADC00CC14B6 /* ReversiGameRepository.swift */,
+				0A695BEB2A7A65F5003145C6 /* Dispatchable.swift */,
+			);
+			path = Infrastructure;
+			sourceTree = "<group>";
+		};
+		0A700B042A757ECD00CC14B6 /* Infrastructure */ = {
+			isa = PBXGroup;
+			children = (
+				0A700B052A757F7500CC14B6 /* ReversiGameRepositoryTest.swift */,
+			);
+			path = Infrastructure;
+			sourceTree = "<group>";
+		};
+		0A7996192A7E928B00B2F2B8 /* Presentation */ = {
+			isa = PBXGroup;
+			children = (
+				0A79961A2A7E929800B2F2B8 /* ViewModelTest.swift */,
+			);
+			path = Presentation;
+			sourceTree = "<group>";
+		};
 		D636B3A123D43203007F370F /* Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -74,14 +237,6 @@
 				D636B39E23D35043007F370F /* DiskView.swift */,
 			);
 			name = Views;
-			sourceTree = "<group>";
-		};
-		D636B3A423D432D3007F370F /* DataTypes */ = {
-			isa = PBXGroup;
-			children = (
-				D642BDD723AA0B5700396732 /* Disk.swift */,
-			);
-			name = DataTypes;
 			sourceTree = "<group>";
 		};
 		D642BDA723A9FE4500396732 = {
@@ -105,15 +260,16 @@
 		D642BDB223A9FE4500396732 /* Reversi */ = {
 			isa = PBXGroup;
 			children = (
+				0A391B032A7954CE00CE4B13 /* Presentation */,
+				0A700B012A757ACB00CC14B6 /* Infrastructure */,
+				0A700AF72A756C4400CC14B6 /* Model */,
 				D642BDB323A9FE4500396732 /* AppDelegate.swift */,
 				D642BDB523A9FE4500396732 /* SceneDelegate.swift */,
-				D642BDB723A9FE4500396732 /* ViewController.swift */,
 				D642BDB923A9FE4500396732 /* Main.storyboard */,
 				D642BDBC23A9FE4700396732 /* Assets.xcassets */,
 				D642BDBE23A9FE4700396732 /* LaunchScreen.storyboard */,
 				D642BDC123A9FE4700396732 /* Info.plist */,
 				D636B3A123D43203007F370F /* Views */,
-				D636B3A423D432D3007F370F /* DataTypes */,
 			);
 			path = Reversi;
 			sourceTree = "<group>";
@@ -121,7 +277,10 @@
 		D642BDC923A9FE4700396732 /* ReversiTests */ = {
 			isa = PBXGroup;
 			children = (
-				D642BDCA23A9FE4700396732 /* ReversiTests.swift */,
+				0A7996192A7E928B00B2F2B8 /* Presentation */,
+				0A3B35642A765BEB00527AB1 /* TestHelper */,
+				0A700B042A757ECD00CC14B6 /* Infrastructure */,
+				0A700AFD2A7576DB00CC14B6 /* Model */,
 				D642BDCC23A9FE4700396732 /* Info.plist */,
 			);
 			path = ReversiTests;
@@ -143,6 +302,11 @@
 			dependencies = (
 			);
 			name = Reversi;
+			packageProductDependencies = (
+				0A0D90622A7BACE1009D77B2 /* RxCocoa */,
+				0A0D90642A7BACE1009D77B2 /* RxRelay */,
+				0A0D90662A7BACE1009D77B2 /* RxSwift */,
+			);
 			productName = Reversi;
 			productReference = D642BDB023A9FE4500396732 /* Reversi.app */;
 			productType = "com.apple.product-type.application";
@@ -161,6 +325,10 @@
 				D642BDC823A9FE4700396732 /* PBXTargetDependency */,
 			);
 			name = ReversiTests;
+			packageProductDependencies = (
+				0A0D90602A7BACE1009D77B2 /* RxBlocking */,
+				0A0D90682A7BACE1009D77B2 /* RxTest */,
+			);
 			productName = ReversiTests;
 			productReference = D642BDC623A9FE4700396732 /* ReversiTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -193,6 +361,9 @@
 				Base,
 			);
 			mainGroup = D642BDA723A9FE4500396732;
+			packageReferences = (
+				0A0D905F2A7BACE1009D77B2 /* XCRemoteSwiftPackageReference "RxSwift" */,
+			);
 			productRefGroup = D642BDB123A9FE4500396732 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -228,12 +399,24 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A6D36462A825F4B004D691A /* AppStateFactory.swift in Sources */,
+				0A6D365B2A8261D6004D691A /* UpdatingViewState.swift in Sources */,
+				0A391B052A7954DC00CE4B13 /* ViewModel.swift in Sources */,
+				0AF8A13A2A82762300C0E6E1 /* AppStateOutput.swift in Sources */,
 				D636B39F23D35043007F370F /* DiskView.swift in Sources */,
 				D642BDD623AA0B3900396732 /* CellView.swift in Sources */,
+				0A6D36432A825F19004D691A /* AppState.swift in Sources */,
+				0A6D364D2A825F9A004D691A /* UserInputWaitingState.swift in Sources */,
 				D642BDD823AA0B5700396732 /* Disk.swift in Sources */,
 				D642BDB823A9FE4500396732 /* ViewController.swift in Sources */,
 				D642BDDC23AA137C00396732 /* BoardView.swift in Sources */,
 				D642BDB423A9FE4500396732 /* AppDelegate.swift in Sources */,
+				0A700AF92A756C4F00CC14B6 /* ReversiGame.swift in Sources */,
+				0A700B032A757ADC00CC14B6 /* ReversiGameRepository.swift in Sources */,
+				0A6D36522A826165004D691A /* GameFinishedState.swift in Sources */,
+				0A6D36582A8261B8004D691A /* PassAcceptWaitingState.swift in Sources */,
+				0A6D36552A8261A0004D691A /* ComputerInputWaitingState.swift in Sources */,
+				0A695BEC2A7A65F5003145C6 /* Dispatchable.swift in Sources */,
 				D642BDB623A9FE4500396732 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -242,7 +425,32 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D642BDCB23A9FE4700396732 /* ReversiTests.swift in Sources */,
+				0AF8A13B2A8277D700C0E6E1 /* AppStateOutput.swift in Sources */,
+				0A700B072A757F7A00CC14B6 /* ReversiGameRepository.swift in Sources */,
+				0A700B062A757F7500CC14B6 /* ReversiGameRepositoryTest.swift in Sources */,
+				0A700B002A75771C00CC14B6 /* Disk.swift in Sources */,
+				0A79961D2A7E92B200B2F2B8 /* Dispatchable.swift in Sources */,
+				0A6D36592A8261B8004D691A /* PassAcceptWaitingState.swift in Sources */,
+				0A2001002A7FBA16006F943F /* TestableObserverFactory.swift in Sources */,
+				0AB46E032A82694000EEBA4A /* UpdatingViewStateTest.swift in Sources */,
+				0A7996212A7E95FA00B2F2B8 /* TestDoubleDispatchers.swift in Sources */,
+				0AB46E052A82695F00EEBA4A /* GameFinishedStateTest.swift in Sources */,
+				0A3B35662A765BFB00527AB1 /* TestData.swift in Sources */,
+				0A6D36562A8261A0004D691A /* ComputerInputWaitingState.swift in Sources */,
+				0AB46E012A82691600EEBA4A /* PassAcceptWaitingStateTest.swift in Sources */,
+				0A700AFA2A756C5200CC14B6 /* ReversiGame.swift in Sources */,
+				0A6D364E2A825F9A004D691A /* UserInputWaitingState.swift in Sources */,
+				0A6D364B2A825F66004D691A /* AppStateFactory.swift in Sources */,
+				0A6D364A2A825F64004D691A /* AppState.swift in Sources */,
+				0A6D36602A826893004D691A /* ComputerInputWaitingStateTest.swift in Sources */,
+				0A700AFF2A7576EA00CC14B6 /* ReversiGameTest.swift in Sources */,
+				0A79961C2A7E929A00B2F2B8 /* ViewModel.swift in Sources */,
+				0A79961F2A7E937D00B2F2B8 /* FakeFileSaveAndLoadStrategy.swift in Sources */,
+				0A6D36532A826165004D691A /* GameFinishedState.swift in Sources */,
+				0A6D36502A825FEF004D691A /* AppStateFactoryTest.swift in Sources */,
+				0A79961B2A7E929800B2F2B8 /* ViewModelTest.swift in Sources */,
+				0A6D365E2A82680F004D691A /* UserInputWaitingStateTest.swift in Sources */,
+				0A6D365C2A8261D6004D691A /* UpdatingViewState.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -493,6 +701,45 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		0A0D905F2A7BACE1009D77B2 /* XCRemoteSwiftPackageReference "RxSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ReactiveX/RxSwift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		0A0D90602A7BACE1009D77B2 /* RxBlocking */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0A0D905F2A7BACE1009D77B2 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxBlocking;
+		};
+		0A0D90622A7BACE1009D77B2 /* RxCocoa */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0A0D905F2A7BACE1009D77B2 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxCocoa;
+		};
+		0A0D90642A7BACE1009D77B2 /* RxRelay */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0A0D905F2A7BACE1009D77B2 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxRelay;
+		};
+		0A0D90662A7BACE1009D77B2 /* RxSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0A0D905F2A7BACE1009D77B2 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxSwift;
+		};
+		0A0D90682A7BACE1009D77B2 /* RxTest */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0A0D905F2A7BACE1009D77B2 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxTest;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = D642BDA823A9FE4500396732 /* Project object */;
 }
