@@ -32,7 +32,7 @@ class GameFinishedState<Repository: ReversiGameRepository, Dispatcher: Dispatcha
     }
 
     func start() {
-
+        output.game.accept(game)
     }
 
     func inputByUser(coordinate: Coordinate) throws -> AppState {
