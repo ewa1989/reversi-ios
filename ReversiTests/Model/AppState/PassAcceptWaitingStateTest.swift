@@ -8,6 +8,8 @@
 
 import XCTest
 import RxRelay
+import RxTest
+import RxSwift
 
 final class PassAcceptWaitingStateTest: XCTestCase {
     private var state: PassAcceptWaitingState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>!
@@ -15,6 +17,15 @@ final class PassAcceptWaitingStateTest: XCTestCase {
     private var repository: ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>!
     private var dispatcher: SynchronousDispatcher!
     private var output: AppStateOutput!
+
+    private var scheduler: TestScheduler!
+    private var disposeBag: DisposeBag!
+
+    private var game: TestableObserver<ReversiGame>!
+    private var computerProcessing: TestableObserver<[Bool]>!
+    private var passAlert: TestableObserver<PassAlert>!
+    private var diskToPlace: TestableObserver<DiskPlacement>!
+    private var finishComputerProcessing: TestableObserver<Coordinate>!
 
     override func setUpWithError() throws {
         strategy = FakeFileSaveAndLoadStrategy()
@@ -27,20 +38,38 @@ final class PassAcceptWaitingStateTest: XCTestCase {
             diskToPlace: PublishRelay<DiskPlacement>(),
             finishComputerProcessing: PublishRelay<Coordinate>()
         )
+
+        scheduler = TestScheduler(initialClock: 0)
+        disposeBag = DisposeBag()
+
+        game = output.game.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        computerProcessing = output.computerProcessing.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        passAlert = output.passAlert.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        diskToPlace = output.diskToPlace.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
+        finishComputerProcessing = output.finishComputerProcessing.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
     }
 
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func test_パス了承待ちの時_ユーザー入力不可能() throws {
+    func test_パス了承待ちの処理を実行すると_パスするアラートの表示が通知される() throws {
         state = PassAcceptWaitingState(
             game: TestData.mustPassOnThisTurn.game,
             repository: repository,
             dispatcher: dispatcher,
             output: output
         )
-        XCTAssertThrowsError(try state.inputByUser(coordinate: Coordinate(x: 0, y: 0)))
+
+        scheduler.createColdObservable([
+            .next(1, (1)),
+        ]).subscribe { [weak self] _ in
+            self?.state.start()
+        }.disposed(by: disposeBag)
+        scheduler.start()
+
+        XCTAssertEqual(game.events, [.next(1, TestData.mustPassOnThisTurn.game)])
+        XCTAssertEqual(passAlert.events, [.next(1, PassAlert())])
     }
 
     func test_パス了承待ちの時_コンピューター入力不可能() throws {

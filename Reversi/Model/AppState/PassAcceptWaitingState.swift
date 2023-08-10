@@ -33,7 +33,8 @@ class PassAcceptWaitingState<Repository: ReversiGameRepository, Dispatcher: Disp
     }
 
     func start() {
-
+        output.game.accept(game)
+        output.passAlert.accept(PassAlert())
     }
 
     func inputByUser(coordinate: Coordinate) throws -> AppState {
