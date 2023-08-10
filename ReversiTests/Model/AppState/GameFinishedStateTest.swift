@@ -89,8 +89,9 @@ final class GameFinishedStateTest: XCTestCase {
         XCTAssertEqual(strategy.fakeOutput, "-10\noooooooo\noooooooo\noooooooo\noooooooo\noooooooo\noooooooo\noooooooo\noooooooo\n")
     }
 
-    func test_ゲーム終了の時_リセット可能() throws {
-        XCTAssertNoThrow(try state.reset())
+    func test_ゲーム終了の時_リセットすると画面描画中になる() throws {
+        let newState = try state.reset()
+        XCTAssertTrue(newState is UpdatingViewState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
     }
 
     func test_ゲーム終了の時_セル描画完了不可能() throws {
