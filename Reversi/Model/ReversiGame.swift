@@ -43,6 +43,39 @@ struct ReversiGame: Hashable {
         game.board.setDisk(.light, atX: game.board.width / 2, y: game.board.height / 2)
         return game
     }
+
+    func needsPass() -> Bool {
+        guard let turn = turn else { return false }
+        if board.canPlaceAnyDisks(by: turn) {
+            return false
+        }
+        return board.canPlaceAnyDisks(by: turn.flipped)
+    }
+
+    func nowhereToPlaceDisk() -> Bool {
+        guard let turn = turn else {
+            return true
+        }
+
+        return !board.canPlaceAnyDisks(by: turn) && !board.canPlaceAnyDisks(by: turn.flipped)
+    }
+
+    mutating func updateTurn() {
+        guard var turn = turn else {
+            return
+        }
+
+        turn.flip()
+
+        if !board.canPlaceAnyDisks(by: turn) {
+            if !board.canPlaceAnyDisks(by: turn.flipped) {
+                self.turn = nil
+                return
+            }
+        }
+
+        self.turn = turn
+    }
 }
 
 enum ReversiGameState: Hashable {

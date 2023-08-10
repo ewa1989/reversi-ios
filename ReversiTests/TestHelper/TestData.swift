@@ -48,7 +48,7 @@ enum TestData: String {
     /// プレイヤーモードはどちらもManual、中央に白黒2つずつディスクが置かれ白から始まる新規ゲームを作成します。
     case newGameStartFromLight = "o00\n--------\n--------\n--------\n---ox---\n---xo---\n--------\n--------\n--------\n"
 
-    /// 左半分が黒、右半分が白でコンピューター同士が引き分けたゲームを作成します。
+    /// 左半分が黒、右半分が白でComputer同士が引き分けたゲームを作成します。
     /// ```
     /// xxxxoooo
     /// xxxxoooo
@@ -64,7 +64,7 @@ enum TestData: String {
     /// プレイヤーモードはどちらもManual、中央に白黒2つずつディスクが置かれ黒から始まる新規ゲームを作成します。
     case newGame = "x00\n--------\n--------\n--------\n---ox---\n---xo---\n--------\n--------\n--------\n"
 
-    /// 黒のコンピューターから始まり、必ず(2, 0)に置かれるゲームを作成します。
+    /// 黒のComputerから始まり、必ず(2, 0)に置かれるゲームを作成します。
     /// ```
     /// xo----xo
     /// --------
@@ -103,7 +103,7 @@ enum TestData: String {
     /// ```
     case willDrawOnNextTurn = "o00\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoox-\n"
 
-    /// 両プレイヤーコンピューター、白から始まるけれどどこにも置けず、すぐパスが必要なゲームを作成します。
+    /// 両プレイヤーComputer、白から始まるけれどどこにも置けず、すぐパスが必要なゲームを作成します。
     /// ```
     /// xo------
     /// o-------
@@ -114,5 +114,34 @@ enum TestData: String {
     /// --------
     /// --------
     /// ```
-    case mustPassOnThisTurn = "o11\nxo------\no-------\n--------\n--------\n--------\n--------\n--------\n--------\n"
+    case mustPassComputerTurnThenComputerTurn = "o11\nxo------\no-------\n--------\n--------\n--------\n--------\n--------\n--------\n"
+
+    /// 黒Manual白Computer、白から始まるけれどどこにも置けず、すぐパスが必要なゲームを作成します。
+    /// ```
+    /// xo------
+    /// o-------
+    /// --------
+    /// --------
+    /// --------
+    /// --------
+    /// --------
+    /// --------
+    /// ```
+    case mustPassComputerTurnThenUserTurn = "o01\nxo------\no-------\n--------\n--------\n--------\n--------\n--------\n--------\n"
+
+    /// 黒から始まるけれど、どちらのプレイヤーも置く場所がないゲームを作成します。
+    /// ```
+    /// xxxxx---
+    /// xxxxx---
+    /// xxxxx---
+    /// xxxxx---
+    /// xxxxx---
+    /// --------
+    /// --------
+    /// --------
+    /// ```
+    case unfinishedButNowhereToPlace = "x00\nxxxxx---\nxxxxx---\nxxxxx---\nxxxxx---\nxxxxx---\n--------\n--------\n--------\n"
+
+    /// プレイヤーモードはどちらもComputer、中央に白黒2つずつディスクが置かれ白から始まる新規ゲームを作成します。
+    case newGameStartFromBothComputer = "x11\n--------\n--------\n--------\n---ox---\n---xo---\n--------\n--------\n--------\n"
 }

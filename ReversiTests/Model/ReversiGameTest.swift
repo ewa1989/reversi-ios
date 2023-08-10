@@ -271,4 +271,16 @@ final class ReversiGameTest: XCTestCase {
         XCTAssertTrue(game.board.canPlaceAnyDisks(by: .dark))
         XCTAssertFalse(game.board.canPlaceAnyDisks(by: .light))
     }
+
+    // MARK: nowhereToPlaceDisk
+
+    func test_新規ゲームは置く場所がある() throws {
+        let game = TestData.newGame.game
+        XCTAssertFalse(game.nowhereToPlaceDisk())
+    }
+
+    func test_終了したゲームは置く場所がない() throws {
+        let game = TestData.tiedComputerMatchWithLeftSideDarkAndRightSideLightBoard.game
+        XCTAssertTrue(game.nowhereToPlaceDisk())
+    }
 }
