@@ -18,55 +18,10 @@
 の形に変更した。
 
 #### 状態遷移図
-```plantuml
-state ユーザー入力待ち
-state コンピューター入力待ち
-state パス了承待ち {
-    "※" : アラートが出ているので\nモード切り替えもパスもできない
-}
-state 画面描画中
-state ゲーム終了
-
-ユーザー入力待ち -> ユーザー入力待ち: ユーザー入力（無効）\nモード切り替え（相手）
-ユーザー入力待ち --> 画面描画中: ユーザー入力（有効）\nリセット
-ユーザー入力待ち --> コンピューター入力待ち: モード切り替え（自分）
-
-コンピューター入力待ち ---> 画面描画中: コンピューター入力
-コンピューター入力待ち -> コンピューター入力待ち: モード切り替え（相手）
-コンピューター入力待ち -> ユーザー入力待ち: モード切り替え（自分）\nリセット
-
-パス了承待ち -> ユーザー入力待ち: パス了承
-パス了承待ち -> コンピューター入力待ち: パス了承
-
-画面描画中 -> 画面描画中: モード切り替え（自分・相手）\nリセット
-画面描画中 -> ユーザー入力待ち: セル描画完了
-画面描画中 -> コンピューター入力待ち: セル描画完了
-画面描画中 --> パス了承待ち: セル描画完了
-画面描画中 ---> ゲーム終了: セル描画完了
-
-ゲーム終了 -> ゲーム終了: モード切り替え
-ゲーム終了 -> 画面描画中: リセット
-```
+![設計変更後の状態遷移図](img/状態遷移図.png)
 
 #### クラス図
-```plantuml
-protocol "状態 (AppState)" {
-    各メソッドが状態遷移を起こす行動
-    func 処理実行 (start)
-    func ユーザー入力 (inputByUser) throws -> 状態
-    func コンピューター入力 (inputByComputer) throws -> 状態
-    func パス了承 (acceptPass) throws -> 状態
-    func モード切り替え (changePlayerControl) throws -> 状態
-    func リセット (reset) throws -> 状態
-    func セル描画完了 (finishUpdatingOneCell) throws -> 状態
-}
-
-class "ユーザー入力待ち (UserInputWaitingState)" implements "状態 (AppState)"
-class "コンピューター入力待ち (ComputerInputWaitingState)" implements "状態 (AppState)"
-class "パス了承待ち (PassAcceptWaitingState)" implements "状態 (AppState)"
-class "画面描画中 (UpdatingViewState)" implements "状態 (AppState)"
-class "ゲーム終了 (GameFinishedState)" implements "状態 (AppState)"
-```
+![設計変更後のクラス図](img/クラス図.png)
 
 ### 発見・修正した既知バグ
 オリジナルのREADMEで言及されていたコーナーケースでのみ発生する既知のバグを、以下の4件を発見し、バグを再現するテストを書き修正を行った。
