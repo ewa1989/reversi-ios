@@ -75,7 +75,7 @@ class UserInputWaitingState<Repository: ReversiGameRepository, Dispatcher: Dispa
         return factory.make(from: game)
     }
 
-    func reset() -> AppState {
+    func reset() throws -> AppState {
         let newGame = ReversiGame.newGame()
         let updates = DiskPlacement.allCellsFrom(game: newGame, animated: false)
 

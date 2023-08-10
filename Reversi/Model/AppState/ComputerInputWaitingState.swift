@@ -87,7 +87,7 @@ class ComputerInputWaitingState<Repository: ReversiGameRepository, Dispatcher: D
         return factory.make(from: game)
     }
 
-    func reset() -> AppState {
+    func reset() throws -> AppState {
         cancelled = true
         let newGame = ReversiGame.newGame()
         let updates = DiskPlacement.allCellsFrom(game: newGame, animated: false)

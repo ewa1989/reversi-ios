@@ -80,7 +80,7 @@ final class GameFinishedStateTest: XCTestCase {
             dispatcher: dispatcher,
             output: output
         )
-        XCTAssertNoThrow(state.reset())
+        XCTAssertNoThrow(try state.reset())
     }
 
     func test_ゲーム終了の時_セル描画完了不可能() throws {

@@ -43,7 +43,7 @@ protocol AppState {
 
     /// リセットした時に状態を変更します。
     /// - Returns: 行動後の状態です。
-    func reset() -> AppState
+    func reset() throws -> AppState
 
     /// セル1つの描画完了した時に状態を変更します。
     /// - Returns: 行動後の状態です。

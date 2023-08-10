@@ -83,7 +83,7 @@ final class ComputerInputWaitingStateTest: XCTestCase {
         ]).subscribe { [weak self] event in
             switch event.element {
             case 1:
-                _ = self?.state.reset()
+                _ = try! self?.state.reset()
             default:
                 self?.state.start()
             }
@@ -123,7 +123,7 @@ final class ComputerInputWaitingStateTest: XCTestCase {
     }
 
     func test_コンピューター入力待ちの時_リセットすると画面描画中になる() throws {
-        let newState = state.reset()
+        let newState = try state.reset()
         XCTAssertTrue(newState is UpdatingViewState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
     }
 

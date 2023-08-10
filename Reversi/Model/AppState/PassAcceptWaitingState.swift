@@ -49,11 +49,11 @@ class PassAcceptWaitingState<Repository: ReversiGameRepository, Dispatcher: Disp
     }
 
     func changePlayerControl(of side: Disk, to player: Player) throws -> AppState {
-        self
+        throw InvalidActionError()
     }
 
-    func reset() -> AppState {
-        self
+    func reset() throws -> AppState {
+        throw InvalidActionError()
     }
 
     func finishUpdatingOneCell(isFinished: Bool) throws -> AppState {

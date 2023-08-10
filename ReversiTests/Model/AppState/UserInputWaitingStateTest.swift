@@ -101,7 +101,7 @@ final class UserInputWaitingStateTest: XCTestCase {
     }
 
     func test_ユーザー入力待ちの時_リセットすると画面描画中になる() throws {
-        let newState = state.reset()
+        let newState = try state.reset()
         XCTAssertTrue(newState is UpdatingViewState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
     }
 

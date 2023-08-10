@@ -51,7 +51,7 @@ class GameFinishedState<Repository: ReversiGameRepository, Dispatcher: Dispatcha
         self
     }
 
-    func reset() -> AppState {
+    func reset() throws -> AppState {
         self
     }
 

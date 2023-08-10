@@ -70,17 +70,17 @@ final class PassAcceptWaitingStateTest: XCTestCase {
             dispatcher: dispatcher,
             output: output
         )
-        XCTAssertNoThrow(try state.changePlayerControl(of: .dark, to: .manual))
+        XCTAssertThrowsError(try state.changePlayerControl(of: .dark, to: .manual))
     }
 
-    func test_パス了承待ちの時_リセット可能() throws {
+    func test_パス了承待ちの時_リセット不可能() throws {
         state = PassAcceptWaitingState(
             game: TestData.mustPassOnThisTurn.game,
             repository: repository,
             dispatcher: dispatcher,
             output: output
         )
-        XCTAssertNoThrow(state.reset())
+        XCTAssertThrowsError(try state.reset())
     }
 
     func test_パス了承待ちの時_セル描画完了不可能() throws {
