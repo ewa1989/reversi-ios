@@ -96,3 +96,9 @@ class UserInputWaitingState<Repository: ReversiGameRepository, Dispatcher: Dispa
         throw InvalidActionError()
     }
 }
+
+struct DiskPlacementError: Error {
+    let disk: Disk
+    let x: Int
+    let y: Int
+}

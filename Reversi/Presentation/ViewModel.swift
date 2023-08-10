@@ -147,12 +147,6 @@ extension ViewModel {
 
 // MARK: Additional types
 
-struct DiskPlacementError: Error {
-    let disk: Disk
-    let x: Int
-    let y: Int
-}
-
 struct DiskPlacement: Hashable {
     let disk: Disk?
     let coordinate: Coordinate
