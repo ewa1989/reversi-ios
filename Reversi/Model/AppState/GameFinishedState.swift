@@ -48,7 +48,9 @@ class GameFinishedState<Repository: ReversiGameRepository, Dispatcher: Dispatcha
     }
 
     func changePlayerControl(of side: Disk, to player: Player) throws -> AppState {
-        self
+        game.playerControls[side.index] = player
+        try repository.save(game)
+        return self
     }
 
     func reset() throws -> AppState {

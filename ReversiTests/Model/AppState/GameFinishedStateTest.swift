@@ -83,8 +83,10 @@ final class GameFinishedStateTest: XCTestCase {
         XCTAssertThrowsError(try state.acceptPass())
     }
 
-    func test_ゲーム終了の時_モード切り替え可能() throws {
-        XCTAssertNoThrow(try state.changePlayerControl(of: .dark, to: .manual))
+    func test_ゲーム終了の時_モード切り替えするとゲーム終了継続し_保存される() throws {
+        let newState = try state.changePlayerControl(of: .dark, to: .computer)
+        XCTAssertTrue(newState is GameFinishedState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
+        XCTAssertEqual(strategy.fakeOutput, "-10\noooooooo\noooooooo\noooooooo\noooooooo\noooooooo\noooooooo\noooooooo\noooooooo\n")
     }
 
     func test_ゲーム終了の時_リセット可能() throws {
