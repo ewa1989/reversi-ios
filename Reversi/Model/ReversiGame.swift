@@ -44,6 +44,8 @@ struct ReversiGame: Hashable {
         return game
     }
 
+    /// 今の攻め手が置く場所がなくパスする必要があるかを返します。
+    /// - Returns: パスする必要がある場合は`true`を、必要ない場合は`false`を返します。
     func needsPass() -> Bool {
         guard let turn = turn else { return false }
         if board.canPlaceAnyDisks(by: turn) {
@@ -52,6 +54,8 @@ struct ReversiGame: Hashable {
         return board.canPlaceAnyDisks(by: turn.flipped)
     }
 
+    /// 両プレイヤーがディスクを置く場所がどこにもないかを返します。
+    /// - Returns: どこにも置く場所がない場合は`true`を、置く場所が1ヶ所でもある場合は`false`を返します。
     func nowhereToPlaceDisk() -> Bool {
         guard let turn = turn else {
             return true
@@ -60,6 +64,7 @@ struct ReversiGame: Hashable {
         return !board.canPlaceAnyDisks(by: turn) && !board.canPlaceAnyDisks(by: turn.flipped)
     }
 
+    /// 攻め手を更新します。現在の攻め手の手が終わった後に呼び出す必要があります。
     mutating func updateTurn() {
         guard var turn = turn else {
             return
