@@ -44,7 +44,7 @@ final class AppStateFactoryTest: XCTestCase {
     }
 
     func test_パスするしかない状態で始まるゲームはパス了承待ち() throws {
-        let appState = factory.make(from: TestData.mustPassOnThisTurn.game)
+        let appState = factory.make(from: TestData.mustPassComputerTurnThenComputerTurn.game)
         XCTAssertTrue(appState is PassAcceptWaitingState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
     }
 

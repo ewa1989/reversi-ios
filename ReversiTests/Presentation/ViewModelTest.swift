@@ -285,7 +285,7 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
     }
 
     func test＿ゲーム読み込み時から先手がパスが必要な場合_表示直後にパスするアラートが表示され_パスを了承しても保存はされない() throws {
-        fakeStrategy.fakeInput = TestData.mustPassOnThisTurn.rawValue
+        fakeStrategy.fakeInput = TestData.mustPassComputerTurnThenComputerTurn.rawValue
 
         scheduler.createColdObservable([
             .next(1, (1)),

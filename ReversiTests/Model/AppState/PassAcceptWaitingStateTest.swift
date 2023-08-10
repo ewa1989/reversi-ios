@@ -55,7 +55,7 @@ final class PassAcceptWaitingStateTest: XCTestCase {
 
     func test_パス了承待ちの処理を実行すると_パスするアラートの表示が通知される() throws {
         state = PassAcceptWaitingState(
-            game: TestData.mustPassOnThisTurn.game,
+            game: TestData.mustPassComputerTurnThenComputerTurn.game,
             repository: repository,
             dispatcher: dispatcher,
             output: output
@@ -68,13 +68,13 @@ final class PassAcceptWaitingStateTest: XCTestCase {
         }.disposed(by: disposeBag)
         scheduler.start()
 
-        XCTAssertEqual(game.events, [.next(1, TestData.mustPassOnThisTurn.game)])
+        XCTAssertEqual(game.events, [.next(1, TestData.mustPassComputerTurnThenComputerTurn.game)])
         XCTAssertEqual(passAlert.events, [.next(1, PassAlert())])
     }
 
     func test_パス了承待ちの時_コンピューター入力不可能() throws {
         state = PassAcceptWaitingState(
-            game: TestData.mustPassOnThisTurn.game,
+            game: TestData.mustPassComputerTurnThenComputerTurn.game,
             repository: repository,
             dispatcher: dispatcher,
             output: output
@@ -82,19 +82,31 @@ final class PassAcceptWaitingStateTest: XCTestCase {
         XCTAssertThrowsError(try state.inputByComputer(coordinate: Coordinate(x: 0, y: 0)))
     }
 
-    func test_パス了承待ちの時_パス了承可能() throws {
+    func test_パス了承待ちの時_次がユーザーだと_パス了承するとユーザー入力待ちになる() throws {
         state = PassAcceptWaitingState(
-            game: TestData.mustPassOnThisTurn.game,
+            game: TestData.mustPassComputerTurnThenUserTurn.game,
             repository: repository,
             dispatcher: dispatcher,
             output: output
         )
-        XCTAssertNoThrow(try state.acceptPass())
+        let newState = try state.acceptPass()
+        XCTAssertTrue(newState is UserInputWaitingState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
+    }
+
+    func test_パス了承待ちの時_次がコンピューターだと_パス了承するとコンピューター入力待ちになる() throws {
+        state = PassAcceptWaitingState(
+            game: TestData.mustPassComputerTurnThenComputerTurn.game,
+            repository: repository,
+            dispatcher: dispatcher,
+            output: output
+        )
+        let newState = try state.acceptPass()
+        XCTAssertTrue(newState is ComputerInputWaitingState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
     }
 
     func test_パス了承待ちの時_モード切り替え不可能() throws {
         state = PassAcceptWaitingState(
-            game: TestData.mustPassOnThisTurn.game,
+            game: TestData.mustPassComputerTurnThenComputerTurn.game,
             repository: repository,
             dispatcher: dispatcher,
             output: output
@@ -104,7 +116,7 @@ final class PassAcceptWaitingStateTest: XCTestCase {
 
     func test_パス了承待ちの時_リセット不可能() throws {
         state = PassAcceptWaitingState(
-            game: TestData.mustPassOnThisTurn.game,
+            game: TestData.mustPassComputerTurnThenComputerTurn.game,
             repository: repository,
             dispatcher: dispatcher,
             output: output
@@ -114,7 +126,7 @@ final class PassAcceptWaitingStateTest: XCTestCase {
 
     func test_パス了承待ちの時_セル描画完了不可能() throws {
         state = PassAcceptWaitingState(
-            game: TestData.mustPassOnThisTurn.game,
+            game: TestData.mustPassComputerTurnThenComputerTurn.game,
             repository: repository,
             dispatcher: dispatcher,
             output: output

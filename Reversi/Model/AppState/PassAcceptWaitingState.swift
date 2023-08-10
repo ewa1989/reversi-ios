@@ -46,7 +46,13 @@ class PassAcceptWaitingState<Repository: ReversiGameRepository, Dispatcher: Disp
     }
 
     func acceptPass() throws -> AppState {
-        self
+        game.updateTurn()
+        let factory = AppStateFactory(
+            repository: repository,
+            dispatcher: dispatcher,
+            output: output
+        )
+        return factory.make(from: game)
     }
 
     func changePlayerControl(of side: Disk, to player: Player) throws -> AppState {

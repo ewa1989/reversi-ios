@@ -84,7 +84,7 @@ class UpdatingViewState<Repository: ReversiGameRepository, Dispatcher: Dispatcha
     func finishUpdatingOneCell(isFinished: Bool) throws -> AppState {
         if updates.isEmpty {
             if !isReset {
-                updateGame()
+                game.updateTurn()
             }
             try repository.save(game)
             let factory = AppStateFactory(
@@ -104,22 +104,5 @@ class UpdatingViewState<Repository: ReversiGameRepository, Dispatcher: Dispatcha
             }
         }
         return self
-    }
-
-    private func updateGame() {
-        guard var turn = game.turn else {
-            return
-        }
-
-        turn.flip()
-
-        if !game.board.canPlaceAnyDisks(by: turn) {
-            if !game.board.canPlaceAnyDisks(by: turn.flipped) {
-                game.turn = nil
-                return
-            }
-        }
-
-        game.turn = turn
     }
 }
