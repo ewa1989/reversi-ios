@@ -1,5 +1,85 @@
 # リファクタリング・チャレンジ （リバーシ編） iOS版
 
+本チャレンジは、 _Fat View Controller_ として実装された[リバーシ](https://en.wikipedia.org/wiki/Reversi)アプリをリファクタリングし、どれだけクリーンな設計とコードを実現できるかというコンペティションである[リファクタリング・チャレンジ （リバーシ編） iOS版]()に挑戦した結果の1つです。
+
+## チャレンジ概要
+※詳細は[リファクタリング戦略](リファクタリング戦略.md)参照
+
+### 重視したポイント
+- 書籍『リファクタリング』で紹介されるような、小さなステップで段階的かつ安全な手順で進める
+- 自動テストがないコードベースに対して、書籍『レガシーコード改善ガイド』紹介されるような、まず自動テストを可能とする接合部を安全に作れるような手順で進める
+- 上記のような安全な手順を取っていることがわかるよう、通常業務よりも細かい粒度でコミットログを残していく
+- アプリの挙動はクラッシュする、進行不能になるなど明確なバグ以外は維持する
+
+### 変更後の設計
+- RxSwiftを用いたMVVM
+- Model部分はStateパターンを用いた状態マシン
+
+の形に変更した。
+
+#### 状態遷移図
+```plantuml
+state ユーザー入力待ち
+state コンピューター入力待ち
+state パス了承待ち {
+    "※" : アラートが出ているので\nモード切り替えもパスもできない
+}
+state 画面描画中
+state ゲーム終了
+
+ユーザー入力待ち -> ユーザー入力待ち: ユーザー入力（無効）\nモード切り替え（相手）
+ユーザー入力待ち --> 画面描画中: ユーザー入力（有効）\nリセット
+ユーザー入力待ち --> コンピューター入力待ち: モード切り替え（自分）
+
+コンピューター入力待ち ---> 画面描画中: コンピューター入力
+コンピューター入力待ち -> コンピューター入力待ち: モード切り替え（相手）
+コンピューター入力待ち -> ユーザー入力待ち: モード切り替え（自分）\nリセット
+
+パス了承待ち -> ユーザー入力待ち: パス了承
+パス了承待ち -> コンピューター入力待ち: パス了承
+
+画面描画中 -> 画面描画中: モード切り替え（自分・相手）\nリセット
+画面描画中 -> ユーザー入力待ち: セル描画完了
+画面描画中 -> コンピューター入力待ち: セル描画完了
+画面描画中 --> パス了承待ち: セル描画完了
+画面描画中 ---> ゲーム終了: セル描画完了
+
+ゲーム終了 -> ゲーム終了: モード切り替え
+ゲーム終了 -> 画面描画中: リセット
+```
+
+#### クラス図
+```plantuml
+protocol "状態 (AppState)" {
+    各メソッドが状態遷移を起こす行動
+    func 処理実行 (start)
+    func ユーザー入力 (inputByUser) throws -> 状態
+    func コンピューター入力 (inputByComputer) throws -> 状態
+    func パス了承 (acceptPass) throws -> 状態
+    func モード切り替え (changePlayerControl) throws -> 状態
+    func リセット (reset) throws -> 状態
+    func セル描画完了 (finishUpdatingOneCell) throws -> 状態
+}
+
+class "ユーザー入力待ち (UserInputWaitingState)" implements "状態 (AppState)"
+class "コンピューター入力待ち (ComputerInputWaitingState)" implements "状態 (AppState)"
+class "パス了承待ち (PassAcceptWaitingState)" implements "状態 (AppState)"
+class "画面描画中 (UpdatingViewState)" implements "状態 (AppState)"
+class "ゲーム終了 (GameFinishedState)" implements "状態 (AppState)"
+```
+
+### 発見・修正した既知バグ
+オリジナルのREADMEで言及されていたコーナーケースでのみ発生する既知のバグを、以下の4件を発見し、バグを再現するテストを書き修正を行った。
+- ディスクを裏返す処理の順番が仕様と異なる
+- 次にプレイヤーの有効な手が存在しない状態でゲームを開始すると進行不能となる
+- リセット確認アラート表示中にパスするアラートが表示されない
+- 画面描画中にモードを切り替えアプリを再起動すると不正なゲーム状態に陥る
+
+<details>
+    <summary>オリジナルのREADME</summary>
+
+# リファクタリング・チャレンジ （リバーシ編） iOS版
+
 本チャレンジは、 _Fat View Controller_ として実装された[リバーシ](https://en.wikipedia.org/wiki/Reversi)アプリをリファクタリングし、どれだけクリーンな設計とコードを実現できるかというコンペティションです（ジャッジが優劣を判定するわけではなく、設計の技を競い合うのが目的です）。
 
 ![アプリのスクリーンショット](img/screenshot.png)
@@ -445,6 +525,8 @@ class ViewController: UIViewController
 | [marty-suzuki/reversi-ios](https://github.com/marty-suzuki/reversi-ios) | [@marty-suzuki](https://github.com/marty-suzuki) | Flux + MVVM | [RxSwift](https://github.com/ReactiveX/RxSwift) + [Unio](https://github.com/cats-oss/Unio) | UIKit | 切り出したロジックのユニットテストとViewControllerのユニットテストも実装しています |
 | [kishikawakatsumi/reversi-ios](https://github.com/kishikawakatsumi/reversi-ios/tree/refactor2) | [@kishikawakatsumi](https://github.com/kishikawakatsumi) | Cocoa MVC | [Combine](https://developer.apple.com/documentation/combine) | UIKit | 小さな変更で受け入れられやすいリファクタリング |
 | [es-kumagai/reversi-ios](https://github.com/es-kumagai/reversi-ios) | [@es-kumagai](https://github.com/es-kumagai) | - | - | UIKit | アーキテクチャー無考慮 |
+
+</details>
 
 ## License
 
