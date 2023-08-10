@@ -10,7 +10,7 @@ import Foundation
 
 /// 画面描画中を表すアプリの状態です。
 class UpdatingViewState<Repository: ReversiGameRepository, Dispatcher: Dispatchable>: AppState {
-    var game: ReversiGame
+    private var game: ReversiGame
 
     private let repository: Repository
     private let dispatcher: Dispatcher

@@ -15,8 +15,6 @@ import Foundation
 /// - 画面描画中
 /// - ゲーム終了
 protocol AppState {
-    var game: ReversiGame { get }
-
     /// 状態としての処理を実行します。
     func start(viewHasAppeared: Bool)
 

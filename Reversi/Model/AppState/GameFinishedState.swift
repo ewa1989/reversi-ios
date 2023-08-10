@@ -10,7 +10,7 @@ import Foundation
 
 /// ゲーム終了を表すアプリの状態です。
 class GameFinishedState<Repository: ReversiGameRepository, Dispatcher: Dispatchable>: AppState {
-    var game: ReversiGame
+    private var game: ReversiGame
 
     private let repository: Repository
     private let dispatcher: Dispatcher

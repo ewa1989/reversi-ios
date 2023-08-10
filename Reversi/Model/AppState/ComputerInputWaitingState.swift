@@ -11,7 +11,7 @@ import RxRelay
 
 /// コンピューター入力待ちを表すアプリの状態です。
 class ComputerInputWaitingState<Repository: ReversiGameRepository, Dispatcher: Dispatchable>: AppState {
-    var game: ReversiGame
+    private var game: ReversiGame
 
     private let repository: Repository
     private let dispatcher: Dispatcher

@@ -10,7 +10,7 @@ import Foundation
 
 /// パス了承待ちを表すアプリの状態です。
 class PassAcceptWaitingState<Repository: ReversiGameRepository, Dispatcher: Dispatchable>: AppState {
-    var game: ReversiGame
+    private var game: ReversiGame
 
     private let repository: Repository
     private let dispatcher: Dispatcher

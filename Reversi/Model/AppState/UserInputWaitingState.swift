@@ -10,7 +10,7 @@ import Foundation
 
 /// ユーザー入力待ちを表すアプリの状態です。
 class UserInputWaitingState<Repository: ReversiGameRepository, Dispatcher: Dispatchable>: AppState {
-    var game: ReversiGame
+    private var game: ReversiGame
 
     private let repository: Repository
     private let dispatcher: Dispatcher
