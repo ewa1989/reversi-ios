@@ -30,6 +30,16 @@ struct AppStateFactory<Repository: ReversiGameRepository, Dispatcher: Dispatchab
     func make(from game: ReversiGame) -> AppState {
         switch game.state {
         case .move(side: let side):
+            if (game.nowhereToPlaceDisk()) {
+                var updatedGame = game
+                updatedGame.turn = nil
+                return GameFinishedState(
+                    game: updatedGame,
+                    repository: repository,
+                    dispatcher: dispatcher,
+                    output: output
+                )
+            }
             if (game.needsPass()) {
                 return PassAcceptWaitingState(
                     game: game,

@@ -33,8 +33,9 @@ class UserInputWaitingState<Repository: ReversiGameRepository, Dispatcher: Dispa
         self.output = output
     }
 
-    func start() {
+    func start(viewHasAppeared: Bool) {
         output.game.accept(game)
+        output.computerProcessing.finish()
     }
 
     func inputByUser(coordinate: Coordinate) throws -> AppState {
@@ -52,7 +53,8 @@ class UserInputWaitingState<Repository: ReversiGameRepository, Dispatcher: Dispa
             dispatcher: dispatcher,
             output: output,
             updates: updates,
-            isReset: false
+            isReset: false,
+            forLoading: false
         )
     }
 
@@ -85,7 +87,8 @@ class UserInputWaitingState<Repository: ReversiGameRepository, Dispatcher: Dispa
             dispatcher: dispatcher,
             output: output,
             updates: updates,
-            isReset: true
+            isReset: true,
+            forLoading: false
         )
     }
 

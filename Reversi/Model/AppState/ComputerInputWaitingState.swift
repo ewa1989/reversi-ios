@@ -36,8 +36,11 @@ class ComputerInputWaitingState<Repository: ReversiGameRepository, Dispatcher: D
         self.output = output
     }
 
-    func start() {
+    func start(viewHasAppeared: Bool) {
         output.game.accept(game)
+
+        if !viewHasAppeared { return }
+
         guard let turn = game.turn else { preconditionFailure() }
         let selected = game.board.validMoves(for: turn).randomElement()!
 
@@ -68,7 +71,8 @@ class ComputerInputWaitingState<Repository: ReversiGameRepository, Dispatcher: D
             dispatcher: dispatcher,
             output: output,
             updates: updates,
-            isReset: false
+            isReset: false,
+            forLoading: false
         )
     }
 
@@ -98,26 +102,12 @@ class ComputerInputWaitingState<Repository: ReversiGameRepository, Dispatcher: D
             dispatcher: dispatcher,
             output: output,
             updates: updates,
-            isReset: true
+            isReset: true,
+            forLoading: false
         )
     }
 
     func finishUpdatingOneCell(isFinished: Bool) throws -> AppState {
         throw InvalidActionError()
-    }
-}
-
-private extension PublishRelay where Element == [Bool] {
-    /// 指定した側のコンピューターの思考状態を思考中に更新します。
-    /// - Parameter side: 状態を変更する側です。
-    func start(side: Disk) {
-        var value = [false, false]
-        value[side.index] = true
-        self.accept(value)
-    }
-
-    /// コンピューターの思考状態を思考終了に更新します。
-    func finish() {
-        self.accept([false, false])
     }
 }

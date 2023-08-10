@@ -63,13 +63,14 @@ final class UpdatingViewStateTest: XCTestCase {
                 DiskPlacement(disk: .dark, coordinate: Coordinate(x: 0, y: 0), animated: true),
                 DiskPlacement(disk: .dark, coordinate: Coordinate(x: 1, y: 0), animated: true),
             ],
-            isReset: false
+            isReset: false,
+            forLoading: false
         )
 
         scheduler.createColdObservable([
             .next(1, (1)),
         ]).subscribe { [weak self] _ in
-            self?.state.start()
+            self?.state.start(viewHasAppeared: true)
         }.disposed(by: disposeBag)
         scheduler.start()
 
@@ -86,7 +87,8 @@ final class UpdatingViewStateTest: XCTestCase {
                 DiskPlacement(disk: .dark, coordinate: Coordinate(x: 0, y: 0), animated: true),
                 DiskPlacement(disk: .dark, coordinate: Coordinate(x: 1, y: 0), animated: true),
             ],
-            isReset: false
+            isReset: false,
+            forLoading: false
         )
 
         scheduler.createColdObservable([
@@ -97,7 +99,7 @@ final class UpdatingViewStateTest: XCTestCase {
             case 1:
                 _ = try! self?.state.reset()
             default:
-                self?.state.start()
+                self?.state.start(viewHasAppeared: true)
             }
         }.disposed(by: disposeBag)
         scheduler.start()
@@ -112,7 +114,8 @@ final class UpdatingViewStateTest: XCTestCase {
             dispatcher: dispatcher,
             output: output,
             updates: [DiskPlacement(disk: nil, coordinate: Coordinate(x: 0, y: 0), animated: false)],
-            isReset: false
+            isReset: false,
+            forLoading: false
         )
         XCTAssertThrowsError(try state.inputByUser(coordinate: Coordinate(x: 0, y: 0)))
     }
@@ -124,7 +127,8 @@ final class UpdatingViewStateTest: XCTestCase {
             dispatcher: dispatcher,
             output: output,
             updates: [DiskPlacement(disk: nil, coordinate: Coordinate(x: 0, y: 0), animated: false)],
-            isReset: false
+            isReset: false,
+            forLoading: false
         )
         XCTAssertThrowsError(try state.inputByComputer(coordinate: Coordinate(x: 0, y: 0)))
     }
@@ -136,7 +140,8 @@ final class UpdatingViewStateTest: XCTestCase {
             dispatcher: dispatcher,
             output: output,
             updates: [DiskPlacement(disk: nil, coordinate: Coordinate(x: 0, y: 0), animated: false)],
-            isReset: false
+            isReset: false,
+            forLoading: false
         )
         XCTAssertThrowsError(try state.acceptPass())
     }
@@ -148,7 +153,8 @@ final class UpdatingViewStateTest: XCTestCase {
             dispatcher: dispatcher,
             output: output,
             updates: [DiskPlacement(disk: nil, coordinate: Coordinate(x: 0, y: 0), animated: false)],
-            isReset: false
+            isReset: false,
+            forLoading: false
         )
         let newState = try state.changePlayerControl(of: .dark, to: .computer)
         XCTAssertTrue(newState is UpdatingViewState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
@@ -162,7 +168,8 @@ final class UpdatingViewStateTest: XCTestCase {
             dispatcher: dispatcher,
             output: output,
             updates: [DiskPlacement(disk: nil, coordinate: Coordinate(x: 0, y: 0), animated: false)],
-            isReset: false
+            isReset: false,
+            forLoading: false
         )
         let newState = try state.reset()
         XCTAssertTrue(newState is UpdatingViewState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
@@ -175,7 +182,8 @@ final class UpdatingViewStateTest: XCTestCase {
             dispatcher: dispatcher,
             output: output,
             updates: [DiskPlacement(disk: .dark, coordinate: Coordinate(x: 1, y: 0), animated: true)],
-            isReset: false
+            isReset: false,
+            forLoading: false
         )
         let newState = try state.finishUpdatingOneCell(isFinished: true)
         XCTAssertTrue(newState is UpdatingViewState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
@@ -189,7 +197,8 @@ final class UpdatingViewStateTest: XCTestCase {
             dispatcher: dispatcher,
             output: output,
             updates: [],
-            isReset: true
+            isReset: true,
+            forLoading: false
         )
         let newState = try state.finishUpdatingOneCell(isFinished: true)
         XCTAssertTrue(newState is UserInputWaitingState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
@@ -203,7 +212,8 @@ final class UpdatingViewStateTest: XCTestCase {
             dispatcher: dispatcher,
             output: output,
             updates: [],
-            isReset: false
+            isReset: false,
+            forLoading: false
         )
         let newState = try state.finishUpdatingOneCell(isFinished: true)
         XCTAssertTrue(newState is UserInputWaitingState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
@@ -217,7 +227,8 @@ final class UpdatingViewStateTest: XCTestCase {
             dispatcher: dispatcher,
             output: output,
             updates: [],
-            isReset: false
+            isReset: false,
+            forLoading: false
         )
         let newState = try state.finishUpdatingOneCell(isFinished: true)
         XCTAssertTrue(newState is ComputerInputWaitingState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
@@ -231,7 +242,8 @@ final class UpdatingViewStateTest: XCTestCase {
             dispatcher: dispatcher,
             output: output,
             updates: [],
-            isReset: false
+            isReset: false,
+            forLoading: false
         )
         let newState = try state.finishUpdatingOneCell(isFinished: true)
         XCTAssertTrue(newState is PassAcceptWaitingState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
@@ -245,7 +257,8 @@ final class UpdatingViewStateTest: XCTestCase {
             dispatcher: dispatcher,
             output: output,
             updates: [],
-            isReset: false
+            isReset: false,
+            forLoading: false
         )
         let newState = try state.finishUpdatingOneCell(isFinished: true)
         XCTAssertTrue(newState is GameFinishedState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)

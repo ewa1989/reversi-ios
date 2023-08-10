@@ -18,7 +18,7 @@ protocol AppState {
     var game: ReversiGame { get }
 
     /// 状態としての処理を実行します。
-    func start()
+    func start(viewHasAppeared: Bool)
 
     /// ユーザー入力が行われた時に状態を変更します。
     /// - Parameter coordinate: ユーザー入力されたセルの位置です。

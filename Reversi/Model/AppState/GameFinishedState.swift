@@ -31,7 +31,7 @@ class GameFinishedState<Repository: ReversiGameRepository, Dispatcher: Dispatcha
         self.output = output
     }
 
-    func start() {
+    func start(viewHasAppeared: Bool) {
         output.game.accept(game)
     }
 
@@ -63,7 +63,8 @@ class GameFinishedState<Repository: ReversiGameRepository, Dispatcher: Dispatcha
             dispatcher: dispatcher,
             output: output,
             updates: updates,
-            isReset: true
+            isReset: true,
+            forLoading: false
         )
     }
 

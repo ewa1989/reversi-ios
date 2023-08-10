@@ -21,7 +21,8 @@ class ViewController: UIViewController {
         viewModel = ViewModel(
             gameRepository: ReversiGameRepositoryImpl(strategy: LocalFileSaveAndLoadStrategy()),
             dispatcher: MainQueueDispatcher(),
-            initialDiskSize: messageDiskSizeConstraint.constant
+            initialDiskSize: messageDiskSizeConstraint.constant,
+            disposeBag: disposeBag
         )
         bind()
 

@@ -64,7 +64,7 @@ final class UserInputWaitingStateTest: XCTestCase {
         scheduler.createColdObservable([
             .next(1, (1)),
         ]).subscribe { [weak self] _ in
-            self?.state.start()
+            self?.state.start(viewHasAppeared: true)
         }.disposed(by: disposeBag)
         scheduler.start()
 

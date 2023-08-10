@@ -18,6 +18,7 @@ class UpdatingViewState<Repository: ReversiGameRepository, Dispatcher: Dispatcha
 
     private var updates: [DiskPlacement]
     private let isReset: Bool
+    private let forLoading: Bool
     private var cancelled = false
 
     init(
@@ -26,11 +27,12 @@ class UpdatingViewState<Repository: ReversiGameRepository, Dispatcher: Dispatcha
         dispatcher: Dispatcher,
         output: AppStateOutput,
         updates: [DiskPlacement],
-        isReset: Bool
+        isReset: Bool,
+        forLoading: Bool
     ) {
         // 最後の1セル描画中にモード切り替えが呼ばれた場合にupdatesは空になり得る
         precondition(
-            game.turn != nil
+            forLoading || game.turn != nil
         )
         self.game = game
         self.repository = repository
@@ -38,13 +40,17 @@ class UpdatingViewState<Repository: ReversiGameRepository, Dispatcher: Dispatcha
         self.output = output
         self.updates = updates
         self.isReset = isReset
+        self.forLoading = forLoading
     }
 
-    func start() {
+    func start(viewHasAppeared: Bool) {
+        // FIXME: DispatchQueueを使わないとReentrancy anomalyの警告が出てしまう。ディスクを裏返し続ける処理をDispatchQueueを挟んで処理を切ることで一旦警告は出なくなったけれど、他のスマートな方法があれば直したい。
         dispatcher.async { [weak self] in
             guard let self = self else { return }
             if self.cancelled { return }
+            if self.updates.isEmpty { return }
             let first = self.updates.removeFirst()
+            self.game.board.setDisk(first.disk, atX: first.coordinate.x, y: first.coordinate.y)
             self.output.diskToPlace.accept(first)
         }
     }
@@ -77,7 +83,8 @@ class UpdatingViewState<Repository: ReversiGameRepository, Dispatcher: Dispatcha
             dispatcher: dispatcher,
             output: output,
             updates: updates,
-            isReset: true
+            isReset: true,
+            forLoading: false
         )
     }
 
@@ -86,7 +93,9 @@ class UpdatingViewState<Repository: ReversiGameRepository, Dispatcher: Dispatcha
             if !isReset {
                 game.updateTurn()
             }
-            try repository.save(game)
+            if !forLoading {
+                try repository.save(game)
+            }
             let factory = AppStateFactory(
                 repository: repository,
                 dispatcher: dispatcher,

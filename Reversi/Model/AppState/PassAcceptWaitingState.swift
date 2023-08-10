@@ -32,8 +32,9 @@ class PassAcceptWaitingState<Repository: ReversiGameRepository, Dispatcher: Disp
         self.output = output
     }
 
-    func start() {
+    func start(viewHasAppeared: Bool) {
         output.game.accept(game)
+        if !viewHasAppeared { return }
         output.passAlert.accept(PassAlert())
     }
 

@@ -28,14 +28,15 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
     override func setUpWithError() throws {
         fakeStrategy = FakeFileSaveAndLoadStrategy()
         dispatcher = SynchronousDispatcher()
+        disposeBag = DisposeBag()
         viewModel = ViewModel(
             gameRepository: ReversiGameRepositoryImpl(strategy: fakeStrategy),
             dispatcher: dispatcher,
-            initialDiskSize: 24
+            initialDiskSize: 24,
+            disposeBag: disposeBag
         )
 
         scheduler = TestScheduler(initialClock: 0)
-        disposeBag = DisposeBag()
 
         computerProcessing = viewModel.computerProcessings.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
         diskToPlace = viewModel.diskToPlace.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
@@ -80,7 +81,7 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
         scheduler.start()
 
         XCTAssertEqual(diskToPlace.events.count, 64)
-        XCTAssertEqual(fakeStrategy.fakeOutput, nil)
+        XCTAssertNil(fakeStrategy.fakeOutput)
     }
 
     // MARK: コンピューターの試行でセルの描画が正しく行われる
@@ -107,7 +108,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
         scheduler.start()
 
         XCTAssertEqual(computerProcessing.events, [
-            .next(0, [false, false]),   // 初期状態
             .next(2, [true, false]),    // コンピューター思考開始
             .next(2, [false, false])    // コンピューター思考終了
         ])
@@ -117,7 +117,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
             .next(3, DiskPlacement(disk: .dark, coordinate: Coordinate(x: 1, y: 0), animated: true)),
         ])
         XCTAssertEqual(playerControls.events, [
-            .next(0, [.manual, .manual]),   // 初期状態
             .next(1, [.computer, .manual]), // ゲーム読み込み後
         ])
         XCTAssertEqual(diskCounts.events, [
@@ -125,12 +124,10 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
             .next(4, [4, 1]),   // コンピューターがディスクを置いた後
         ])
         XCTAssertEqual(message.events, [
-            .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
             .next(1, Message(disk: .dark, label: "'s turn")),   // ゲーム読み込み後
             .next(4, Message(disk: .light, label: "'s turn")),  // コンピューターがディスクを置いた後
         ])
         XCTAssertEqual(messageDiskSize.events, [
-            .next(0, 0),    // 初期状態
             .next(1, 24),   // ゲーム読み込み後
         ])
         // 描画が最後まで完了していれば保存処理が走っている
@@ -173,7 +170,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
             .next(5, [1, 4]),   // ユーザーがディスクを置いた後
         ])
         XCTAssertEqual(message.events, [
-            .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
             .next(1, Message(disk: .light, label: "'s turn")),   // ゲーム読み込み後
             .next(5, Message(disk: .dark, label: "'s turn")),  // ユーザーがディスクを置いた後
         ])
@@ -207,11 +203,10 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
             .next(1, [2, 2]),   // ゲーム読み込み後
         ])
         XCTAssertEqual(message.events, [
-            .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
             .next(1, Message(disk: .light, label: "'s turn")),   // ゲーム読み込み後
         ])
         // 保存処理は走らない
-        XCTAssertEqual(fakeStrategy.fakeOutput, nil)
+        XCTAssertNil(fakeStrategy.fakeOutput)
     }
 
     func test_すでに置いてあるセルをタップしても何も起こらない() throws {
@@ -240,11 +235,10 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
             .next(1, [16, 8]),   // ゲーム読み込み後
         ])
         XCTAssertEqual(message.events, [
-            .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
             .next(1, Message(disk: .dark, label: "'s turn")),   // ゲーム読み込み後
         ])
         // 保存処理は走らない
-        XCTAssertEqual(fakeStrategy.fakeOutput, nil)
+        XCTAssertNil(fakeStrategy.fakeOutput)
     }
 
     // MARK: パスの判定が正しくされ了承でターンが変わる
@@ -274,7 +268,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
         scheduler.start()
 
         XCTAssertEqual(message.events, [
-            .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
             .next(1, Message(disk: .dark, label: "'s turn")),   // ゲーム読み込み後
             .next(3, Message(disk: .light, label: "'s turn")),  // パスするアラートが表示されてる最中は白のターンと表示される
             .next(4, Message(disk: .dark, label: "'s turn")),   // パス後黒にターンが移る
@@ -305,13 +298,12 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
         scheduler.start()
 
         XCTAssertEqual(message.events, [
-            .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
             .next(1, Message(disk: .light, label: "'s turn")),   // ゲーム読み込み後、パスするアラートが表示されてる最中は白のターンと表示される
             .next(3, Message(disk: .dark, label: "'s turn")),  // パスすると黒にターンが移る
         ])
         XCTAssertEqual(passAlert.events, [.next(2, PassAlert())])
         // パスするアラート表示、パス了承では保存はされない
-        XCTAssertEqual(fakeStrategy.fakeOutput, nil)
+        XCTAssertNil(fakeStrategy.fakeOutput)
     }
 
     // MARK: ゲームの終了判定が正しく行われる
@@ -342,7 +334,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
             .next(3, [25, 0])   // ゲーム終了時
         ])
         XCTAssertEqual(message.events, [
-            .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
             .next(1, Message(disk: .dark, label: "'s turn")),   // ゲーム読み込み後
             .next(3, Message(disk: .dark, label: " won")),   // ゲーム終了時
         ])
@@ -375,12 +366,10 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
             .next(3, [32, 32])   // ゲーム終了時
         ])
         XCTAssertEqual(message.events, [
-            .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
             .next(1, Message(disk: .light, label: "'s turn")),   // ゲーム読み込み後
             .next(3, Message(disk: nil, label: "Tied")),   // ゲーム終了時
         ])
         XCTAssertEqual(messageDiskSize.events, [
-            .next(0, 0),    // 初期状態
             .next(1, 24),   // ゲーム読み込み後
             .next(3, 0),   // ゲーム終了時
         ])
@@ -410,7 +399,7 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
         scheduler.start()
 
         XCTAssertEqual(playerControls.events, [
-            .next(0, [.manual, .manual]),   // 初期状態
+            .next(1, [.manual, .manual]),   // ゲーム読み込み後
             .next(3, [.manual, .computer]), // モード変更後
         ])
         XCTAssertEqual(fakeStrategy.fakeOutput, "x01\n--------\n--------\n--------\n---ox---\n---xo---\n--------\n--------\n--------\n")
@@ -437,7 +426,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
         scheduler.start()
 
         XCTAssertEqual(playerControls.events, [
-            .next(0, [.manual, .manual]),   // 初期状態
             .next(1, [.computer, .computer]),   // ゲーム読み込み後
             .next(3, [.manual, .computer]), // モード変更後
         ])
@@ -474,7 +462,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
             .next(3, [2, 2]),   // リセット後
         ])
         XCTAssertEqual(message.events, [
-            .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
             .next(1, Message(disk: .dark, label: "'s turn")),   // ゲーム読み込み後
         ])
         XCTAssertEqual(fakeStrategy.fakeOutput, TestData.newGame.rawValue)
@@ -504,7 +491,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
         // リセット時全セルの再描画がかかっている
         XCTAssertEqual(diskToPlace.events.filter { $0.time == 3 }.count, 64)
         XCTAssertEqual(playerControls.events, [
-            .next(0, [.manual, .manual]),   // 初期状態
             .next(1, [.computer, .computer]),   // ゲーム読み込み後
             .next(3, [.manual, .manual])    // リセット後
         ])
@@ -513,11 +499,11 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
             .next(3, [2, 2]),   // リセット後
         ])
         XCTAssertEqual(message.events, [
-            .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
+            .next(1, Message(disk: nil, label: "Tied")),        // ゲーム読み込み後
             .next(3, Message(disk: .dark, label: "'s turn")),   // リセット後
         ])
         XCTAssertEqual(messageDiskSize.events, [
-            .next(0, 0),    // 初期状態
+            .next(1, 0),    // ゲーム読み込み後
             .next(3, 24),   // リセット後
         ])
         XCTAssertEqual(fakeStrategy.fakeOutput, TestData.newGame.rawValue)
@@ -571,9 +557,7 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
         scheduler.start()
 
         XCTAssertEqual(message.events, [
-            .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
-            .next(1, Message(disk: .dark, label: "'s turn")),   // ゲーム読み込み後
-            .next(2, Message(disk: .dark, label: " won")),   // 画面表示後
+            .next(1, Message(disk: .dark, label: " won")),   // ゲーム読み込み後
         ])
     }
 
@@ -615,7 +599,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
             .next(5, [2, 2]),   // リセット時
         ])
         XCTAssertEqual(message.events, [
-            .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
             .next(1, Message(disk: .dark, label: "'s turn")),   // ゲーム読み込み後
         ])
         XCTAssertEqual(fakeStrategy.fakeOutput, TestData.newGame.rawValue)
@@ -662,7 +645,6 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
             .next(4, [25, 0]),   // リセット時
         ])
         XCTAssertEqual(message.events, [
-            .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
             .next(1, Message(disk: .dark, label: "'s turn")),   // ゲーム読み込み後
             .next(4, Message(disk: .dark, label: " won")),   // 描画完了後
         ])
@@ -686,14 +668,15 @@ final class DispatchTimingControlledViewModelTest: XCTestCase {
     override func setUpWithError() throws {
         fakeStrategy = FakeFileSaveAndLoadStrategy()
         dispatcher = TimingControllableDispatcher()
+        disposeBag = DisposeBag()
         viewModel = ViewModel(
             gameRepository: ReversiGameRepositoryImpl(strategy: fakeStrategy),
             dispatcher: dispatcher,
-            initialDiskSize: 24
+            initialDiskSize: 24,
+            disposeBag: disposeBag
         )
 
         scheduler = TestScheduler(initialClock: 0)
-        disposeBag = DisposeBag()
 
         computerProcessing = viewModel.computerProcessings.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
         diskToPlace = viewModel.diskToPlace.makeTestableObserver(testScheduler: scheduler, disposeBag: disposeBag)
@@ -729,14 +712,12 @@ final class DispatchTimingControlledViewModelTest: XCTestCase {
         scheduler.start()
 
         XCTAssertEqual(computerProcessing.events, [
-            .next(0, [false, false]),   // 初期状態
             .next(2, [true, false]),   // コンピューター思考開始
             .next(3, [false, false])    // モード変更後
         ])
         // time > 1のイベントでフィルターすることで、ゲーム読み込み時の全セルの描画イベントを除く
         XCTAssertEqual(diskToPlace.events.filter { $0.time > 1 }.count, 0)
         XCTAssertEqual(playerControls.events, [
-            .next(0, [.manual, .manual]),   // 初期状態
             .next(1, [.computer, .manual]),   // ゲーム読み込み後
             .next(3, [.manual, .manual]),   // 初期状態
         ])
@@ -744,7 +725,6 @@ final class DispatchTimingControlledViewModelTest: XCTestCase {
             .next(1, [2, 2]),   // ゲーム読み込み後
         ])
         XCTAssertEqual(message.events, [
-            .next(0, Message(disk: nil, label: "Tied")),        // 初期状態
             .next(1, Message(disk: .dark, label: "'s turn")),   // ゲーム読み込み後
         ])
         XCTAssertEqual(fakeStrategy.fakeOutput, "x00\nxo----xo\n--------\n--------\n--------\n--------\n--------\n--------\n--------\n")

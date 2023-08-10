@@ -64,7 +64,7 @@ final class ComputerInputWaitingStateTest: XCTestCase {
         scheduler.createColdObservable([
             .next(1, (1)),
         ]).subscribe { [weak self] _ in
-            self?.state.start()
+            self?.state.start(viewHasAppeared: true)
         }.disposed(by: disposeBag)
         scheduler.start()
 
@@ -85,7 +85,7 @@ final class ComputerInputWaitingStateTest: XCTestCase {
             case 1:
                 _ = try! self?.state.reset()
             default:
-                self?.state.start()
+                self?.state.start(viewHasAppeared: true)
             }
         }.disposed(by: disposeBag)
         scheduler.start()
