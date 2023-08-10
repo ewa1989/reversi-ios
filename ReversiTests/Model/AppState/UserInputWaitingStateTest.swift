@@ -71,8 +71,13 @@ final class UserInputWaitingStateTest: XCTestCase {
         XCTAssertEqual(game.events, [.next(1, TestData.newGame.game)])
     }
 
-    func test_ユーザー入力待ちの時_ユーザー入力可能() throws {
-        XCTAssertNoThrow(try state.inputByUser(coordinate: Coordinate(x: 0, y: 0)))
+    func test_ユーザー入力待ちの時_ディスクを置ける位置にユーザー入力すると_画面描画中になる() throws {
+        let newState = try state.inputByUser(coordinate: Coordinate(x: 3, y: 2))
+        XCTAssertTrue(newState is UpdatingViewState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
+    }
+
+    func test_ユーザー入力待ちの時_ディスクを置けない位置にユーザー入力すると_DiskPlacementErrorが投げられる() throws {
+        XCTAssertThrowsError(try state.inputByUser(coordinate: Coordinate(x: 0, y: 0)))
     }
 
     func test_ユーザー入力待ちの時_コンピューター入力不可能() throws {

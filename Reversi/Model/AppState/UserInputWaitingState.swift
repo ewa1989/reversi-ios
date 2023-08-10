@@ -38,7 +38,22 @@ class UserInputWaitingState<Repository: ReversiGameRepository, Dispatcher: Dispa
     }
 
     func inputByUser(coordinate: Coordinate) throws -> AppState {
-        self
+        guard let turn = game.turn else { preconditionFailure() }
+        let flippedCoordinates = game.board.flippedDiskCoordinatesByPlacingDisk(turn, atX: coordinate.x, y: coordinate.y)
+        if (flippedCoordinates.isEmpty) { throw DiskPlacementError(disk: turn, x: coordinate.x, y: coordinate.y) }
+        let updateCoordinates = [coordinate] + flippedCoordinates
+        let updates = updateCoordinates.map {
+            DiskPlacement(disk: turn, coordinate: $0, animated: true)
+        }
+
+        return UpdatingViewState(
+            game: game,
+            repository: repository,
+            dispatcher: dispatcher,
+            output: output,
+            updates: updates,
+            isReset: false
+        )
     }
 
     func inputByComputer(coordinate: Coordinate) throws -> AppState {
