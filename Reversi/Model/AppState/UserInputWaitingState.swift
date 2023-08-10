@@ -34,7 +34,7 @@ class UserInputWaitingState<Repository: ReversiGameRepository, Dispatcher: Dispa
     }
 
     func start() {
-
+        output.game.accept(game)
     }
 
     func inputByUser(coordinate: Coordinate) throws -> AppState {

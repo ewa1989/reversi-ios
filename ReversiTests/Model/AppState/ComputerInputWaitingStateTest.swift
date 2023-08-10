@@ -54,7 +54,6 @@ final class ComputerInputWaitingStateTest: XCTestCase {
             dispatcher: dispatcher,
             output: output
         )
-
     }
 
     override func tearDownWithError() throws {
