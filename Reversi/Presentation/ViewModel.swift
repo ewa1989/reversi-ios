@@ -199,7 +199,7 @@ extension ViewModel {
         let value = try repository.load()
         game.accept(value)
 
-        setAllCellToChange()
+        disksWaitingToPlace = DiskPlacement.allCellsFrom(game: game.value, animated: false)
         let first = disksWaitingToPlace.removeFirst()
         _diskToPlace.accept(first)
     }
@@ -267,20 +267,12 @@ extension ViewModel {
         }
     }
 
-    private func setAllCellToChange() {
-        for y in game.value.board.yRange {
-            for x in game.value.board.xRange {
-                disksWaitingToPlace.append(DiskPlacement(disk: game.value.board.diskAt(x: x, y: y), coordinate: Coordinate(x: x, y: y), animated: false))
-            }
-        }
-    }
-
     /// ゲームの状態を初期化し、新しいゲームを開始します。
     private func newGame() {
         let value = ReversiGame.newGame()
         game.accept(value)
 
-        setAllCellToChange()
+        disksWaitingToPlace = DiskPlacement.allCellsFrom(game: game.value, animated: false)
         let first = disksWaitingToPlace.removeFirst()
         _diskToPlace.accept(first)
 
@@ -408,6 +400,21 @@ struct DiskPlacement: Hashable {
 
     mutating func noAnimation() {
         animated = false
+    }
+
+    static func allCellsFrom(game: ReversiGame, animated: Bool) -> [DiskPlacement] {
+        var diskPlacements: [DiskPlacement] = []
+        for y in game.board.yRange {
+            for x in game.board.xRange {
+                let diskPlacement = DiskPlacement(
+                    disk: game.board.diskAt(x: x, y: y),
+                    coordinate: Coordinate(x: x, y: y),
+                    animated: animated
+                )
+                diskPlacements.append(diskPlacement)
+            }
+        }
+        return diskPlacements
     }
 }
 

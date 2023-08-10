@@ -17,6 +17,7 @@ class UpdatingViewState<Repository: ReversiGameRepository, Dispatcher: Dispatcha
     private let output: AppStateOutput
 
     private var updates: [DiskPlacement]
+    private var cancelled = false
 
     init(
         game: ReversiGame,
@@ -62,7 +63,17 @@ class UpdatingViewState<Repository: ReversiGameRepository, Dispatcher: Dispatcha
     }
 
     func reset() -> AppState {
-        self
+        cancelled = true
+        let newGame = ReversiGame.newGame()
+        let updates = DiskPlacement.allCellsFrom(game: newGame, animated: false)
+
+        return UpdatingViewState(
+            game: newGame,
+            repository: repository,
+            dispatcher: dispatcher,
+            output: output,
+            updates: updates
+        )
     }
 
     func finishUpdatingOneCell() throws -> AppState {

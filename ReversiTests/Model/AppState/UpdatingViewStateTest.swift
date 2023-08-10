@@ -121,7 +121,7 @@ final class UpdatingViewStateTest: XCTestCase {
         XCTAssertNil(strategy.fakeOutput)
     }
 
-    func test_画面描画中の時_リセット可能() throws {
+    func test_画面描画中の時_リセットすると画面描画中継続() throws {
         state = UpdatingViewState(
             game: TestData.willDrawOnNextTurn.game,
             repository: repository,
@@ -129,7 +129,8 @@ final class UpdatingViewStateTest: XCTestCase {
             output: output,
             updates: [DiskPlacement(disk: nil, coordinate: Coordinate(x: 0, y: 0), animated: false)]
         )
-        XCTAssertNoThrow(state.reset())
+        let newState = state.reset()
+        XCTAssertTrue(newState is UpdatingViewState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
     }
 
     func test_画面描画中の時_セル描画完了可能() throws {
