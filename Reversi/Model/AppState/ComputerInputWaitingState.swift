@@ -67,7 +67,8 @@ class ComputerInputWaitingState<Repository: ReversiGameRepository, Dispatcher: D
             repository: repository,
             dispatcher: dispatcher,
             output: output,
-            updates: updates
+            updates: updates,
+            isReset: false
         )
     }
 
@@ -99,7 +100,8 @@ class ComputerInputWaitingState<Repository: ReversiGameRepository, Dispatcher: D
             repository: repository,
             dispatcher: dispatcher,
             output: output,
-            updates: updates
+            updates: updates,
+            isReset: true
         )
     }
 

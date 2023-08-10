@@ -62,7 +62,8 @@ final class UpdatingViewStateTest: XCTestCase {
             updates: [
                 DiskPlacement(disk: .dark, coordinate: Coordinate(x: 0, y: 0), animated: true),
                 DiskPlacement(disk: .dark, coordinate: Coordinate(x: 1, y: 0), animated: true),
-            ]
+            ],
+            isReset: false
         )
 
         scheduler.createColdObservable([
@@ -84,7 +85,8 @@ final class UpdatingViewStateTest: XCTestCase {
             updates: [
                 DiskPlacement(disk: .dark, coordinate: Coordinate(x: 0, y: 0), animated: true),
                 DiskPlacement(disk: .dark, coordinate: Coordinate(x: 1, y: 0), animated: true),
-            ]
+            ],
+            isReset: false
         )
 
         scheduler.createColdObservable([
@@ -109,7 +111,8 @@ final class UpdatingViewStateTest: XCTestCase {
             repository: repository,
             dispatcher: dispatcher,
             output: output,
-            updates: [DiskPlacement(disk: nil, coordinate: Coordinate(x: 0, y: 0), animated: false)]
+            updates: [DiskPlacement(disk: nil, coordinate: Coordinate(x: 0, y: 0), animated: false)],
+            isReset: false
         )
         XCTAssertThrowsError(try state.inputByUser(coordinate: Coordinate(x: 0, y: 0)))
     }
@@ -120,7 +123,8 @@ final class UpdatingViewStateTest: XCTestCase {
             repository: repository,
             dispatcher: dispatcher,
             output: output,
-            updates: [DiskPlacement(disk: nil, coordinate: Coordinate(x: 0, y: 0), animated: false)]
+            updates: [DiskPlacement(disk: nil, coordinate: Coordinate(x: 0, y: 0), animated: false)],
+            isReset: false
         )
         XCTAssertThrowsError(try state.inputByComputer(coordinate: Coordinate(x: 0, y: 0)))
     }
@@ -131,7 +135,8 @@ final class UpdatingViewStateTest: XCTestCase {
             repository: repository,
             dispatcher: dispatcher,
             output: output,
-            updates: [DiskPlacement(disk: nil, coordinate: Coordinate(x: 0, y: 0), animated: false)]
+            updates: [DiskPlacement(disk: nil, coordinate: Coordinate(x: 0, y: 0), animated: false)],
+            isReset: false
         )
         XCTAssertThrowsError(try state.acceptPass())
     }
@@ -142,7 +147,8 @@ final class UpdatingViewStateTest: XCTestCase {
             repository: repository,
             dispatcher: dispatcher,
             output: output,
-            updates: [DiskPlacement(disk: nil, coordinate: Coordinate(x: 0, y: 0), animated: false)]
+            updates: [DiskPlacement(disk: nil, coordinate: Coordinate(x: 0, y: 0), animated: false)],
+            isReset: false
         )
         let newState = try state.changePlayerControl(of: .dark, to: .computer)
         XCTAssertTrue(newState is UpdatingViewState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
@@ -155,7 +161,8 @@ final class UpdatingViewStateTest: XCTestCase {
             repository: repository,
             dispatcher: dispatcher,
             output: output,
-            updates: [DiskPlacement(disk: nil, coordinate: Coordinate(x: 0, y: 0), animated: false)]
+            updates: [DiskPlacement(disk: nil, coordinate: Coordinate(x: 0, y: 0), animated: false)],
+            isReset: false
         )
         let newState = state.reset()
         XCTAssertTrue(newState is UpdatingViewState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
@@ -167,7 +174,8 @@ final class UpdatingViewStateTest: XCTestCase {
             repository: repository,
             dispatcher: dispatcher,
             output: output,
-            updates: [DiskPlacement(disk: nil, coordinate: Coordinate(x: 0, y: 0), animated: false)]
+            updates: [DiskPlacement(disk: nil, coordinate: Coordinate(x: 0, y: 0), animated: false)],
+            isReset: false
         )
         XCTAssertNoThrow(try state.finishUpdatingOneCell(isFinished: true))
     }

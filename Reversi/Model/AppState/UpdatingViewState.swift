@@ -17,6 +17,7 @@ class UpdatingViewState<Repository: ReversiGameRepository, Dispatcher: Dispatcha
     private let output: AppStateOutput
 
     private var updates: [DiskPlacement]
+    private let isReset: Bool
     private var cancelled = false
 
     init(
@@ -24,7 +25,8 @@ class UpdatingViewState<Repository: ReversiGameRepository, Dispatcher: Dispatcha
         repository: Repository,
         dispatcher: Dispatcher,
         output: AppStateOutput,
-        updates: [DiskPlacement]
+        updates: [DiskPlacement],
+        isReset: Bool
     ) {
         // 最後の1セル描画中にモード切り替えが呼ばれた場合にupdatesは空になり得る
         precondition(
@@ -35,6 +37,7 @@ class UpdatingViewState<Repository: ReversiGameRepository, Dispatcher: Dispatcha
         self.dispatcher = dispatcher
         self.output = output
         self.updates = updates
+        self.isReset = isReset
     }
 
     func start() {
@@ -73,7 +76,8 @@ class UpdatingViewState<Repository: ReversiGameRepository, Dispatcher: Dispatcha
             repository: repository,
             dispatcher: dispatcher,
             output: output,
-            updates: updates
+            updates: updates,
+            isReset: true
         )
     }
 
