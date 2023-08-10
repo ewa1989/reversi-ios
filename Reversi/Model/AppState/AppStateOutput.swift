@@ -32,6 +32,34 @@ class AppStateOutput {
     }
 }
 
+struct DiskPlacement: Hashable {
+    let disk: Disk?
+    let coordinate: Coordinate
+    var animated: Bool
+
+    static func allCellsFrom(game: ReversiGame, animated: Bool) -> [DiskPlacement] {
+        var diskPlacements: [DiskPlacement] = []
+        for y in game.board.yRange {
+            for x in game.board.xRange {
+                let diskPlacement = DiskPlacement(
+                    disk: game.board.diskAt(x: x, y: y),
+                    coordinate: Coordinate(x: x, y: y),
+                    animated: animated
+                )
+                diskPlacements.append(diskPlacement)
+            }
+        }
+        return diskPlacements
+    }
+}
+
+struct Message: Hashable {
+    let disk: Disk?
+    let label: String
+}
+
+struct PassAlert: Hashable {}
+
 extension PublishRelay where Element == [Bool] {
     /// 指定した側のコンピューターの思考状態を思考中に更新します。
     /// - Parameter side: 状態を変更する側です。

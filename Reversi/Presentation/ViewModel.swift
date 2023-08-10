@@ -144,33 +144,3 @@ extension ViewModel {
         } catch {}
     }
 }
-
-// MARK: Additional types
-
-struct DiskPlacement: Hashable {
-    let disk: Disk?
-    let coordinate: Coordinate
-    var animated: Bool
-
-    static func allCellsFrom(game: ReversiGame, animated: Bool) -> [DiskPlacement] {
-        var diskPlacements: [DiskPlacement] = []
-        for y in game.board.yRange {
-            for x in game.board.xRange {
-                let diskPlacement = DiskPlacement(
-                    disk: game.board.diskAt(x: x, y: y),
-                    coordinate: Coordinate(x: x, y: y),
-                    animated: animated
-                )
-                diskPlacements.append(diskPlacement)
-            }
-        }
-        return diskPlacements
-    }
-}
-
-struct Message: Hashable {
-    let disk: Disk?
-    let label: String
-}
-
-struct PassAlert: Hashable {}
