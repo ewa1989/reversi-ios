@@ -75,6 +75,34 @@ final class UpdatingViewStateTest: XCTestCase {
         XCTAssertEqual(diskToPlace.events, [.next(1, DiskPlacement(disk: .dark, coordinate: Coordinate(x: 0, y: 0), animated: true))])
     }
 
+    func test_画面描画中の処理を実行し_画面描画完了前にリセットがかかると_画面描画情報が通知されない() throws {
+        state = UpdatingViewState(
+            game: TestData.willDrawOnNextTurn.game,
+            repository: repository,
+            dispatcher: dispatcher,
+            output: output,
+            updates: [
+                DiskPlacement(disk: .dark, coordinate: Coordinate(x: 0, y: 0), animated: true),
+                DiskPlacement(disk: .dark, coordinate: Coordinate(x: 1, y: 0), animated: true),
+            ]
+        )
+
+        scheduler.createColdObservable([
+            .next(1, (1)),
+            .next(2, (2)),
+        ]).subscribe { [weak self] event in
+            switch event.element {
+            case 1:
+                _ = self?.state.reset()
+            default:
+                self?.state.start()
+            }
+        }.disposed(by: disposeBag)
+        scheduler.start()
+
+        XCTAssertEqual(diskToPlace.events.count, 0)
+    }
+
     func test_画面描画中の時_ユーザー入力不可能() throws {
         state = UpdatingViewState(
             game: TestData.willDrawOnNextTurn.game,
