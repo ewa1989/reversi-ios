@@ -47,7 +47,7 @@ class ComputerInputWaitingState<Repository: ReversiGameRepository, Dispatcher: D
         output.computerProcessing.start(side: turn)
         dispatcher.asyncAfter(seconds: 2.0) { [weak self] in
             guard let self = self else { return }
-            if (self.cancelled) { return }
+            if self.cancelled { return }
             output.computerProcessing.finish()
             self.output.finishComputerProcessing.accept(selected)
         }
