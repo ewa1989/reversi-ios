@@ -103,7 +103,7 @@ class ComputerInputWaitingState<Repository: ReversiGameRepository, Dispatcher: D
         )
     }
 
-    func finishUpdatingOneCell() throws -> AppState {
+    func finishUpdatingOneCell(isFinished: Bool) throws -> AppState {
         throw InvalidActionError()
     }
 }

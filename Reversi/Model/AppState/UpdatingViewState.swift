@@ -77,7 +77,7 @@ class UpdatingViewState<Repository: ReversiGameRepository, Dispatcher: Dispatcha
         )
     }
 
-    func finishUpdatingOneCell() throws -> AppState {
+    func finishUpdatingOneCell(isFinished: Bool) throws -> AppState {
         self
     }
 }

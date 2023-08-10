@@ -57,7 +57,7 @@ class UserInputWaitingState<Repository: ReversiGameRepository, Dispatcher: Dispa
         self
     }
 
-    func finishUpdatingOneCell() throws -> AppState {
+    func finishUpdatingOneCell(isFinished: Bool) throws -> AppState {
         throw InvalidActionError()
     }
 }

@@ -90,6 +90,6 @@ final class GameFinishedStateTest: XCTestCase {
             dispatcher: dispatcher,
             output: output
         )
-        XCTAssertThrowsError(try state.finishUpdatingOneCell())
+        XCTAssertThrowsError(try state.finishUpdatingOneCell(isFinished: true))
     }
 }

@@ -129,6 +129,6 @@ final class ComputerInputWaitingStateTest: XCTestCase {
     }
 
     func test_コンピューター入力待ちの時_セル描画完了不可能() throws {
-        XCTAssertThrowsError(try state.finishUpdatingOneCell())
+        XCTAssertThrowsError(try state.finishUpdatingOneCell(isFinished: true))
     }
 }

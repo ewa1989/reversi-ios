@@ -56,7 +56,7 @@ class PassAcceptWaitingState<Repository: ReversiGameRepository, Dispatcher: Disp
         self
     }
 
-    func finishUpdatingOneCell() throws -> AppState {
+    func finishUpdatingOneCell(isFinished: Bool) throws -> AppState {
         throw InvalidActionError()
     }
 }

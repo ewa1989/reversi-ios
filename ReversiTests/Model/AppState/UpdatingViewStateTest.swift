@@ -169,6 +169,6 @@ final class UpdatingViewStateTest: XCTestCase {
             output: output,
             updates: [DiskPlacement(disk: nil, coordinate: Coordinate(x: 0, y: 0), animated: false)]
         )
-        XCTAssertNoThrow(try state.finishUpdatingOneCell())
+        XCTAssertNoThrow(try state.finishUpdatingOneCell(isFinished: true))
     }
 }
