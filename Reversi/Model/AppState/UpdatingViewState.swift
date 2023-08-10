@@ -82,6 +82,44 @@ class UpdatingViewState<Repository: ReversiGameRepository, Dispatcher: Dispatcha
     }
 
     func finishUpdatingOneCell(isFinished: Bool) throws -> AppState {
-        self
+        if updates.isEmpty {
+            if !isReset {
+                updateGame()
+            }
+            try repository.save(game)
+            let factory = AppStateFactory(
+                repository: repository,
+                dispatcher: dispatcher,
+                output: output
+            )
+            return factory.make(from: game)
+        }
+        if !isFinished {
+            updates = updates.map {
+                DiskPlacement(
+                    disk: $0.disk,
+                    coordinate: $0.coordinate,
+                    animated: false
+                )
+            }
+        }
+        return self
+    }
+
+    private func updateGame() {
+        guard var turn = game.turn else {
+            return
+        }
+
+        turn.flip()
+
+        if !game.board.canPlaceAnyDisks(by: turn) {
+            if !game.board.canPlaceAnyDisks(by: turn.flipped) {
+                game.turn = nil
+                return
+            }
+        }
+
+        game.turn = turn
     }
 }

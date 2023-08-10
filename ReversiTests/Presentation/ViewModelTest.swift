@@ -554,7 +554,7 @@ final class SynchronousDispatchViewModelTest: XCTestCase {
     }
 
     func test_どちらもどこにも置けないけれどturnがnilではないゲームが_アプリ起動時読み込まれた際に_ゲーム終了とハンドリングできる() throws {
-        fakeStrategy.fakeInput = "x00\nxxxxx---\nxxxxx---\nxxxxx---\nxxxxx---\nxxxxx---\n--------\n--------\n--------\n"
+        fakeStrategy.fakeInput = TestData.unfinishedButNowhereToPlace.rawValue
 
         scheduler.createColdObservable([
             .next(1, (1)),

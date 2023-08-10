@@ -115,4 +115,20 @@ enum TestData: String {
     /// --------
     /// ```
     case mustPassOnThisTurn = "o11\nxo------\no-------\n--------\n--------\n--------\n--------\n--------\n--------\n"
+
+    /// 黒から始まるけれど、どちらのプレイヤーも置く場所がないゲームを作成します。
+    /// ```
+    /// xxxxx---
+    /// xxxxx---
+    /// xxxxx---
+    /// xxxxx---
+    /// xxxxx---
+    /// --------
+    /// --------
+    /// --------
+    /// ```
+    case unfinishedButNowhereToPlace = "x00\nxxxxx---\nxxxxx---\nxxxxx---\nxxxxx---\nxxxxx---\n--------\n--------\n--------\n"
+
+    /// プレイヤーモードはどちらもComputer、中央に白黒2つずつディスクが置かれ白から始まる新規ゲームを作成します。
+    case newGameStartFromBothComputer = "x11\n--------\n--------\n--------\n---ox---\n---xo---\n--------\n--------\n--------\n"
 }

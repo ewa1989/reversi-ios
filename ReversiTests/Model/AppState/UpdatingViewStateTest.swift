@@ -168,15 +168,87 @@ final class UpdatingViewStateTest: XCTestCase {
         XCTAssertTrue(newState is UpdatingViewState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
     }
 
-    func test_画面描画中の時_セル描画完了可能() throws {
+    func test_画面描画中の時_描画対象がまだあると_セル描画完了後画面描画中継続し_保存されない() throws {
         state = UpdatingViewState(
             game: TestData.willDrawOnNextTurn.game,
             repository: repository,
             dispatcher: dispatcher,
             output: output,
-            updates: [DiskPlacement(disk: nil, coordinate: Coordinate(x: 0, y: 0), animated: false)],
+            updates: [DiskPlacement(disk: .dark, coordinate: Coordinate(x: 1, y: 0), animated: true)],
             isReset: false
         )
-        XCTAssertNoThrow(try state.finishUpdatingOneCell(isFinished: true))
+        let newState = try state.finishUpdatingOneCell(isFinished: true)
+        XCTAssertTrue(newState is UpdatingViewState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
+        XCTAssertNil(strategy.fakeOutput)
+    }
+
+    func test_リセットによる画面描画中の時_描画対象がないと_セル描画完了後gameの状態がそのまま保存される() throws {
+        state = UpdatingViewState(
+            game: TestData.newGame.game,
+            repository: repository,
+            dispatcher: dispatcher,
+            output: output,
+            updates: [],
+            isReset: true
+        )
+        let newState = try state.finishUpdatingOneCell(isFinished: true)
+        XCTAssertTrue(newState is UserInputWaitingState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
+        XCTAssertEqual(strategy.fakeOutput, TestData.newGame.rawValue)
+    }
+
+    func test_ディスク配置による画面描画中の時_描画対象がなく次に手動で打つ手があると_セル描画完了後_ターンが代わりユーザー入力待ちになり_保存される() throws {
+        state = UpdatingViewState(
+            game: TestData.willDrawOnNextTurn.game,
+            repository: repository,
+            dispatcher: dispatcher,
+            output: output,
+            updates: [],
+            isReset: false
+        )
+        let newState = try state.finishUpdatingOneCell(isFinished: true)
+        XCTAssertTrue(newState is UserInputWaitingState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
+        XCTAssertEqual(strategy.fakeOutput, "x00\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoooo\nxxxxoox-\n")
+    }
+
+    func test_ディスク配置による画面描画中の時_描画対象がなく次にコンピューターで打つ手があると_セル描画完了後_ターンが変わりコンピューター入力待ちになり_保存される() throws {
+        state = UpdatingViewState(
+            game: TestData.newGameStartFromBothComputer.game,
+            repository: repository,
+            dispatcher: dispatcher,
+            output: output,
+            updates: [],
+            isReset: false
+        )
+        let newState = try state.finishUpdatingOneCell(isFinished: true)
+        XCTAssertTrue(newState is ComputerInputWaitingState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
+        XCTAssertEqual(strategy.fakeOutput, "o11\n--------\n--------\n--------\n---ox---\n---xo---\n--------\n--------\n--------\n")
+    }
+
+    func test_ディスク配置による画面描画中の時_描画対象がなく次に打つ手がないと_セル描画完了後_ターンが変わりパス了承待ちになり_保存される() throws {
+        state = UpdatingViewState(
+            game: TestData.darkSurroundedByLightGame.game,
+            repository: repository,
+            dispatcher: dispatcher,
+            output: output,
+            updates: [],
+            isReset: false
+        )
+        let newState = try state.finishUpdatingOneCell(isFinished: true)
+        XCTAssertTrue(newState is PassAcceptWaitingState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
+        XCTAssertEqual(strategy.fakeOutput, "o00\n--------\n-ooo----\n-oxo----\n-ooo----\n--------\n--------\n--------\n--------\n")
+    }
+
+    func test_ディスク配置による画面描画中の時_描画対象がなくどちらも打つ手がないと_セル描画完了後_ターンが変わりゲーム終了になり_保存される() throws {
+        state = UpdatingViewState(
+            game: TestData.unfinishedButNowhereToPlace.game,
+            repository: repository,
+            dispatcher: dispatcher,
+            output: output,
+            updates: [],
+            isReset: false
+        )
+        let newState = try state.finishUpdatingOneCell(isFinished: true)
+        XCTAssertTrue(newState is GameFinishedState<ReversiGameRepositoryImpl<FakeFileSaveAndLoadStrategy>, SynchronousDispatcher>)
+        XCTAssertEqual(strategy.fakeOutput, "-00\nxxxxx---\nxxxxx---\nxxxxx---\nxxxxx---\nxxxxx---\n--------\n--------\n--------\n")
     }
 }
