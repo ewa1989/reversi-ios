@@ -1,6 +1,6 @@
 # リファクタリング・チャレンジ （リバーシ編） iOS版
 
-本チャレンジは、 _Fat View Controller_ として実装された[リバーシ](https://en.wikipedia.org/wiki/Reversi)アプリをリファクタリングし、どれだけクリーンな設計とコードを実現できるかというコンペティションである[リファクタリング・チャレンジ （リバーシ編） iOS版]()に挑戦した結果の1つです。
+本チャレンジは、 _Fat View Controller_ として実装された[リバーシ](https://en.wikipedia.org/wiki/Reversi)アプリをリファクタリングし、どれだけクリーンな設計とコードを実現できるかというコンペティションである[リファクタリング・チャレンジ （リバーシ編） iOS版](https://github.com/refactoring-challenge/reversi-ios)に挑戦した結果の1つです。
 
 ## チャレンジ概要
 ※詳細は[リファクタリング戦略](リファクタリング戦略.md)参照
