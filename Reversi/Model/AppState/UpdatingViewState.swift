@@ -21,6 +21,8 @@ class UpdatingViewState<Repository: ReversiGameRepository, Dispatcher: Dispatcha
     private let forLoading: Bool
     private var cancelled = false
 
+    private var updating = false
+
     init(
         game: ReversiGame,
         repository: Repository,
@@ -44,6 +46,8 @@ class UpdatingViewState<Repository: ReversiGameRepository, Dispatcher: Dispatcha
     }
 
     func start(viewHasAppeared: Bool) {
+        if updating { return }
+        updating = true
         // FIXME: DispatchQueueを使わないとReentrancy anomalyの警告が出てしまう。ディスクを裏返し続ける処理をDispatchQueueを挟んで処理を切ることで一旦警告は出なくなったけれど、他のスマートな方法があれば直したい。
         dispatcher.async { [weak self] in
             guard let self = self else { return }
@@ -89,6 +93,7 @@ class UpdatingViewState<Repository: ReversiGameRepository, Dispatcher: Dispatcha
     }
 
     func finishUpdatingOneCell(isFinished: Bool) throws -> AppState {
+        updating = false
         if updates.isEmpty {
             if !isReset {
                 game.updateTurn()
