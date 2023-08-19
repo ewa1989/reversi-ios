@@ -88,7 +88,9 @@ class ComputerInputWaitingState<Repository: ReversiGameRepository, Dispatcher: D
             dispatcher: dispatcher,
             output: output
         )
-        return factory.make(from: game)
+        let newState = factory.make(from: game)
+        if newState is Self { return self }
+        return newState
     }
 
     func reset() throws -> AppState {
