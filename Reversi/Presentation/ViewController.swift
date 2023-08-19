@@ -124,7 +124,7 @@ extension ViewController {
     }
 
     fileprivate func keyWindow() -> UIWindow? {
-        guard let windowScenes = UIApplication.shared.connectedScenes.first as? UIWindowScene else {
+        guard let windowScenes = view.window?.windowScene else {
             return nil
         }
 
